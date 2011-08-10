@@ -1,0 +1,11 @@
+/-- StrawberryEMU --\
+
+Our ToDo list:
+
+- New Spellsystem
+- OpcodeDB system
+- Update structs for World login
+- Other opcode structs
+
+- Implent new Guild, Currency,... systems
+- DataDB system
