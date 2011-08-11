@@ -208,7 +208,7 @@ public:
     uint32 AttributesEx5;
     uint32 AttributesEx6;
     uint32 AttributesEx7;
-    uint32 AttributesCu;
+    uint32 AttributesEx8;
     uint32 Stances;
     uint32 StancesNot;
     uint32 Targets;
@@ -242,7 +242,6 @@ public:
     uint32 ManaCost;
     uint32 ManaCostPerlevel;
     uint32 ManaPerSecond;
-    uint32 ManaPerSecondPerLevel;
     uint32 ManaCostPercentage;
     uint32 RuneCostID;
     SpellRangeEntry const* RangeEntry;

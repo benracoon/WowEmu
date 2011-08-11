@@ -312,7 +312,7 @@ void Spell::SpellDamageSchoolDmg(SpellEffIndex effIndex)
             case SPELLFAMILY_GENERIC:
             {
                 // Meteor like spells (divided damage to targets)
-                if (m_spellInfo->AttributesCu & SPELL_ATTR0_CU_SHARE_DAMAGE)
+                if (m_spellInfo->AttributesEx8 & SPELL_ATTR0_CU_SHARE_DAMAGE)
                 {
                     uint32 count = 0;
                     for (std::list<TargetInfo>::iterator ihit= m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)

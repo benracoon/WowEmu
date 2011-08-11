@@ -471,7 +471,6 @@ void ArenaTeamMember::ModifyPersonalRating(Player* plr, int32 mod, uint32 slot)
     if (plr)
     {
         plr->SetArenaTeamInfoField(slot, ARENA_TEAM_PERSONAL_RATING, PersonalRating);
-        plr->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_PERSONAL_RATING, PersonalRating, slot);
     }
 }
 

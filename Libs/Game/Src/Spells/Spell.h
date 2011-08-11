@@ -58,7 +58,7 @@ enum SpellCastTargetFlags
     TARGET_FLAG_UNIT_MINIPET    = 0x00010000,               // pguid, used to validate target (if non combat pet)
     TARGET_FLAG_GLYPH_SLOT      = 0x00020000,               // used in glyph spells
     TARGET_FLAG_UNK19           = 0x00040000,               // sometimes appears with DEST_TARGET spells (may appear or not for a given spell)
-    TARGET_FLAG_UNUSED20        = 0x00080000,               // uint32 counter, loop { vec3 - screen position (?), guid }, not used so far
+    TARGET_FLAG_VISUAL_CHAIN    = 0x00080000,               // uint32 counter, loop { vec3 - screen position (?), guid }, not used so far
     TARGET_FLAG_UNIT_PASSENGER  = 0x00100000,               // guessed, used to validate target (if vehicle passenger)
 };
 #define MAX_TARGET_FLAGS 21

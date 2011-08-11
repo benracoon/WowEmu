@@ -511,6 +511,7 @@ typedef std::vector<uint32> SpellCustomAttribute;
 typedef std::vector<bool> EnchantCustomAttribute;
 
 typedef std::vector<SpellInfo*> SpellInfoMap;
+typedef std::vector<SpellEffectInfo*> SpellEffectInfoMap;
 
 typedef std::map<int32, std::vector<int32> > SpellLinkedMap;
 
@@ -626,7 +627,12 @@ class SpellMgr
 
         // SpellInfo object management
         SpellInfo const* GetSpellInfo(uint32 spellId) const { return spellId < GetSpellInfoStoreSize() ?  mSpellInfoMap[spellId] : NULL; }
+        SpellInfo* ReadSpellInfo(uint32 spellId) const { return spellId < GetSpellInfoStoreSize() ?  mSpellInfoMap[spellId] : NULL; }
+
+        SpellEffectInfo* ReadSpellEffectInfo(uint32 spellId) const { return spellId < GetSpellEffectInfoStoreSize() ?  mSpellEffectInfoMap[spellId] : NULL; }
+
         uint32 GetSpellInfoStoreSize() const { return mSpellInfoMap.size(); }
+        uint32 GetSpellEffectInfoStoreSize() const { return mSpellEffectInfoMap.size(); }
 
     // Modifiers
     public:
@@ -654,6 +660,8 @@ class SpellMgr
         void LoadSpellAreas();
         void LoadSpellInfoStore();
         void UnloadSpellInfoStore();
+        void LoadSpellEffectInfoStore();
+        void UnloadSpellEffectInfoStore();
         void LoadSpellCustomAttr();
         void LoadDbcDataCorrections();
 
@@ -686,6 +694,7 @@ class SpellMgr
         PetLevelupSpellMap         mPetLevelupSpellMap;
         PetDefaultSpellsMap        mPetDefaultSpellsMap;           // only spells not listed in related mPetLevelupSpellMap entry
         SpellInfoMap               mSpellInfoMap;
+        SpellEffectInfoMap         mSpellEffectInfoMap;
 };
 
 #define sSpellMgr ACE_Singleton<SpellMgr, ACE_Null_Mutex>::instance()

@@ -1873,9 +1873,8 @@ class Player : public Unit, public GridObject<Player>
         float GetMeleeCritFromAgility();
         float GetDodgeFromAgility();
         float GetSpellCritFromIntellect();
-        float OCTRegenHPPerSpirit();
         float OCTRegenMPPerSpirit();
-        float GetRatingMultiplier(CombatRating cr) const;
+        float GetRatingCoefficient(CombatRating cr) const;
         float GetRatingBonusValue(CombatRating cr) const;
         uint32 GetBaseSpellPowerBonus() { return m_baseSpellPower; }
         int32 GetSpellPenetrationItemMod() const { return m_spellPenetrationItemMod; }

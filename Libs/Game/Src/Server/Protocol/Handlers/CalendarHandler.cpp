@@ -75,7 +75,7 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket & /*recv_data*/)
 
         data << uint32(mapid);
         data << uint32(itr->second - cur_time);
-        data << uint32(mapEnt->unk_time);
+        data << uint32(mapEnt->unkTime);
         ++counter;
     }
 

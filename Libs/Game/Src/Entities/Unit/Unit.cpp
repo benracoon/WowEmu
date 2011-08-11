@@ -1515,7 +1515,7 @@ bool Unit::IsDamageReducedByArmor(SpellSchoolMask schoolMask, SpellInfo const* s
     if (spellInfo)
     {
         // there are spells with no specific attribute but they have "ignores armor" in tooltip
-        if (spellInfo->AttributesCu & SPELL_ATTR0_CU_IGNORE_ARMOR)
+        if (spellInfo->AttributesEx8 & SPELL_ATTR0_CU_IGNORE_ARMOR)
             return false;
 
         // bleeding effects are not reduced by armor
@@ -3179,7 +3179,7 @@ Aura* Unit::_TryStackingOrRefreshingExistingAura(SpellInfo const* newAura, uint8
             castItemGUID = castItem->GetGUID();
 
         // find current aura from spell and change it's stackamount, or refresh it's duration
-        if (Aura* foundAura = GetOwnedAura(newAura->Id, casterGUID, (newAura->AttributesCu & SPELL_ATTR0_CU_ENCHANT_PROC) ? castItemGUID : 0, 0))
+        if (Aura* foundAura = GetOwnedAura(newAura->Id, casterGUID, (newAura->AttributesEx8 & SPELL_ATTR0_CU_ENCHANT_PROC) ? castItemGUID : 0, 0))
         {
             // effect masks do not match
             // extremely rare case
@@ -13361,7 +13361,7 @@ uint32 Unit::GetCreatureType() const
     if (GetTypeId() == TYPEID_PLAYER)
     {
         ShapeshiftForm form = GetShapeshiftForm();
-        SpellShapeshiftEntry const* ssEntry = sSpellShapeshiftStore.LookupEntry(form);
+        SpellShapeshiftFormEntry const* ssEntry = sSpellShapeshiftFormStore.LookupEntry(form);
         if (ssEntry && ssEntry->creatureType > 0)
             return ssEntry->creatureType;
         else
@@ -16772,7 +16772,7 @@ uint32 Unit::GetModelForForm(ShapeshiftForm form)
     }
 
     uint32 modelid = 0;
-    SpellShapeshiftEntry const* formEntry = sSpellShapeshiftStore.LookupEntry(form);
+    SpellShapeshiftFormEntry const* formEntry = sSpellShapeshiftFormStore.LookupEntry(form);
     if (formEntry && formEntry->modelID_A)
     {
         // Take the alliance modelid as default

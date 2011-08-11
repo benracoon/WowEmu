@@ -309,8 +309,8 @@ bool SpellChatLink::ValidateName(DBCString buffer, const char* context)
 
         for (uint8 i = 0; i < TOTAL_LOCALES; ++i)
         {
-            uint32 skillLineNameLength = strlen(skillLine->name[i]);
-            if (skillLineNameLength > 0 && strncmp(skillLine->name[i], buf, skillLineNameLength) == 0)
+            uint32 skillLineNameLength = strlen(skillLine->name);
+            if (skillLineNameLength > 0 && strncmp(skillLine->name, buf, skillLineNameLength) == 0)
             {
                 // found the prefix, remove it to perform spellname validation below
                 // -2 = strlen(": ")
@@ -381,7 +381,7 @@ bool AchievementChatLink::ValidateName(DBCString buffer, const char* context)
 
     bool res = false;
     for (uint8 i = 0; i < TOTAL_LOCALES; ++i)
-        if (*_achievement->name[i] && strcmp(_achievement->name[i], buffer) == 0)
+        if (*_achievement->name && strcmp(_achievement->name, buffer) == 0)
         {
             res = true;
             break;

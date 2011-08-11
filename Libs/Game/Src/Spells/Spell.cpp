@@ -1325,7 +1325,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
             caster->ProcDamageAndSpell(unit, procAttacker, procVictim, procEx, 0, m_attackType, m_spellInfo, m_triggeredByAuraSpell);
 
         // Failed Pickpocket, reveal rogue
-        if (missInfo == SPELL_MISS_RESIST && m_spellInfo->AttributesCu & SPELL_ATTR0_CU_PICKPOCKET && unitTarget->GetTypeId() == TYPEID_UNIT)
+        if (missInfo == SPELL_MISS_RESIST && m_spellInfo->AttributesEx8 & SPELL_ATTR0_CU_PICKPOCKET && unitTarget->GetTypeId() == TYPEID_UNIT)
         {
             m_caster->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TALK);
             if (unitTarget->ToCreature()->IsAIEnabled)
@@ -1337,7 +1337,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
     {
         m_caster->CombatStart(unit, !(m_spellInfo->AttributesEx3 & SPELL_ATTR3_NO_INITIAL_AGGRO));
 
-        if (m_spellInfo->AttributesCu & SPELL_ATTR0_CU_AURA_CC)
+        if (m_spellInfo->AttributesEx8 & SPELL_ATTR0_CU_AURA_CC)
             if (!unit->IsStandState())
                 unit->SetStandState(UNIT_STAND_STATE_STAND);
     }
@@ -1411,7 +1411,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit *unit, const uint32 effectMask, bool 
         {
             unit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_HITBYSPELL);
             //TODO: This is a hack. But we do not know what types of stealth should be interrupted by CC
-            if ((m_spellInfo->AttributesCu & SPELL_ATTR0_CU_AURA_CC) && unit->IsControlledByPlayer())
+            if ((m_spellInfo->AttributesEx8 & SPELL_ATTR0_CU_AURA_CC) && unit->IsControlledByPlayer())
                 unit->RemoveAurasByType(SPELL_AURA_MOD_STEALTH);
         }
         else if (m_caster->IsFriendlyTo(unit))
@@ -1847,7 +1847,7 @@ void Spell::SearchAreaTarget(std::list<Unit*> &TagUnitMap, float radius, SpellNo
     else
         m_caster->GetMap()->VisitAll(pos->m_positionX, pos->m_positionY, radius, notifier);
 
-    if (m_spellInfo->AttributesCu & SPELL_ATTR0_CU_EXCLUDE_SELF)
+    if (m_spellInfo->AttributesEx8 & SPELL_ATTR0_CU_EXCLUDE_SELF)
         TagUnitMap.remove(m_caster);
 }
 
@@ -2143,9 +2143,9 @@ void Spell::SelectEffectTargets(uint32 i, SpellImplicitTargetInfo const& cur)
             break;
 
         case TARGET_TYPE_AREA_CONE:
-            if (m_spellInfo->AttributesCu & SPELL_ATTR0_CU_CONE_BACK)
+            if (m_spellInfo->AttributesEx8 & SPELL_ATTR0_CU_CONE_BACK)
                 pushType = PUSH_IN_BACK;
-            else if (m_spellInfo->AttributesCu & SPELL_ATTR0_CU_CONE_LINE)
+            else if (m_spellInfo->AttributesEx8 & SPELL_ATTR0_CU_CONE_LINE)
                 pushType = PUSH_IN_LINE;
             else
                 pushType = PUSH_IN_FRONT;
@@ -3203,7 +3203,7 @@ void Spell::cast(bool skipCheck)
             TakeReagents();
     }
 
-    if (m_spellInfo->AttributesCu & SPELL_ATTR0_CU_DIRECT_DAMAGE)
+    if (m_spellInfo->AttributesEx8 & SPELL_ATTR0_CU_DIRECT_DAMAGE)
         CalculateDamageDoneForAllTargets();
 
     // CAST SPELL
@@ -4669,7 +4669,7 @@ SpellCastResult Spell::CheckCast(bool strict)
             SpellEffectInfo const* effInfo = &m_spellInfo->Effects[effIndex];
             if (effInfo->ApplyAuraName == SPELL_AURA_MOD_SHAPESHIFT)
             {
-                SpellShapeshiftEntry const* shapeShiftEntry = sSpellShapeshiftStore.LookupEntry(effInfo->MiscValue);
+                SpellShapeshiftFormEntry const* shapeShiftEntry = sSpellShapeshiftFormStore.LookupEntry(effInfo->MiscValue);
                 if (shapeShiftEntry && (shapeShiftEntry->flags1 & 1) == 0)  // unk flag
                     checkMask |= VEHICLE_SEAT_FLAG_UNCONTROLLED;
                 break;
@@ -4731,7 +4731,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                         if (targetCreature->hasLootRecipient() && !targetCreature->isTappedBy(m_caster->ToPlayer()))
                             return SPELL_FAILED_CANT_CAST_ON_TAPPED;
 
-                if (m_spellInfo->AttributesCu & SPELL_ATTR0_CU_PICKPOCKET)
+                if (m_spellInfo->AttributesEx8 & SPELL_ATTR0_CU_PICKPOCKET)
                 {
                      if (target->GetTypeId() == TYPEID_PLAYER)
                          return SPELL_FAILED_BAD_TARGETS;
@@ -4810,11 +4810,11 @@ SpellCastResult Spell::CheckCast(bool strict)
             }
 
             // Must be behind the target
-            if ((m_spellInfo->AttributesCu & SPELL_ATTR0_CU_REQ_CASTER_BEHIND_TARGET) && target->HasInArc(static_cast<float>(M_PI), m_caster))
+            if ((m_spellInfo->AttributesEx8 & SPELL_ATTR0_CU_REQ_CASTER_BEHIND_TARGET) && target->HasInArc(static_cast<float>(M_PI), m_caster))
                 return SPELL_FAILED_NOT_BEHIND;
 
             // Target must be facing you
-            if ((m_spellInfo->AttributesCu & SPELL_ATTR0_CU_REQ_TARGET_FACING_CASTER) && !target->HasInArc(static_cast<float>(M_PI), m_caster))
+            if ((m_spellInfo->AttributesEx8 & SPELL_ATTR0_CU_REQ_TARGET_FACING_CASTER) && !target->HasInArc(static_cast<float>(M_PI), m_caster))
                 return SPELL_FAILED_NOT_INFRONT;
 
             // Target must not be in combat

@@ -32,10 +32,10 @@ std::string AcceptableClientBuildsListStr();
 typedef std::list<uint32> SimpleFactionsList;
 SimpleFactionsList const* GetFactionTeamList(uint32 faction);
 
-char* GetPetName(uint32 petfamily, uint32 dbclang);
+const char* GetPetName(uint32 petfamily, uint32 dbclang);
 uint32 GetTalentSpellCost(uint32 spellId);
 TalentSpellPos const* GetTalentSpellPos(uint32 spellId);
-SpellEffectEntry const* GetSpellEffectEntry(uint32 spellId, SpellEffIndex effect);
+SpellEffectEntry const* GetSpellEffectEntry(uint32 spellId, uint8 effect);
 
 int32 GetAreaFlagByAreaID(uint32 area_id);                  // -1 if not found
 AreaTableEntry const* GetAreaEntryByAreaID(uint32 area_id);
@@ -112,7 +112,7 @@ extern DBCStorage <GtChanceToSpellCritBaseEntry> sGtChanceToSpellCritBaseStore;
 extern DBCStorage <GtChanceToSpellCritEntry>     sGtChanceToSpellCritStore;
 extern DBCStorage <GtOCTRegenMPEntry>            sGtOCTRegenMPStore;
 extern DBCStorage <GtRegenMPPerSptEntry>         sGtRegenMPPerSptStore;
-extern DBCStorage <GtSpellScaling>               sGtSpellScalingStore;
+//extern DBCStorage <GtSpellScaling>               sGtSpellScalingStore;
 extern DBCStorage <HolidaysEntry>                sHolidaysStore;
 extern DBCStorage <ItemArmorQualityEntry>        sItemArmorQualityStore;
 extern DBCStorage <ItemArmorShieldEntry>         sItemArmorShieldStore;
@@ -128,7 +128,6 @@ extern DBCStorage <ItemDamageEntry>              sItemDamageTwoHandCasterStore;
 extern DBCStorage <ItemDamageEntry>              sItemDamageWandStore;
 extern DBCStorage <ItemDisenchantLootEntry>      sItemDisenchantLootStore;
 //extern DBCStorage <ItemDisplayInfoEntry>      sItemDisplayInfoStore; -- not used currently
-extern DBCStorage <ItemExtendedCostEntry>        sItemExtendedCostStore;
 extern DBCStorage <ItemLimitCategoryEntry>       sItemLimitCategoryStore;
 extern DBCStorage <ItemRandomPropertiesEntry>    sItemRandomPropertiesStore;
 extern DBCStorage <ItemRandomSuffixEntry>        sItemRandomSuffixStore;

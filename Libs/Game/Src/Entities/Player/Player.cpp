@@ -74,6 +74,7 @@
 #include "CharacterDatabaseCleaner.h"
 #include "InstanceScript.h"
 #include <cmath>
+#include "DB2Structure.h"
 
 #define ZONE_UPDATE_INTERVAL (1*IN_MILLISECONDS)
 
@@ -2590,7 +2591,7 @@ void Player::RegenerateHealth()
     // normal regen case (maybe partly in combat case)
     else if (!isInCombat() || HasAuraType(SPELL_AURA_MOD_REGEN_DURING_COMBAT))
     {
-        addvalue = OCTRegenHPPerSpirit() * HealthIncreaseRate;
+        addvalue = HealthIncreaseRate;
         if (!isInCombat())
         {
             AuraEffectList const& mModHealthRegenPct = GetAuraEffectsByType(SPELL_AURA_MOD_HEALTH_REGEN_PERCENT);
@@ -5595,7 +5596,7 @@ void Player::UpdateLocalChannels(uint32 newZone)
                     else
                         currentNameExt = current_zone_name.c_str();
 
-                    snprintf(new_channel_name_buf, 100, channel->pattern[m_session->GetSessionDbcLocale()], currentNameExt);
+                    snprintf(new_channel_name_buf, 100, channel->pattern, currentNameExt);
 
                     joinChannel = cMgr->GetJoinChannel(new_channel_name_buf, channel->ChannelID);
                     if (usedChannel)
@@ -5610,7 +5611,7 @@ void Player::UpdateLocalChannels(uint32 newZone)
                     }
                 }
                 else
-                    joinChannel = cMgr->GetJoinChannel(channel->pattern[m_session->GetSessionDbcLocale()], channel->ChannelID);
+                    joinChannel = cMgr->GetJoinChannel(channel->pattern, channel->ChannelID);
             }
             else
                 removeChannel = usedChannel;
@@ -5802,7 +5803,7 @@ float Player::GetSpellCritFromIntellect()
     return crit*100.0f;
 }
 
-float Player::GetRatingMultiplier(CombatRating cr) const
+float Player::GetRatingCoefficient(CombatRating cr) const
 {
     uint8 level = getLevel();
 
@@ -5810,17 +5811,15 @@ float Player::GetRatingMultiplier(CombatRating cr) const
         level = GT_MAX_LEVEL;
 
     GtCombatRatingsEntry const *Rating = sGtCombatRatingsStore.LookupEntry(cr*GT_MAX_LEVEL+level-1);
-    // gtOCTClassCombatRatingScalarStore.dbc starts with 1, CombatRating with zero, so cr+1
-    GtOCTClassCombatRatingScalarEntry const *classRating = sGtOCTClassCombatRatingScalarStore.LookupEntry((getClass()-1)*GT_MAX_RATING+cr+1);
-    if (!Rating || !classRating)
+    if (Rating == NULL)
         return 1.0f;                                        // By default use minimum coefficient (not must be called)
 
-    return classRating->ratio / Rating->ratio;
+    return Rating->ratio;
 }
 
 float Player::GetRatingBonusValue(CombatRating cr) const
 {
-    return float(GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + cr)) * GetRatingMultiplier(cr);
+    return float(GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + cr)) * GetRatingCoefficient(cr);
 }
 
 float Player::GetExpertiseDodgeOrParryReduction(WeaponAttackType attType) const
@@ -5835,29 +5834,6 @@ float Player::GetExpertiseDodgeOrParryReduction(WeaponAttackType attType) const
             break;
     }
     return 0.0f;
-}
-
-float Player::OCTRegenHPPerSpirit()
-{
-    uint8 level = getLevel();
-    uint32 pclass = getClass();
-
-    if (level > GT_MAX_LEVEL)
-        level = GT_MAX_LEVEL;
-
-    GtOCTRegenHPEntry     const *baseRatio = sGtOCTRegenHPStore.LookupEntry((pclass-1)*GT_MAX_LEVEL + level-1);
-    GtRegenHPPerSptEntry  const *moreRatio = sGtRegenHPPerSptStore.LookupEntry((pclass-1)*GT_MAX_LEVEL + level-1);
-    if (baseRatio == NULL || moreRatio == NULL)
-        return 0.0f;
-
-    // Formula from PaperDollFrame script
-    float spirit = GetStat(STAT_SPIRIT);
-    float baseSpirit = spirit;
-    if (baseSpirit > 50)
-        baseSpirit = 50;
-    float moreSpirit = spirit - baseSpirit;
-    float regen = baseSpirit * baseRatio->ratio + moreSpirit * moreRatio->ratio;
-    return regen;
 }
 
 float Player::OCTRegenMPPerSpirit()
@@ -5888,20 +5864,20 @@ void Player::ApplyRatingMod(CombatRating cr, int32 value, bool apply)
     {
         case CR_HASTE_MELEE:
         {
-            float RatingChange = value * GetRatingMultiplier(cr);
+            float RatingChange = value * GetRatingCoefficient(cr);
             ApplyAttackTimePercentMod(BASE_ATTACK, RatingChange, apply);
             ApplyAttackTimePercentMod(OFF_ATTACK, RatingChange, apply);
             break;
         }
         case CR_HASTE_RANGED:
         {
-            float RatingChange = value * GetRatingMultiplier(cr);
+            float RatingChange = value * GetRatingCoefficient(cr);
             ApplyAttackTimePercentMod(RANGED_ATTACK, RatingChange, apply);
             break;
         }
         case CR_HASTE_SPELL:
         {
-            float RatingChange = value * GetRatingMultiplier(cr);
+            float RatingChange = value * GetRatingCoefficient(cr);
             ApplyCastTimePercentMod(RatingChange, apply);
             break;
         }
@@ -20018,7 +19994,7 @@ void Player::InitDataForForm(bool reapplyMods)
 {
     ShapeshiftForm form = GetShapeshiftForm();
 
-    SpellShapeshiftEntry const* ssEntry = sSpellShapeshiftStore.LookupEntry(form);
+    SpellShapeshiftFormEntry const* ssEntry = sSpellShapeshiftFormStore.LookupEntry(form);
     if (ssEntry && ssEntry->attackSpeed)
     {
         SetAttackTime(BASE_ATTACK, ssEntry->attackSpeed);

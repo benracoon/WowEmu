@@ -847,7 +847,7 @@ bool ChatHandler::HandleLookupItemSetCommand(const char *args)
         if (set)
         {
             int loc = GetSessionDbcLocale();
-            std::string name = set->name[loc];
+            std::string name = set->name;
             if (name.empty())
                 continue;
 
@@ -920,7 +920,7 @@ bool ChatHandler::HandleLookupSkillCommand(const char *args)
         if (skillInfo)
         {
             int loc = GetSessionDbcLocale();
-            std::string name = skillInfo->name[loc];
+            std::string name = skillInfo->name;
             if (name.empty())
                 continue;
 
@@ -1013,19 +1013,12 @@ bool ChatHandler::HandleLookupSpellCommand(const char *args)
 
             if (!Utf8FitTo(name, wnamepart))
             {
-                loc = 0;
-                for (; loc < TOTAL_LOCALES; ++loc)
-                {
-                    if (loc == GetSessionDbcLocale())
-                        continue;
-
                     name = spellInfo->SpellName;
                     if (name.empty())
                         continue;
 
                     if (Utf8FitTo(name, wnamepart))
                         break;
-                }
             }
 
             if (loc < TOTAL_LOCALES)
@@ -1394,7 +1387,7 @@ bool ChatHandler::HandleLookupFactionCommand(const char *args)
             FactionState const* repState = target ? target->GetReputationMgr().GetState(factionEntry) : NULL;
 
             int loc = GetSessionDbcLocale();
-            std::string name = factionEntry->name[loc];
+            std::string name = factionEntry->name;
             if (name.empty())
                 continue;
 
@@ -1492,7 +1485,7 @@ bool ChatHandler::HandleLookupTaxiNodeCommand(const char * args)
         if (nodeEntry)
         {
             int loc = GetSessionDbcLocale();
-            std::string name = nodeEntry->name[loc];
+            std::string name = nodeEntry->name;
             if (name.empty())
                 continue;
 

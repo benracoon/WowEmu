@@ -1530,39 +1530,6 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
 
                 break;
             }
-            case ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_PERSONAL_RATING:
-            {
-                uint32 reqTeamType = achievementCriteria->highest_personal_rating.teamtype;
-
-                if (miscValue1)
-                {
-                    if (miscValue2 != reqTeamType)
-                        continue;
-
-                    SetCriteriaProgress(achievementCriteria, miscValue1, PROGRESS_HIGHEST);
-                }
-                else    // login case
-                {
-                    for (uint32 arena_slot = 0; arena_slot < MAX_ARENA_SLOT; ++arena_slot)
-                    {
-                        uint32 teamId = GetPlayer()->GetArenaTeamId(arena_slot);
-                        if (!teamId)
-                            continue;
-
-                        ArenaTeam* team = sArenaTeamMgr->GetArenaTeamById(teamId);
-                        if (!team || team->GetType() != reqTeamType)
-                            continue;
-
-                        if (ArenaTeamMember const* member = team->GetMember(GetPlayer()->GetGUID()))
-                        {
-                            SetCriteriaProgress(achievementCriteria, member->PersonalRating, PROGRESS_HIGHEST);
-                            break;
-                        }
-                    }
-                }
-
-                break;
-            }
             // std case: not exist in DBC, not triggered in code as result
             case ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HEALTH:
             case ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_SPELLPOWER:
@@ -1677,8 +1644,6 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
             return progress->counter >= achievementCriteria->own_item.itemCount;
         case ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_ARENA:
             return progress->counter >= achievementCriteria->win_rated_arena.count;
-        case ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_PERSONAL_RATING:
-            return progress->counter >= achievementCriteria->highest_personal_rating.PersonalRating;
         case ACHIEVEMENT_CRITERIA_TYPE_LEARN_SKILL_LEVEL:
             return progress->counter >= (achievementCriteria->learn_skill_level.skillLevel * 75);
         case ACHIEVEMENT_CRITERIA_TYPE_USE_ITEM:
@@ -1730,8 +1695,8 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
             return progress->counter >= 9000;
         case ACHIEVEMENT_CRITERIA_TYPE_USE_LFD_TO_GROUP_WITH_PLAYERS:
             return progress->counter >= achievementCriteria->use_lfg.dungeonsComplete;
-        case ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS:
-            return progress->counter >= achievementCriteria->get_killing_blow.killCount;
+        //case ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS:
+        //    return progress->counter >= achievementCriteria->get_killing_blow.killCount;
         // handle all statistic-only criteria here
         case ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_BATTLEGROUND:
         case ACHIEVEMENT_CRITERIA_TYPE_DEATH_AT_MAP:
@@ -1966,7 +1931,7 @@ void AchievementMgr::StartTimedAchievement(AchievementCriteriaTimedTypes type, u
     AchievementCriteriaEntryList const& achievementCriteriaList = sAchievementMgr->GetTimedAchievementCriteriaByType(type);
     for (AchievementCriteriaEntryList::const_iterator i = achievementCriteriaList.begin(); i != achievementCriteriaList.end(); ++i)
     {
-        if ((*i)->timerStartEvent != entry)
+        if ((*i)->timedCriteriaMiscId != entry)
             continue;
 
         AchievementEntry const *achievement = sAchievementStore.LookupEntry((*i)->referredAchievement);
@@ -1989,7 +1954,7 @@ void AchievementMgr::RemoveTimedAchievement(AchievementCriteriaTimedTypes type, 
     AchievementCriteriaEntryList const& achievementCriteriaList = sAchievementMgr->GetTimedAchievementCriteriaByType(type);
     for (AchievementCriteriaEntryList::const_iterator i = achievementCriteriaList.begin(); i!=achievementCriteriaList.end(); ++i)
     {
-        if ((*i)->timerStartEvent != entry)
+        if ((*i)->timedCriteriaMiscId != entry)
             continue;
 
         TimedAchievementMap::iterator timedIter = m_timedAchievements.find((*i)->ID);
@@ -2190,8 +2155,8 @@ void AchievementGlobalMgr::LoadAchievementCriteriaList()
         m_AchievementCriteriasByType[criteria->requiredType].push_back(criteria);
         m_AchievementCriteriaListByAchievement[criteria->referredAchievement].push_back(criteria);
 
-        if (criteria->timeLimit)
-            m_AchievementCriteriasByTimedType[criteria->timedType].push_back(criteria);
+        //if (criteria->timeLimit)
+        //    m_AchievementCriteriasByTimedType[criteria->timedType].push_back(criteria);
     }
 
     sLog->outString(">> Loaded %lu achievement criteria in %u ms", (unsigned long)m_AchievementCriteriasByType->size(), GetMSTimeDiffToNow(oldMSTime));

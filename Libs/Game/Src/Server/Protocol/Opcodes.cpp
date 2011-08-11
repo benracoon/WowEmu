@@ -652,7 +652,6 @@ OpcodeHandler opcodeTable[NUM_MSG_TYPES] =
     /*0x26F*/ { "MSG_LIST_STABLED_PETS",                        STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleListStabledPetsOpcode     },
     /*0x270*/ { "CMSG_STABLE_PET",                              STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleStablePet                 },
     /*0x271*/ { "CMSG_UNSTABLE_PET",                            STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleUnstablePet               },
-    /*0x272*/ { "CMSG_BUY_STABLE_SLOT",                         STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleBuyStableSlot             },
     /*0x273*/ { "SMSG_STABLE_RESULT",                           STATUS_NEVER,    PROCESS_INPLACE,      &WorldSession::Handle_ServerSide               },
     /*0x274*/ { "CMSG_STABLE_REVIVE_PET",                       STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleStableRevivePet           },
     /*0x275*/ { "CMSG_STABLE_SWAP_PET",                         STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleStableSwapPet             },

@@ -509,7 +509,7 @@ bool ChatHandler::HandleCharacterReputationCommand(const char* args)
     {
         const FactionState& faction = itr->second;
         FactionEntry const *factionEntry = sFactionStore.LookupEntry(faction.ID);
-        char const* factionName = factionEntry ? factionEntry->name[loc] : "#Not found#";
+        char const* factionName = factionEntry ? factionEntry->name : "#Not found#";
         ReputationRank rank = target->GetReputationMgr().GetRank(factionEntry);
         std::string rankName = GetStrings(ReputationRankStrIndex[rank]);
         std::ostringstream ss;

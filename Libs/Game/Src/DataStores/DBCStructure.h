@@ -1322,7 +1322,7 @@ struct MapDifficultyEntry
     //uint32      Id;                                       // 0
     uint32      MapId;                                      // 1
     uint32      Difficulty;                                 // 2 (for arenas: arena slot)
-    //DBCString areaTriggerText;                            // 3 text showed when transfer to map failed (missing requirements)
+    DBCString   areaTriggerText;                            // 3 text showed when transfer to map failed (missing requirements)
     uint32      resetTime;                                  // 4, in secs, 0 if no fixed reset time
     uint32      maxPlayers;                                 // 5, some heroic versions have 0 when expected same amount as in normal version
     //DBCString difficultyString;                           // 6
@@ -1611,8 +1611,7 @@ struct SpellClassOptionsEntry
 {
     uint32    Id;                                           // 0 - m_ID
     //uint32  modalNextSpell;                               // 1 - m_modalNextSpell not used
-    uint64    SpellFamilyFlags;                             // 2 - 3, m_spellClassMask
-    uint32    SpellFamilyFlags2;                            // 4 - addition to m_spellClassMask
+    flag96    SpellFamilyFlags;                             // 2 - 4, m_spellClassMask
     uint32    SpellFamilyName;                              // 5 - m_spellClassSet
     //DBCString Description;                                // 6 - 4.0.0
 };
@@ -1647,7 +1646,7 @@ struct SpellEffectEntry
     uint32    EffectRadiusIndex;                            // 15 - m_effectRadiusIndex - spellradius.dbc
     uint32    EffectRadiusMaxIndex;                         // 16 - 4.0.0
     float     EffectRealPointsPerLevel;                     // 17 - m_effectRealPointsPerLevel
-    uint32    EffectSpellClassMaskA[3];                     // 18 - m_effectSpellClassMaskA, effect 0
+    uint32    EffectSpellClassMask[MAX_SPELL_EFFECTS];      // 18 - m_effectSpellClassMask, effect 0
     uint32    EffectTriggerSpell;                           // 19 - m_effectTriggerSpell
     uint32    EffectImplicitTargetA;                        // 20 - m_implicitTargetA
     uint32    EffectImplicitTargetB;                        // 21 - m_implicitTargetB
@@ -1757,7 +1756,7 @@ struct SpellTotemsEntry
 
 struct SpellEntry
 {
-    int32    Id;                                           // 0  - m_ID
+    int32     Id;                                           // 0  - m_ID
     uint32    Attributes;                                   // 1  - m_attribute
     uint32    AttributesEx;                                 // 2  - m_attributesEx
     uint32    AttributesEx2;                                // 3  - m_attributesExB
@@ -1804,6 +1803,26 @@ struct SpellEntry
     uint32 SpellTargetRestrictionsId;                       // 45 - SpellTargetRestrictions.dbc
     uint32 SpellTotemsId;                                   // 46 - SpellTotems.dbc
     //uint32 ResearchProject;                               // 47 - ResearchProject.dbc
+
+    SpellEffectEntry const* GetSpellEffectEntry(uint32 spellId, uint8 effect);
+
+    SpellAuraOptionsEntry const* GetSpellAuraOptions() const;
+    SpellAuraRestrictionsEntry const* GetSpellAuraRestrictions() const;
+    SpellCastingRequirementsEntry const* GetSpellCastingRequirements() const;
+    SpellCategoriesEntry const* GetSpellCategories() const;
+    SpellClassOptionsEntry const* GetSpellClassOptions() const;
+    SpellCooldownsEntry const* GetSpellCooldowns() const;
+    SpellEffectEntry const* GetSpellEffect(uint8 eff) const;
+    SpellEquippedItemsEntry const* GetSpellEquippedItems() const;
+    SpellInterruptsEntry const* GetSpellInterrupts() const;
+    SpellLevelsEntry const* GetSpellLevels() const;
+    SpellPowerEntry const* GetSpellPower() const;
+    SpellReagentsEntry const* GetSpellReagents() const;
+    SpellScalingEntry const* GetSpellScaling() const;
+    SpellShapeshiftEntry const* GetSpellShapeshift() const;
+    SpellTargetRestrictionsEntry const* GetSpellTargetRestrictions() const;
+    SpellTotemsEntry const* GetSpellTotems() const;
+
 };
 
 typedef std::set<uint32> SpellCategorySet;
@@ -1833,9 +1852,9 @@ struct SpellFocusObjectEntry
 
 struct SpellRadiusEntry
 {
-    uint32    ID;                                           // 0
-    float     radiusHostile;                                // 1
-    float     radiusFriend;                                 // 2
+    uint32 ID;                                        // 0
+    float  radiusMin;                                 // 1
+    float  radiusMax;                                 // 2
 };
 
 struct SpellRangeEntry
@@ -2259,6 +2278,8 @@ struct SpellEffect
     }
     SpellEffectEntry const* effects[3];
 };
+
+typedef std::map<uint32, SpellEffect> SpellEffectMap;
 
 struct TaxiPathBySourceAndDestination
 {

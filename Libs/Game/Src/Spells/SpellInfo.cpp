@@ -45,12 +45,12 @@ bool SpellImplicitTargetInfo::IsPosition(uint32 targetType)
 {
     switch (SpellImplicitTargetInfo::Type[targetType])
     {
-        case TARGET_TYPE_DEST_CASTER:
-        case TARGET_TYPE_DEST_TARGET:
-        case TARGET_TYPE_DEST_DEST:
-            return true;
-        default:
-            break;
+    case TARGET_TYPE_DEST_CASTER:
+    case TARGET_TYPE_DEST_TARGET:
+    case TARGET_TYPE_DEST_DEST:
+        return true;
+    default:
+        break;
     }
     return false;
 }
@@ -68,27 +68,27 @@ void SpellImplicitTargetInfo::InitAreaData()
     {
         switch (i)
         {
-            case TARGET_UNIT_AREA_ENEMY_DST:
-            case TARGET_UNIT_AREA_ENEMY_SRC:
-            case TARGET_UNIT_AREA_ALLY_DST:
-            case TARGET_UNIT_AREA_ALLY_SRC:
-            case TARGET_UNIT_AREA_ENTRY_DST:
-            case TARGET_UNIT_AREA_ENTRY_SRC:
-            case TARGET_UNIT_AREA_PARTY_DST:
-            case TARGET_UNIT_AREA_PARTY_SRC:
-            case TARGET_UNIT_TARGET_ALLY_PARTY:
-            case TARGET_UNIT_PARTY_CASTER:
-            case TARGET_UNIT_CONE_ENEMY:
-            case TARGET_UNIT_CONE_ALLY:
-            case TARGET_UNIT_CONE_ENEMY_UNKNOWN:
-            case TARGET_UNIT_AREA_PATH:
-            case TARGET_GAMEOBJECT_AREA_PATH:
-            case TARGET_UNIT_RAID_CASTER:
-                Area[i] = true;
-                break;
-            default:
-                Area[i] = false;
-                break;
+        case TARGET_UNIT_AREA_ENEMY_DST:
+        case TARGET_UNIT_AREA_ENEMY_SRC:
+        case TARGET_UNIT_AREA_ALLY_DST:
+        case TARGET_UNIT_AREA_ALLY_SRC:
+        case TARGET_UNIT_AREA_ENTRY_DST:
+        case TARGET_UNIT_AREA_ENTRY_SRC:
+        case TARGET_UNIT_AREA_PARTY_DST:
+        case TARGET_UNIT_AREA_PARTY_SRC:
+        case TARGET_UNIT_TARGET_ALLY_PARTY:
+        case TARGET_UNIT_PARTY_CASTER:
+        case TARGET_UNIT_CONE_ENEMY:
+        case TARGET_UNIT_CONE_ALLY:
+        case TARGET_UNIT_CONE_ENEMY_UNKNOWN:
+        case TARGET_UNIT_AREA_PATH:
+        case TARGET_GAMEOBJECT_AREA_PATH:
+        case TARGET_UNIT_RAID_CASTER:
+            Area[i] = true;
+            break;
+        default:
+            Area[i] = false;
+            break;
         }
     }
 }
@@ -99,125 +99,125 @@ void SpellImplicitTargetInfo::InitTypeData()
     {
         switch (i)
         {
-            case TARGET_UNIT_CASTER:
-            case TARGET_UNIT_CASTER_FISHING:
-            case TARGET_UNIT_MASTER:
-            case TARGET_UNIT_PET:
-            case TARGET_UNIT_PARTY_CASTER:
-            case TARGET_UNIT_RAID_CASTER:
-            case TARGET_UNIT_VEHICLE:
-            case TARGET_UNIT_PASSENGER_0:
-            case TARGET_UNIT_PASSENGER_1:
-            case TARGET_UNIT_PASSENGER_2:
-            case TARGET_UNIT_PASSENGER_3:
-            case TARGET_UNIT_PASSENGER_4:
-            case TARGET_UNIT_PASSENGER_5:
-            case TARGET_UNIT_PASSENGER_6:
-            case TARGET_UNIT_PASSENGER_7:
-            case TARGET_UNIT_SUMMONER:
-                Type[i] = TARGET_TYPE_UNIT_CASTER;
-                break;
-            case TARGET_UNIT_TARGET_MINIPET:
-            case TARGET_UNIT_TARGET_ALLY:
-            case TARGET_UNIT_TARGET_RAID:
-            case TARGET_UNIT_TARGET_ANY:
-            case TARGET_UNIT_TARGET_ENEMY:
-            case TARGET_UNIT_TARGET_PARTY:
-            case TARGET_UNIT_TARGET_PASSENGER:
-            case TARGET_UNIT_TARGET_ALLY_PARTY:
-            case TARGET_UNIT_TARGET_CLASS_RAID:
-            case TARGET_UNIT_CHAINHEAL:
-                Type[i] = TARGET_TYPE_UNIT_TARGET;
-                break;
-            case TARGET_UNIT_NEARBY_ENEMY:
-            case TARGET_UNIT_NEARBY_ALLY:
-            case TARGET_UNIT_NEARBY_ENTRY:
-            case TARGET_UNIT_NEARBY_PARTY:
-            case TARGET_UNIT_NEARBY_RAID:
-            case TARGET_GAMEOBJECT_NEARBY_ENTRY:
-                Type[i] = TARGET_TYPE_UNIT_NEARBY;
-                break;
-            case TARGET_UNIT_AREA_ENEMY_SRC:
-            case TARGET_UNIT_AREA_ALLY_SRC:
-            case TARGET_UNIT_AREA_ENTRY_SRC:
-            case TARGET_UNIT_AREA_PARTY_SRC:
-            case TARGET_GAMEOBJECT_AREA_SRC:
-                Type[i] = TARGET_TYPE_AREA_SRC;
-                break;
-            case TARGET_UNIT_AREA_ENEMY_DST:
-            case TARGET_UNIT_AREA_ALLY_DST:
-            case TARGET_UNIT_AREA_ENTRY_DST:
-            case TARGET_UNIT_AREA_PARTY_DST:
-            case TARGET_GAMEOBJECT_AREA_DST:
-                Type[i] = TARGET_TYPE_AREA_DST;
-                break;
-            case TARGET_UNIT_CONE_ENEMY:
-            case TARGET_UNIT_CONE_ALLY:
-            case TARGET_UNIT_CONE_ENTRY:
-            case TARGET_UNIT_CONE_ENEMY_UNKNOWN:
-            case TARGET_UNIT_AREA_PATH:
-            case TARGET_GAMEOBJECT_AREA_PATH:
-                Type[i] = TARGET_TYPE_AREA_CONE;
-                break;
-            case TARGET_DST_CASTER:
-            case TARGET_SRC_CASTER:
-            case TARGET_MINION:
-            case TARGET_DEST_CASTER_FRONT_LEAP:
-            case TARGET_DEST_CASTER_FRONT:
-            case TARGET_DEST_CASTER_BACK:
-            case TARGET_DEST_CASTER_RIGHT:
-            case TARGET_DEST_CASTER_LEFT:
-            case TARGET_DEST_CASTER_FRONT_LEFT:
-            case TARGET_DEST_CASTER_BACK_LEFT:
-            case TARGET_DEST_CASTER_BACK_RIGHT:
-            case TARGET_DEST_CASTER_FRONT_RIGHT:
-            case TARGET_DEST_CASTER_RANDOM:
-            case TARGET_DEST_CASTER_RADIUS:
-                Type[i] = TARGET_TYPE_DEST_CASTER;
-                break;
-            case TARGET_DST_TARGET_ENEMY:
-            case TARGET_DEST_TARGET_ANY:
-            case TARGET_DEST_TARGET_FRONT:
-            case TARGET_DEST_TARGET_BACK:
-            case TARGET_DEST_TARGET_RIGHT:
-            case TARGET_DEST_TARGET_LEFT:
-            case TARGET_DEST_TARGET_FRONT_LEFT:
-            case TARGET_DEST_TARGET_BACK_LEFT:
-            case TARGET_DEST_TARGET_BACK_RIGHT:
-            case TARGET_DEST_TARGET_FRONT_RIGHT:
-            case TARGET_DEST_TARGET_RANDOM:
-            case TARGET_DEST_TARGET_RADIUS:
-                Type[i] = TARGET_TYPE_DEST_TARGET;
-                break;
-            case TARGET_DEST_DYNOBJ_ENEMY:
-            case TARGET_DEST_DYNOBJ_ALLY:
-            case TARGET_DEST_DYNOBJ_NONE:
-            case TARGET_DEST_DEST:
-            case TARGET_DEST_TRAJ:
-            case TARGET_DEST_DEST_FRONT_LEFT:
-            case TARGET_DEST_DEST_BACK_LEFT:
-            case TARGET_DEST_DEST_BACK_RIGHT:
-            case TARGET_DEST_DEST_FRONT_RIGHT:
-            case TARGET_DEST_DEST_FRONT:
-            case TARGET_DEST_DEST_BACK:
-            case TARGET_DEST_DEST_RIGHT:
-            case TARGET_DEST_DEST_LEFT:
-            case TARGET_DEST_DEST_RANDOM:
-            case TARGET_DEST_DEST_RANDOM_DIR_DIST:
-                Type[i] = TARGET_TYPE_DEST_DEST;
-                break;
-            case TARGET_DST_DB:
-            case TARGET_DST_HOME:
-            case TARGET_DST_NEARBY_ENTRY:
-                Type[i] = TARGET_TYPE_DEST_SPECIAL;
-                break;
-            case TARGET_UNIT_CHANNEL_TARGET:
-            case TARGET_DEST_CHANNEL_TARGET:
-            case TARGET_DEST_CHANNEL_CASTER:
-                Type[i] = TARGET_TYPE_CHANNEL;
-                break;
-            default:
-                Type[i] = TARGET_TYPE_DEFAULT;
+        case TARGET_UNIT_CASTER:
+        case TARGET_UNIT_CASTER_FISHING:
+        case TARGET_UNIT_MASTER:
+        case TARGET_UNIT_PET:
+        case TARGET_UNIT_PARTY_CASTER:
+        case TARGET_UNIT_RAID_CASTER:
+        case TARGET_UNIT_VEHICLE:
+        case TARGET_UNIT_PASSENGER_0:
+        case TARGET_UNIT_PASSENGER_1:
+        case TARGET_UNIT_PASSENGER_2:
+        case TARGET_UNIT_PASSENGER_3:
+        case TARGET_UNIT_PASSENGER_4:
+        case TARGET_UNIT_PASSENGER_5:
+        case TARGET_UNIT_PASSENGER_6:
+        case TARGET_UNIT_PASSENGER_7:
+        case TARGET_UNIT_SUMMONER:
+            Type[i] = TARGET_TYPE_UNIT_CASTER;
+            break;
+        case TARGET_UNIT_TARGET_MINIPET:
+        case TARGET_UNIT_TARGET_ALLY:
+        case TARGET_UNIT_TARGET_RAID:
+        case TARGET_UNIT_TARGET_ANY:
+        case TARGET_UNIT_TARGET_ENEMY:
+        case TARGET_UNIT_TARGET_PARTY:
+        case TARGET_UNIT_TARGET_PASSENGER:
+        case TARGET_UNIT_TARGET_ALLY_PARTY:
+        case TARGET_UNIT_TARGET_CLASS_RAID:
+        case TARGET_UNIT_CHAINHEAL:
+            Type[i] = TARGET_TYPE_UNIT_TARGET;
+            break;
+        case TARGET_UNIT_NEARBY_ENEMY:
+        case TARGET_UNIT_NEARBY_ALLY:
+        case TARGET_UNIT_NEARBY_ENTRY:
+        case TARGET_UNIT_NEARBY_PARTY:
+        case TARGET_UNIT_NEARBY_RAID:
+        case TARGET_GAMEOBJECT_NEARBY_ENTRY:
+            Type[i] = TARGET_TYPE_UNIT_NEARBY;
+            break;
+        case TARGET_UNIT_AREA_ENEMY_SRC:
+        case TARGET_UNIT_AREA_ALLY_SRC:
+        case TARGET_UNIT_AREA_ENTRY_SRC:
+        case TARGET_UNIT_AREA_PARTY_SRC:
+        case TARGET_GAMEOBJECT_AREA_SRC:
+            Type[i] = TARGET_TYPE_AREA_SRC;
+            break;
+        case TARGET_UNIT_AREA_ENEMY_DST:
+        case TARGET_UNIT_AREA_ALLY_DST:
+        case TARGET_UNIT_AREA_ENTRY_DST:
+        case TARGET_UNIT_AREA_PARTY_DST:
+        case TARGET_GAMEOBJECT_AREA_DST:
+            Type[i] = TARGET_TYPE_AREA_DST;
+            break;
+        case TARGET_UNIT_CONE_ENEMY:
+        case TARGET_UNIT_CONE_ALLY:
+        case TARGET_UNIT_CONE_ENTRY:
+        case TARGET_UNIT_CONE_ENEMY_UNKNOWN:
+        case TARGET_UNIT_AREA_PATH:
+        case TARGET_GAMEOBJECT_AREA_PATH:
+            Type[i] = TARGET_TYPE_AREA_CONE;
+            break;
+        case TARGET_DST_CASTER:
+        case TARGET_SRC_CASTER:
+        case TARGET_MINION:
+        case TARGET_DEST_CASTER_FRONT_LEAP:
+        case TARGET_DEST_CASTER_FRONT:
+        case TARGET_DEST_CASTER_BACK:
+        case TARGET_DEST_CASTER_RIGHT:
+        case TARGET_DEST_CASTER_LEFT:
+        case TARGET_DEST_CASTER_FRONT_LEFT:
+        case TARGET_DEST_CASTER_BACK_LEFT:
+        case TARGET_DEST_CASTER_BACK_RIGHT:
+        case TARGET_DEST_CASTER_FRONT_RIGHT:
+        case TARGET_DEST_CASTER_RANDOM:
+        case TARGET_DEST_CASTER_RADIUS:
+            Type[i] = TARGET_TYPE_DEST_CASTER;
+            break;
+        case TARGET_DST_TARGET_ENEMY:
+        case TARGET_DEST_TARGET_ANY:
+        case TARGET_DEST_TARGET_FRONT:
+        case TARGET_DEST_TARGET_BACK:
+        case TARGET_DEST_TARGET_RIGHT:
+        case TARGET_DEST_TARGET_LEFT:
+        case TARGET_DEST_TARGET_FRONT_LEFT:
+        case TARGET_DEST_TARGET_BACK_LEFT:
+        case TARGET_DEST_TARGET_BACK_RIGHT:
+        case TARGET_DEST_TARGET_FRONT_RIGHT:
+        case TARGET_DEST_TARGET_RANDOM:
+        case TARGET_DEST_TARGET_RADIUS:
+            Type[i] = TARGET_TYPE_DEST_TARGET;
+            break;
+        case TARGET_DEST_DYNOBJ_ENEMY:
+        case TARGET_DEST_DYNOBJ_ALLY:
+        case TARGET_DEST_DYNOBJ_NONE:
+        case TARGET_DEST_DEST:
+        case TARGET_DEST_TRAJ:
+        case TARGET_DEST_DEST_FRONT_LEFT:
+        case TARGET_DEST_DEST_BACK_LEFT:
+        case TARGET_DEST_DEST_BACK_RIGHT:
+        case TARGET_DEST_DEST_FRONT_RIGHT:
+        case TARGET_DEST_DEST_FRONT:
+        case TARGET_DEST_DEST_BACK:
+        case TARGET_DEST_DEST_RIGHT:
+        case TARGET_DEST_DEST_LEFT:
+        case TARGET_DEST_DEST_RANDOM:
+        case TARGET_DEST_DEST_RANDOM_DIR_DIST:
+            Type[i] = TARGET_TYPE_DEST_DEST;
+            break;
+        case TARGET_DST_DB:
+        case TARGET_DST_HOME:
+        case TARGET_DST_NEARBY_ENTRY:
+            Type[i] = TARGET_TYPE_DEST_SPECIAL;
+            break;
+        case TARGET_UNIT_CHANNEL_TARGET:
+        case TARGET_DEST_CHANNEL_TARGET:
+        case TARGET_DEST_CHANNEL_CASTER:
+            Type[i] = TARGET_TYPE_CHANNEL;
+            break;
+        default:
+            Type[i] = TARGET_TYPE_DEFAULT;
         }
     }
 }
@@ -228,28 +228,29 @@ SpellSelectTargetTypes SpellImplicitTargetInfo::Type[TOTAL_SPELL_TARGETS];
 
 SpellEffectInfo::SpellEffectInfo(SpellEntry const* spellEntry, SpellInfo const* spellInfo, uint8 effIndex)
 {
+    SpellEffectEntry const* spellEffect = spellEntry->GetSpellEffect(effIndex);
     _spellInfo = spellInfo;
     _effIndex = effIndex;
-    Effect = spellEntry->Effect[effIndex];
-    ApplyAuraName = spellEntry->EffectApplyAuraName[effIndex];
-    Amplitude = spellEntry->EffectAmplitude[effIndex];
-    DieSides = spellEntry->EffectDieSides[effIndex];
-    RealPointsPerLevel = spellEntry->EffectRealPointsPerLevel[effIndex];
-    BasePoints = spellEntry->EffectBasePoints[effIndex];
-    PointsPerComboPoint = spellEntry->EffectPointsPerComboPoint[effIndex];
-    ValueMultiplier = spellEntry->EffectValueMultiplier[effIndex];
-    DamageMultiplier = spellEntry->EffectDamageMultiplier[effIndex];
-    BonusMultiplier = spellEntry->EffectBonusMultiplier[effIndex];
-    MiscValue = spellEntry->EffectMiscValue[effIndex];
-    MiscValueB = spellEntry->EffectMiscValueB[effIndex];
-    Mechanic = Mechanics(spellEntry->EffectMechanic[effIndex]);
-    TargetA = SpellImplicitTargetInfo(spellEntry->EffectImplicitTargetA[effIndex]);
-    TargetB = SpellImplicitTargetInfo(spellEntry->EffectImplicitTargetB[effIndex]);
-    RadiusEntry = spellEntry->EffectRadiusIndex[effIndex] ? sSpellRadiusStore.LookupEntry(spellEntry->EffectRadiusIndex[effIndex]) : NULL;
-    ChainTarget = spellEntry->EffectChainTarget[effIndex];
-    ItemType = spellEntry->EffectItemType[effIndex];
-    TriggerSpell = spellEntry->EffectTriggerSpell[effIndex];
-    SpellClassMask = spellEntry->EffectSpellClassMask[effIndex];
+    Effect = spellEffect->Effect;
+    ApplyAuraName = spellEffect->EffectApplyAuraName;
+    Amplitude = spellEffect->EffectAmplitude;
+    DieSides = spellEffect->EffectDieSides;
+    RealPointsPerLevel = spellEffect->EffectRealPointsPerLevel;
+    BasePoints = spellEffect->EffectBasePoints;
+    PointsPerComboPoint = spellEffect->EffectPointsPerComboPoint;
+    ValueMultiplier = spellEffect->EffectDamageMultiplier;
+    DamageMultiplier = spellEffect->EffectDamageMultiplier;
+    BonusMultiplier = spellEffect->EffectBonusCoefficient;
+    MiscValue = spellEffect->EffectMiscValue;
+    MiscValueB = spellEffect->EffectMiscValueB;
+    Mechanic = Mechanics(spellEffect->EffectMechanic);
+    TargetA = SpellImplicitTargetInfo(spellEffect->EffectImplicitTargetA);
+    TargetB = SpellImplicitTargetInfo(spellEffect->EffectImplicitTargetB);
+    RadiusEntry = spellEffect->EffectRadiusIndex ? sSpellRadiusStore.LookupEntry(spellEffect->EffectRadiusIndex) : NULL;
+    ChainTarget = spellEffect->EffectChainTarget;
+    ItemType = spellEffect->EffectItemType;
+    TriggerSpell = spellEffect->EffectTriggerSpell;
+    SpellClassMask = spellEffect->EffectSpellClassMask;
 }
 
 bool SpellEffectInfo::IsEffect() const
@@ -325,16 +326,16 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
     // roll in a range <1;EffectDieSides> as of patch 3.3.3
     switch (randomPoints)
     {
-        case 0: break;
-        case 1: basePoints += 1; break;                     // range 1..1
-        default:
-            // range can have positive (1..rand) and negative (rand..1) values, so order its for irand
-            int32 randvalue = (randomPoints >= 1)
-                ? irand(1, randomPoints)
-                : irand(randomPoints, 1);
+    case 0: break;
+    case 1: basePoints += 1; break;                     // range 1..1
+    default:
+        // range can have positive (1..rand) and negative (rand..1) values, so order its for irand
+        int32 randvalue = (randomPoints >= 1)
+            ? irand(1, randomPoints)
+            : irand(randomPoints, 1);
 
-            basePoints += randvalue;
-            break;
+        basePoints += randvalue;
+        break;
     }
 
     float value = float(basePoints);
@@ -352,15 +353,15 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
 
         // amount multiplication based on caster's level
         if (!basePointsPerLevel && (_spellInfo->Attributes & SPELL_ATTR0_LEVEL_DAMAGE_CALCULATION && _spellInfo->SpellLevel) &&
-                Effect != SPELL_EFFECT_WEAPON_PERCENT_DAMAGE &&
-                Effect != SPELL_EFFECT_KNOCK_BACK &&
-                ApplyAuraName != SPELL_AURA_MOD_SPEED_ALWAYS &&
-                ApplyAuraName != SPELL_AURA_MOD_SPEED_NOT_STACK &&
-                ApplyAuraName != SPELL_AURA_MOD_INCREASE_SPEED &&
-                ApplyAuraName != SPELL_AURA_MOD_DECREASE_SPEED)
-                //there are many more: slow speed, -healing pct
+            Effect != SPELL_EFFECT_WEAPON_PERCENT_DAMAGE &&
+            Effect != SPELL_EFFECT_KNOCK_BACK &&
+            ApplyAuraName != SPELL_AURA_MOD_SPEED_ALWAYS &&
+            ApplyAuraName != SPELL_AURA_MOD_SPEED_NOT_STACK &&
+            ApplyAuraName != SPELL_AURA_MOD_INCREASE_SPEED &&
+            ApplyAuraName != SPELL_AURA_MOD_DECREASE_SPEED)
+            //there are many more: slow speed, -healing pct
             value *= 0.25f * exp(caster->getLevel() * (70 - _spellInfo->SpellLevel) / 1000.0f);
-            //value = int32(value * (int32)getLevel() / (int32)(_spellInfo->spellLevel ? _spellInfo->spellLevel : 1));
+        //value = int32(value * (int32)getLevel() / (int32)(_spellInfo->spellLevel ? _spellInfo->spellLevel : 1));
     }
 
     return int32(value);
@@ -424,63 +425,63 @@ void SpellEffectInfo::InitRequiredTargetTypeData()
     {
         switch (i)
         {
-            case SPELL_EFFECT_PERSISTENT_AREA_AURA: //27
-            case SPELL_EFFECT_SUMMON:               //28
-            case SPELL_EFFECT_TRIGGER_MISSILE:      //32
-            case SPELL_EFFECT_TRANS_DOOR:           //50 summon object
-            case SPELL_EFFECT_SUMMON_PET:           //56
-            case SPELL_EFFECT_ADD_FARSIGHT:         //72
-            case SPELL_EFFECT_SUMMON_OBJECT_WILD:   //76
+        case SPELL_EFFECT_PERSISTENT_AREA_AURA: //27
+        case SPELL_EFFECT_SUMMON:               //28
+        case SPELL_EFFECT_TRIGGER_MISSILE:      //32
+        case SPELL_EFFECT_TRANS_DOOR:           //50 summon object
+        case SPELL_EFFECT_SUMMON_PET:           //56
+        case SPELL_EFFECT_ADD_FARSIGHT:         //72
+        case SPELL_EFFECT_SUMMON_OBJECT_WILD:   //76
             //case SPELL_EFFECT_SUMMON_CRITTER:       //97 not 303
-            case SPELL_EFFECT_SUMMON_OBJECT_SLOT1:  //104
-            case SPELL_EFFECT_SUMMON_OBJECT_SLOT2:  //105
-            case SPELL_EFFECT_SUMMON_OBJECT_SLOT3:  //106
-            case SPELL_EFFECT_SUMMON_OBJECT_SLOT4:  //107
-            case SPELL_EFFECT_SUMMON_DEAD_PET:      //109
-            case SPELL_EFFECT_TRIGGER_SPELL_2:      //151 ritual of summon
-                RequiredTargetType[i] = SPELL_REQUIRE_DEST;
-                break;
-            case SPELL_EFFECT_PARRY: // 0
-            case SPELL_EFFECT_BLOCK: // 0
-            case SPELL_EFFECT_SKILL: // always with dummy 3 as A
+        case SPELL_EFFECT_SUMMON_OBJECT_SLOT1:  //104
+        case SPELL_EFFECT_SUMMON_OBJECT_SLOT2:  //105
+        case SPELL_EFFECT_SUMMON_OBJECT_SLOT3:  //106
+        case SPELL_EFFECT_SUMMON_OBJECT_SLOT4:  //107
+        case SPELL_EFFECT_SUMMON_DEAD_PET:      //109
+        case SPELL_EFFECT_TRIGGER_SPELL_2:      //151 ritual of summon
+            RequiredTargetType[i] = SPELL_REQUIRE_DEST;
+            break;
+        case SPELL_EFFECT_PARRY: // 0
+        case SPELL_EFFECT_BLOCK: // 0
+        case SPELL_EFFECT_SKILL: // always with dummy 3 as A
             //case SPELL_EFFECT_LEARN_SPELL: // 0 may be 5 pet
-            case SPELL_EFFECT_TRADE_SKILL: // 0 or 1
-            case SPELL_EFFECT_PROFICIENCY: // 0
-                RequiredTargetType[i] = SPELL_REQUIRE_NONE;
-                break;
-            case SPELL_EFFECT_ENCHANT_ITEM:
-            case SPELL_EFFECT_ENCHANT_ITEM_TEMPORARY:
-            case SPELL_EFFECT_DISENCHANT:
+        case SPELL_EFFECT_TRADE_SKILL: // 0 or 1
+        case SPELL_EFFECT_PROFICIENCY: // 0
+            RequiredTargetType[i] = SPELL_REQUIRE_NONE;
+            break;
+        case SPELL_EFFECT_ENCHANT_ITEM:
+        case SPELL_EFFECT_ENCHANT_ITEM_TEMPORARY:
+        case SPELL_EFFECT_DISENCHANT:
             //in 243 this is 0, in 309 it is 1
             //so both item target and unit target is pushed, and cause crash
             //case SPELL_EFFECT_FEED_PET:
-            case SPELL_EFFECT_PROSPECTING:
-            case SPELL_EFFECT_MILLING:
-            case SPELL_EFFECT_ENCHANT_ITEM_PRISMATIC:
-                RequiredTargetType[i] = SPELL_REQUIRE_ITEM;
-                break;
+        case SPELL_EFFECT_PROSPECTING:
+        case SPELL_EFFECT_MILLING:
+        case SPELL_EFFECT_ENCHANT_ITEM_PRISMATIC:
+            RequiredTargetType[i] = SPELL_REQUIRE_ITEM;
+            break;
             //caster must be pushed otherwise no sound
-            case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
-            case SPELL_EFFECT_APPLY_AREA_AURA_FRIEND:
-            case SPELL_EFFECT_APPLY_AREA_AURA_ENEMY:
-            case SPELL_EFFECT_APPLY_AREA_AURA_PET:
-            case SPELL_EFFECT_APPLY_AREA_AURA_OWNER:
-            case SPELL_EFFECT_APPLY_AREA_AURA_RAID:
-            case SPELL_EFFECT_CHARGE:
-            case SPELL_EFFECT_CHARGE_DEST:
-            case SPELL_EFFECT_JUMP:
-            case SPELL_EFFECT_JUMP_DEST:
-            case SPELL_EFFECT_LEAP_BACK:
-                RequiredTargetType[i] = SPELL_REQUIRE_CASTER;
-                break;
+        case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
+        case SPELL_EFFECT_APPLY_AREA_AURA_FRIEND:
+        case SPELL_EFFECT_APPLY_AREA_AURA_ENEMY:
+        case SPELL_EFFECT_APPLY_AREA_AURA_PET:
+        case SPELL_EFFECT_APPLY_AREA_AURA_OWNER:
+        case SPELL_EFFECT_APPLY_AREA_AURA_RAID:
+        case SPELL_EFFECT_CHARGE:
+        case SPELL_EFFECT_CHARGE_DEST:
+        case SPELL_EFFECT_JUMP:
+        case SPELL_EFFECT_JUMP_DEST:
+        case SPELL_EFFECT_LEAP_BACK:
+            RequiredTargetType[i] = SPELL_REQUIRE_CASTER;
+            break;
             //case SPELL_EFFECT_WMO_DAMAGE:
             //case SPELL_EFFECT_WMO_REPAIR:
             //case SPELL_EFFECT_WMO_CHANGE:
             //    RequiredTargetType[i] = SPELL_REQUIRE_GOBJECT;
             //    break;
-            default:
-                RequiredTargetType[i] = SPELL_REQUIRE_UNIT;
-                break;
+        default:
+            RequiredTargetType[i] = SPELL_REQUIRE_UNIT;
+            break;
         }
     }
 }
@@ -491,9 +492,9 @@ SpellEffectTargetTypes SpellEffectInfo::RequiredTargetType[TOTAL_SPELL_EFFECTS];
 SpellInfo::SpellInfo(SpellEntry const* spellEntry)
 {
     Id = spellEntry->Id;
-    Category = spellEntry->Category;
-    Dispel = spellEntry->Dispel;
-    Mechanic = spellEntry->Mechanic;
+    Category = spellEntry->GetSpellCategories()->Category;
+    Dispel = spellEntry->GetSpellCategories()->Dispel;
+    Mechanic = spellEntry->GetSpellCategories()->Mechanic;
     Attributes = spellEntry->Attributes;
     AttributesEx = spellEntry->AttributesEx;
     AttributesEx2 = spellEntry->AttributesEx2;
@@ -502,70 +503,69 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
     AttributesEx5 = spellEntry->AttributesEx5;
     AttributesEx6 = spellEntry->AttributesEx6;
     AttributesEx7 = spellEntry->AttributesEx7;
-    AttributesCu = 0;
-    Stances = spellEntry->Stances;
-    StancesNot = spellEntry->StancesNot;
-    Targets = spellEntry->Targets;
-    TargetCreatureType = spellEntry->TargetCreatureType;
-    RequiresSpellFocus = spellEntry->RequiresSpellFocus;
-    FacingCasterFlags = spellEntry->FacingCasterFlags;
-    CasterAuraState = spellEntry->CasterAuraState;
-    TargetAuraState = spellEntry->TargetAuraState;
-    CasterAuraStateNot = spellEntry->CasterAuraStateNot;
-    TargetAuraStateNot = spellEntry->TargetAuraStateNot;
-    CasterAuraSpell = spellEntry->casterAuraSpell;
-    TargetAuraSpell = spellEntry->targetAuraSpell;
-    ExcludeCasterAuraSpell = spellEntry->excludeCasterAuraSpell;
-    ExcludeTargetAuraSpell = spellEntry->excludeTargetAuraSpell;
+    AttributesEx8 = spellEntry->AttributesEx8;
+    Stances =  spellEntry->GetSpellShapeshift()->Stances;
+    StancesNot =  spellEntry->GetSpellShapeshift()->StancesNot;
+    Targets =  spellEntry->GetSpellTargetRestrictions()->Targets;
+    TargetCreatureType =  spellEntry->GetSpellTargetRestrictions()->TargetCreatureType;
+    RequiresSpellFocus =  spellEntry->GetSpellCastingRequirements()->RequiresSpellFocus;
+    FacingCasterFlags =  spellEntry->GetSpellCastingRequirements()->FacingCasterFlags;
+    CasterAuraState = spellEntry->GetSpellAuraRestrictions()->CasterAuraState;
+    TargetAuraState = spellEntry->GetSpellAuraRestrictions()->TargetAuraState;
+    CasterAuraStateNot = spellEntry->GetSpellAuraRestrictions()->CasterAuraStateNot;
+    TargetAuraStateNot = spellEntry->GetSpellAuraRestrictions()->TargetAuraStateNot;
+    CasterAuraSpell = spellEntry->GetSpellAuraRestrictions()->casterAuraSpell;
+    TargetAuraSpell = spellEntry->GetSpellAuraRestrictions()->targetAuraSpell;
+    ExcludeCasterAuraSpell = spellEntry->GetSpellAuraRestrictions()->excludeCasterAuraSpell;
+    ExcludeTargetAuraSpell = spellEntry->GetSpellAuraRestrictions()->excludeTargetAuraSpell;
     CastTimeEntry = spellEntry->CastingTimeIndex ? sSpellCastTimesStore.LookupEntry(spellEntry->CastingTimeIndex) : NULL;
-    RecoveryTime = spellEntry->RecoveryTime;
-    CategoryRecoveryTime = spellEntry->CategoryRecoveryTime;
-    StartRecoveryCategory = spellEntry->StartRecoveryCategory;
-    StartRecoveryTime = spellEntry->StartRecoveryTime;
-    InterruptFlags = spellEntry->InterruptFlags;
-    AuraInterruptFlags = spellEntry->AuraInterruptFlags;
-    ChannelInterruptFlags = spellEntry->ChannelInterruptFlags;
-    ProcFlags = spellEntry->procFlags;
-    ProcChance = spellEntry->procChance;
-    ProcCharges = spellEntry->procCharges;
-    MaxLevel = spellEntry->maxLevel;
-    BaseLevel = spellEntry->baseLevel;
-    SpellLevel = spellEntry->spellLevel;
+    RecoveryTime = spellEntry->GetSpellCooldowns()->RecoveryTime;
+    CategoryRecoveryTime = spellEntry->GetSpellCooldowns()->CategoryRecoveryTime;
+    StartRecoveryCategory = spellEntry->GetSpellCategories()->StartRecoveryCategory;
+    StartRecoveryTime = spellEntry->GetSpellCooldowns()->StartRecoveryTime;
+    InterruptFlags = spellEntry->GetSpellInterrupts()->InterruptFlags;
+    AuraInterruptFlags = spellEntry->GetSpellInterrupts()->AuraInterruptFlags;
+    ChannelInterruptFlags = spellEntry->GetSpellInterrupts()->ChannelInterruptFlags;
+    ProcFlags = spellEntry->GetSpellAuraOptions()->procFlags;
+    ProcChance = spellEntry->GetSpellAuraOptions()->procChance;
+    ProcCharges = spellEntry->GetSpellAuraOptions()->procCharges;
+    MaxLevel = spellEntry->GetSpellLevels()->maxLevel;
+    BaseLevel = spellEntry->GetSpellLevels()->baseLevel;
+    SpellLevel = spellEntry->GetSpellLevels()->spellLevel;
     DurationEntry = spellEntry->DurationIndex ? sSpellDurationStore.LookupEntry(spellEntry->DurationIndex) : NULL;
     PowerType = spellEntry->powerType;
-    ManaCost = spellEntry->manaCost;
-    ManaCostPerlevel = spellEntry->manaCostPerlevel;
-    ManaPerSecond = spellEntry->manaPerSecond;
-    ManaPerSecondPerLevel = spellEntry->manaPerSecondPerLevel;
-    ManaCostPercentage = spellEntry->ManaCostPercentage;
+    ManaCost = spellEntry->GetSpellPower()->manaCost;
+    ManaCostPerlevel = spellEntry->GetSpellPower()->manaCostPerlevel;
+    ManaPerSecond = spellEntry->GetSpellPower()->manaPerSecond;
+    ManaCostPercentage = spellEntry->GetSpellPower()->ManaCostPercentage;
     RuneCostID = spellEntry->runeCostID;
     RangeEntry = spellEntry->rangeIndex ? sSpellRangeStore.LookupEntry(spellEntry->rangeIndex) : NULL;
     Speed = spellEntry->speed;
-    StackAmount = spellEntry->StackAmount;
+    StackAmount = spellEntry->GetSpellAuraOptions()->StackAmount;
     for (uint8 i = 0; i < 2; ++i)
-        Totem[i] = spellEntry->Totem[i];
+        Totem[i] = spellEntry->GetSpellTotems()->Totem[i];
     for (uint8 i = 0; i < MAX_SPELL_REAGENTS; ++i)
-        Reagent[i] = spellEntry->Reagent[i];
+        Reagent[i] = spellEntry->GetSpellReagents()->Reagent[i];
     for (uint8 i = 0; i < MAX_SPELL_REAGENTS; ++i)
-        ReagentCount[i] = spellEntry->ReagentCount[i];
-    EquippedItemClass = spellEntry->EquippedItemClass;
-    EquippedItemSubClassMask = spellEntry->EquippedItemSubClassMask;
-    EquippedItemInventoryTypeMask = spellEntry->EquippedItemInventoryTypeMask;
+        ReagentCount[i] = spellEntry->GetSpellReagents()->ReagentCount[i];
+    EquippedItemClass = spellEntry->GetSpellEquippedItems()->EquippedItemClass;
+    EquippedItemSubClassMask = spellEntry->GetSpellEquippedItems()->EquippedItemSubClassMask;
+    EquippedItemInventoryTypeMask = spellEntry->GetSpellEquippedItems()->EquippedItemInventoryTypeMask;
     for (uint8 i = 0; i < 2; ++i)
-        TotemCategory[i] = spellEntry->TotemCategory[i];
+        TotemCategory[i] = spellEntry->GetSpellTotems()->TotemCategory[i];
     for (uint8 i = 0; i < 2; ++i)
         SpellVisual[i] = spellEntry->SpellVisual[i];
     SpellIconID = spellEntry->SpellIconID;
     ActiveIconID = spellEntry->activeIconID;
     SpellName = spellEntry->SpellName;
     Rank = spellEntry->Rank;
-    MaxTargetLevel = spellEntry->MaxTargetLevel;
-    MaxAffectedTargets = spellEntry->MaxAffectedTargets;
-    SpellFamilyName = spellEntry->SpellFamilyName;
-    SpellFamilyFlags = spellEntry->SpellFamilyFlags;
-    DmgClass = spellEntry->DmgClass;
-    PreventionType = spellEntry->PreventionType;
-    AreaGroupId  = spellEntry->AreaGroupId;
+    MaxTargetLevel = spellEntry->GetSpellTargetRestrictions()->MaxTargetLevel;
+    MaxAffectedTargets = spellEntry->GetSpellTargetRestrictions()->MaxAffectedTargets;
+    SpellFamilyName = spellEntry->GetSpellClassOptions()->SpellFamilyName;
+    SpellFamilyFlags = spellEntry->GetSpellClassOptions()->SpellFamilyFlags;
+    DmgClass = spellEntry->GetSpellCategories()->DmgClass;
+    PreventionType = spellEntry->GetSpellCategories()->PreventionType;
+    AreaGroupId  = spellEntry->GetSpellCastingRequirements()->AreaGroupId;
     SchoolMask = spellEntry->SchoolMask;
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         Effects[i] = SpellEffectInfo(spellEntry, this, i);
@@ -797,7 +797,7 @@ bool SpellInfo::CanBeUsedInCombat() const
 
 bool SpellInfo::IsPositive() const
 {
-    return !(AttributesCu & SPELL_ATTR0_CU_NEGATIVE);
+    return !(AttributesEx8 & SPELL_ATTR0_CU_NEGATIVE);
 }
 
 bool SpellInfo::IsPositiveEffect(uint8 effIndex) const
@@ -806,11 +806,11 @@ bool SpellInfo::IsPositiveEffect(uint8 effIndex) const
     {
         default:
         case 0:
-            return !(AttributesCu & SPELL_ATTR0_CU_NEGATIVE_EFF0);
+            return !(AttributesEx8 & SPELL_ATTR0_CU_NEGATIVE_EFF0);
         case 1:
-            return !(AttributesCu & SPELL_ATTR0_CU_NEGATIVE_EFF1);
+            return !(AttributesEx8 & SPELL_ATTR0_CU_NEGATIVE_EFF1);
         case 2:
-            return !(AttributesCu & SPELL_ATTR0_CU_NEGATIVE_EFF2);
+            return !(AttributesEx8 & SPELL_ATTR0_CU_NEGATIVE_EFF2);
     }
 }
 
@@ -1001,10 +1001,10 @@ SpellCastResult SpellInfo::CheckShapeshift(uint32 form) const
         return SPELL_CAST_OK;
 
     bool actAsShifted = false;
-    SpellShapeshiftEntry const* shapeInfo = NULL;
+    SpellShapeshiftFormEntry const* shapeInfo = NULL;
     if (form > 0)
     {
-        shapeInfo = sSpellShapeshiftStore.LookupEntry(form);
+        shapeInfo = sSpellShapeshiftFormStore.LookupEntry(form);
         if (!shapeInfo)
         {
             sLog->outError("GetErrorAtShapeshiftedCast: unknown shapeshift %u", form);
@@ -1938,4 +1938,84 @@ bool SpellInfo::_IsPositiveTarget(uint32 targetA, uint32 targetB)
     if (targetB)
         return _IsPositiveTarget(targetB, 0);
     return true;
+}
+
+SpellAuraOptionsEntry const* SpellEntry::GetSpellAuraOptions() const
+{
+    return SpellAuraOptionsId ? sSpellAuraOptionsStore.LookupEntry(SpellAuraOptionsId) : NULL;
+}
+
+SpellAuraRestrictionsEntry const* SpellEntry::GetSpellAuraRestrictions() const
+{
+    return SpellAuraRestrictionsId ? sSpellAuraRestrictionsStore.LookupEntry(SpellAuraRestrictionsId) : NULL;
+}
+
+SpellCastingRequirementsEntry const* SpellEntry::GetSpellCastingRequirements() const
+{
+    return SpellCastingRequirementsId ? sSpellCastingRequirementsStore.LookupEntry(SpellCastingRequirementsId) : NULL;
+}
+
+SpellCategoriesEntry const* SpellEntry::GetSpellCategories() const
+{
+    return SpellCategoriesId ? sSpellCategoriesStore.LookupEntry(SpellCategoriesId) : NULL;
+}
+
+SpellClassOptionsEntry const* SpellEntry::GetSpellClassOptions() const
+{
+    return SpellClassOptionsId ? sSpellClassOptionsStore.LookupEntry(SpellClassOptionsId) : NULL;
+}
+
+SpellCooldownsEntry const* SpellEntry::GetSpellCooldowns() const
+{
+    return SpellCooldownsId ? sSpellCooldownsStore.LookupEntry(SpellCooldownsId) : NULL;
+}
+
+SpellEffectEntry const* SpellEntry::GetSpellEffect(uint8 eff) const
+{
+    return GetSpellEffectEntry(Id, eff);
+}
+
+SpellEquippedItemsEntry const* SpellEntry::GetSpellEquippedItems() const
+{
+    return SpellEquippedItemsId ? sSpellEquippedItemsStore.LookupEntry(SpellEquippedItemsId) : NULL;
+}
+
+SpellInterruptsEntry const* SpellEntry::GetSpellInterrupts() const
+{
+    return SpellInterruptsId ? sSpellInterruptsStore.LookupEntry(SpellInterruptsId) : NULL;
+}
+
+SpellLevelsEntry const* SpellEntry::GetSpellLevels() const
+{
+    return SpellLevelsId ? sSpellLevelsStore.LookupEntry(SpellLevelsId) : NULL;
+}
+
+SpellPowerEntry const* SpellEntry::GetSpellPower() const
+{
+    return SpellPowerId ? sSpellPowerStore.LookupEntry(SpellPowerId) : NULL;
+}
+
+SpellReagentsEntry const* SpellEntry::GetSpellReagents() const
+{
+    return SpellReagentsId ? sSpellReagentsStore.LookupEntry(SpellReagentsId) : NULL;
+}
+
+SpellScalingEntry const* SpellEntry::GetSpellScaling() const
+{
+    return SpellScalingId ? sSpellScalingStore.LookupEntry(SpellScalingId) : NULL;
+}
+
+SpellShapeshiftEntry const* SpellEntry::GetSpellShapeshift() const
+{
+    return SpellShapeshiftId ? sSpellShapeshiftStore.LookupEntry(SpellShapeshiftId) : NULL;
+}
+
+SpellTargetRestrictionsEntry const* SpellEntry::GetSpellTargetRestrictions() const
+{
+    return SpellTargetRestrictionsId ? sSpellTargetRestrictionsStore.LookupEntry(SpellTargetRestrictionsId) : NULL;
+}
+
+SpellTotemsEntry const* SpellEntry::GetSpellTotems() const
+{
+    return SpellTotemsId ? sSpellTotemsStore.LookupEntry(SpellTotemsId) : NULL;
 }

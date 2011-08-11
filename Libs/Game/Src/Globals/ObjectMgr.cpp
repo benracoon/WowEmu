@@ -46,6 +46,8 @@
 #include "ScriptMgr.h"
 #include "SpellScript.h"
 #include "PoolMgr.h"
+#include "DB2Structure.h"
+#include "DB2Stores.h"
 
 ScriptMapMap sQuestEndScripts;
 ScriptMapMap sQuestStartScripts;
@@ -6711,7 +6713,7 @@ std::string ObjectMgr::GeneratePetName(uint32 entry)
     if (list0.empty() || list1.empty())
     {
         CreatureTemplate const *cinfo = GetCreatureTemplate(entry);
-        char* petname = GetPetName(cinfo->family, sWorld->GetDefaultDbcLocale());
+        const char* petname = GetPetName(cinfo->family, 0);
         if (!petname)
             return cinfo->Name;
 

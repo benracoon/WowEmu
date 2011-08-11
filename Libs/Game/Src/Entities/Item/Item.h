@@ -27,6 +27,7 @@
 #include "DatabaseEnv.h"
 
 class SpellInfo;
+class SpellEffectInfo;
 class Bag;
 class Unit;
 
