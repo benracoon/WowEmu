@@ -160,7 +160,7 @@ public:
     uint32    ChainTarget;
     uint32    ItemType;
     uint32    TriggerSpell;
-    flag96    SpellClassMask;
+    uint32    SpellClassMask;
 
     SpellEffectInfo() {}
     SpellEffectInfo(SpellEntry const* spellEntry, SpellInfo const* spellInfo, uint8 effIndex);

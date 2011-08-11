@@ -281,9 +281,10 @@ void WorldSession::HandleDestroyItemOpcode(WorldPacket & recv_data)
 // Only _static_ data send in this packet !!!
 void WorldSession::HandleItemQuerySingleOpcode(WorldPacket & recv_data)
 {
-    //sLog->outDebug(LOG_FILTER_PACKETIO, "WORLD: CMSG_ITEM_QUERY_SINGLE");
-    uint32 item;
-    recv_data >> item;
+    uint64 unk;
+    uint32 item, unk1;
+
+    recv_data >> unk >> item >> unk1;
 
     sLog->outDetail("STORAGE: Item Query = %u", item);
 
@@ -298,20 +299,17 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket & recv_data)
         {
             if (ItemLocale const *il = sObjectMgr->GetItemLocale(pProto->ItemId))
             {
-                ObjectMgr::GetLocaleString(il->Name, loc_idx, Name);
-                ObjectMgr::GetLocaleString(il->Description, loc_idx, Description);
+                sObjectMgr->GetLocaleString(il->Name, loc_idx, Name);
+                sObjectMgr->GetLocaleString(il->Description, loc_idx, Description);
             }
         }
-                                                            // guess size
-        WorldPacket data(SMSG_ITEM_QUERY_SINGLE_RESPONSE, 600);
+
+        WorldPacket data(SMSG_ITEM_QUERY_SINGLE_RESPONSE, 600);    // guess size
         data << pProto->ItemId;
         data << pProto->Class;
         data << pProto->SubClass;
-        data << int32(pProto->Unk0);                        // new 2.0.3, not exist in wdb cache?
+        data << int32(pProto->Unk0);                               // New 2.0.3 - Exist in item-sparse file (4.0.1)
         data << Name;
-        data << uint8(0x00);                                //pProto->Name2; // blizz not send name there, just uint8(0x00); <-- \0 = empty string = empty name...
-        data << uint8(0x00);                                //pProto->Name3; // blizz not send name there, just uint8(0x00);
-        data << uint8(0x00);                                //pProto->Name4; // blizz not send name there, just uint8(0x00);
         data << pProto->DisplayInfoID;
         data << pProto->Quality;
         data << pProto->Flags;
@@ -333,32 +331,18 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket & recv_data)
         data << int32(pProto->MaxCount);
         data << int32(pProto->Stackable);
         data << pProto->ContainerSlots;
-        data << pProto->StatsCount;                         // item stats count
-        for (uint32 i = 0; i < pProto->StatsCount; ++i)
+        //data << pProto->StatsCount;                         // item stats count
+        for (uint32 i = 0; i < MAX_ITEM_PROTO_STATS; ++i)
         {
             data << pProto->ItemStat[i].ItemStatType;
             data << pProto->ItemStat[i].ItemStatValue;
+            data << pProto->ItemStat[i].ItemStatType2;
+            data << pProto->ItemStat[i].ItemStatValue2;
         }
         data << pProto->ScalingStatDistribution;            // scaling stats distribution
         data << pProto->ScalingStatValue;                   // some kind of flags used to determine stat values column
-        for (int i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
-        {
-            data << pProto->Damage[i].DamageMin;
-            data << pProto->Damage[i].DamageMax;
-            data << pProto->Damage[i].DamageType;
-        }
-
-        // resistances (7)
-        data << pProto->Armor;
-        data << pProto->HolyRes;
-        data << pProto->FireRes;
-        data << pProto->NatureRes;
-        data << pProto->FrostRes;
-        data << pProto->ShadowRes;
-        data << pProto->ArcaneRes;
-
+        data << pProto->damagetype;                         // DamageType
         data << pProto->Delay;
-        data << pProto->AmmoType;
         data << pProto->RangedModRange;
 
         for (int s = 0; s < MAX_ITEM_PROTO_SPELLS; ++s)
@@ -382,9 +366,9 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket & recv_data)
                 }
                 else
                 {
-                    data << uint32(spell->RecoveryTime);
-                    data << uint32(spell->Category);
-                    data << uint32(spell->CategoryRecoveryTime);
+                    data << uint32(spell->RecoveryTime());
+                    data << uint32(spell->Category());
+                    data << uint32(spell->CategoryRecoveryTime());
                 }
             }
             else
@@ -427,11 +411,13 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket & recv_data)
         data << uint32(abs(pProto->Duration));              // added in 2.4.2.8209, duration (seconds)
         data << pProto->ItemLimitCategory;                  // WotLK, ItemLimitCategory
         data << pProto->HolidayId;                          // Holiday.dbc?
+        data << pProto->StatScalingFactor;                  // damage/armor scaling factor
+        data << uint32(0);                                  // 4.0.0
+        data << uint32(0);                                  // 4.0.0
         SendPacket(&data);
     }
     else
     {
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_ITEM_QUERY_SINGLE - NO item INFO! (ENTRY: %u)", item);
         WorldPacket data(SMSG_ITEM_QUERY_SINGLE_RESPONSE, 4);
         data << uint32(item | 0x80000000);
         SendPacket(&data);
@@ -743,7 +729,7 @@ void WorldSession::SendListInventory(uint64 vendorGuid)
     VendorItemData const* items = vendor->GetVendorItems();
     if (!items)
     {
-        WorldPacket data(SMSG_LIST_INVENTORY, 8 + 1 + 1);
+        WorldPacket data(SMSG_VENDOR_INVENTORY, 8 + 1 + 1);
         data << uint64(vendorGuid);
         data << uint8(0);                                   // count == 0, next will be error code
         data << uint8(0);                                   // "Vendor has no inventory"
@@ -754,7 +740,7 @@ void WorldSession::SendListInventory(uint64 vendorGuid)
     uint8 itemCount = items->GetItemCount();
     uint8 count = 0;
 
-    WorldPacket data(SMSG_LIST_INVENTORY, 8 + 1 + itemCount * 8 * 4);
+    WorldPacket data(SMSG_VENDOR_INVENTORY, 8 + 1 + itemCount * 8 * 4);
     data << uint64(vendorGuid);
 
     size_t countPos = data.wpos();
@@ -1002,30 +988,6 @@ void WorldSession::SendItemEnchantTimeUpdate(uint64 Playerguid, uint64 Itemguid,
     data << uint32(Duration);
     data << uint64(Playerguid);
     SendPacket(&data);
-}
-
-void WorldSession::HandleItemNameQueryOpcode(WorldPacket & recv_data)
-{
-    uint32 itemid;
-    recv_data >> itemid;
-    recv_data.read_skip<uint64>();                          // guid
-
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: CMSG_ITEM_NAME_QUERY %u", itemid);
-    ItemSetNameEntry const *pName = sObjectMgr->GetItemSetNameEntry(itemid);
-    if (pName)
-    {
-        std::string Name = pName->name;
-        int loc_idx = GetSessionDbLocaleIndex();
-        if (loc_idx >= 0)
-            if (ItemSetNameLocale const *isnl = sObjectMgr->GetItemSetNameLocale(itemid))
-                ObjectMgr::GetLocaleString(isnl->Name, loc_idx, Name);
-
-        WorldPacket data(SMSG_ITEM_NAME_QUERY_RESPONSE, (4+Name.size()+1+4));
-        data << uint32(itemid);
-        data << Name;
-        data << uint32(pName->InventoryType);
-        SendPacket(&data);
-    }
 }
 
 void WorldSession::HandleWrapItemOpcode(WorldPacket& recv_data)

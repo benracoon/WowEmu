@@ -1452,7 +1452,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                             else if (aurEff->GetId() == 47537)
                                 multiplier += 0.5f;
 
-                            int32 basepoints0 = int32(CalculatePctF(caster->GetMaxPower(POWER_MANA), multiplier));
+                            int32 basepoints0 = int32(CalculatePctF(caster->GetMaxPower(MANA), multiplier));
                             caster->CastCustomSpell(caster, 47755, &basepoints0, NULL, NULL, true);
                         }
                         // effect on aura target
@@ -1464,15 +1464,15 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                             int32 triggeredSpellId = 0;
                             switch(target->getPowerType())
                             {
-                                case POWER_MANA:
+                                case MANA:
                                 {
-                                    int32 basepoints0 = int32(CalculatePctN(target->GetMaxPower(POWER_MANA), 2));
+                                    int32 basepoints0 = int32(CalculatePctN(target->GetMaxPower(MANA), 2));
                                     caster->CastCustomSpell(target, 63654, &basepoints0, NULL, NULL, true);
                                     break;
                                 }
-                                case POWER_RAGE:   triggeredSpellId = 63653; break;
-                                case POWER_ENERGY: triggeredSpellId = 63655; break;
-                                case POWER_RUNIC_POWER: triggeredSpellId = 63652; break;
+                                case RAGE:   triggeredSpellId = 63653; break;
+                                case ENERGY: triggeredSpellId = 63655; break;
+                                case RUNIC_POWER: triggeredSpellId = 63652; break;
                                 default:
                                     break;
                             }

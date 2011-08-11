@@ -31,6 +31,22 @@ char const* localeNames[TOTAL_LOCALES] = {
   "ruRU"
 };
 
+// used for search by name or iterate all names
+LocaleNameStr const fullLocaleNameList[] =
+{
+    { "enUS", LOCALE_enUS },
+    { "enGB", LOCALE_enUS },
+    { "koKR", LOCALE_koKR },
+    { "frFR", LOCALE_frFR },
+    { "deDE", LOCALE_deDE },
+    { "zhCN", LOCALE_zhCN },
+    { "zhTW", LOCALE_zhTW },
+    { "esES", LOCALE_esES },
+    { "esMX", LOCALE_esMX },
+    { "ruRU", LOCALE_ruRU },
+    { NULL,   LOCALE_enUS }
+};
+
 LocaleConstant GetLocaleByName(const std::string& name)
 {
     for (uint32 i = 0; i < TOTAL_LOCALES; ++i)

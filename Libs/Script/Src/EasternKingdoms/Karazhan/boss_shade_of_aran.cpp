@@ -259,7 +259,7 @@ public:
             else FrostCooldown = 0;
             }
 
-            if (!Drinking && me->GetMaxPower(POWER_MANA) && (me->GetPower(POWER_MANA)*100 / me->GetMaxPower(POWER_MANA)) < 20)
+            if (!Drinking && me->GetMaxPower(MANA) && (me->GetPower(MANA)*100 / me->GetMaxPower(MANA)) < 20)
             {
                 Drinking = true;
                 me->InterruptNonMeleeSpells(false);
@@ -282,7 +282,7 @@ public:
                 Drinking = false;
                 me->RemoveAurasDueToSpell(SPELL_DRINK);
                 me->SetStandState(UNIT_STAND_STATE_STAND);
-                me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA)-32000);
+                me->SetPower(MANA, me->GetMaxPower(MANA)-32000);
                 DoCast(me, SPELL_POTION, false);
             }
 

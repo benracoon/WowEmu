@@ -2220,9 +2220,9 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
         }
         case SMART_EVENT_MANA_PCT:
         {
-            if (!me || !me->isInCombat() || !me->GetMaxPower(POWER_MANA))
+            if (!me || !me->isInCombat() || !me->GetMaxPower(MANA))
                 return;
-            uint32 perc = uint32(100.0f * me->GetPower(POWER_MANA) / me->GetMaxPower(POWER_MANA));
+            uint32 perc = uint32(100.0f * me->GetPower(MANA) / me->GetMaxPower(MANA));
             if (perc > e.event.minMaxRepeat.max || perc < e.event.minMaxRepeat.min)
                 return;
             RecalcTimer(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax);
@@ -2231,9 +2231,9 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
         }
         case SMART_EVENT_TARGET_MANA_PCT:
         {
-            if (!me || !me->isInCombat() || !me->getVictim() || !me->getVictim()->GetMaxPower(POWER_MANA))
+            if (!me || !me->isInCombat() || !me->getVictim() || !me->getVictim()->GetMaxPower(MANA))
                 return;
-            uint32 perc = uint32(100.0f * me->getVictim()->GetPower(POWER_MANA) / me->getVictim()->GetMaxPower(POWER_MANA));
+            uint32 perc = uint32(100.0f * me->getVictim()->GetPower(MANA) / me->getVictim()->GetMaxPower(MANA));
             if (perc > e.event.minMaxRepeat.max || perc < e.event.minMaxRepeat.min)
                 return;
             RecalcTimer(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax);

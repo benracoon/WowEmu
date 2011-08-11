@@ -244,12 +244,12 @@ class spell_bronjahm_magic_bane : public SpellScriptLoader
 
             void RecalculateDamage()
             {
-                if (GetHitUnit()->getPowerType() != POWER_MANA)
+                if (GetHitUnit()->getPowerType() != MANA)
                     return;
 
                 const int32 maxDamage = GetCaster()->GetMap()->GetSpawnMode() == 1 ? 15000 : 10000;
                 int32 newDamage = GetHitDamage();
-                newDamage += GetHitUnit()->GetMaxPower(POWER_MANA)/2;
+                newDamage += GetHitUnit()->GetMaxPower(MANA)/2;
                 newDamage = std::min<int32>(maxDamage, newDamage);
 
                 SetHitDamage(newDamage);

@@ -370,10 +370,10 @@ public:
             }
         }
         ifs.close();
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "Sending opcode %u", data.GetOpcode());
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "Sending opcode %u", data.GetOpcodeEnum());
         data.hexlike();
         player->GetSession()->SendPacket(&data);
-        handler->PSendSysMessage(LANG_COMMAND_OPCODESENT, data.GetOpcode(), unit->GetName());
+        handler->PSendSysMessage(LANG_COMMAND_OPCODESENT, data.GetOpcodeEnum(), unit->GetName());
         return true;
     }
 

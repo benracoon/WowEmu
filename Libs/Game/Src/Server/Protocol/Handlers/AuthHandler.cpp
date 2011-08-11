@@ -20,19 +20,33 @@
 #include "WorldSession.h"
 #include "WorldPacket.h"
 
-void WorldSession::SendAuthResponse(uint8 code, bool shortForm, uint32 queuePos)
+int WorldSocket::SendResumeComms()
 {
-    WorldPacket packet(SMSG_AUTH_RESPONSE, 1 + 4 + 1 + 4 + 1 + (shortForm ? 0 : (4 + 1)));
-    packet << uint8(code);
-    packet << uint32(0);                                   // BillingTimeRemaining
-    packet << uint8(0);                                    // BillingPlanFlags
-    packet << uint32(0);                                   // BillingTimeRested
-    packet << uint8(Expansion());                          // 0 - normal, 1 - TBC, 2 - WOTLK, must be set in database manually for each account
+    std::string ServerToClient = "RLD OF WARCRAFT CONNECTION - SERVER TO CLIENT";
+    WorldPacket data(MSG_RESUME_COMMS, 45);
+
+    data.Put(ServerToClient);
+
+    if (SendPacket(data) == -1)
+        return -1;
+
+    return 0;
+}
+
+void WorldSession::SendAuthResponse(uint8 AuthCode, bool shortForm, uint32 queuePos)
+{
+    WorldPacket packet(SMSG_AUTH_RESPONSE, 1 + 4 + 1 + 4 + 1 + 1 + (shortForm ? 0 : (4 + 1)));
+    packet.Put(AuthCode);
+    packet.Put(0);                            // BillingTimeRemaining
+    packet.Put(0);                            // BillingPlanFlags
+    packet.Put(0);                            // BillingTimeRested
+    packet.Put(Expansion());                  // Account expansion
+    packet.Put(CONFIG_EXPANSION);             // Server expansion
 
     if (!shortForm)
     {
-        packet << uint32(queuePos);                             // Queue position
-        packet << uint8(0);                                     // Unk 3.3.0
+        packet.Put(queuePos);                             // Queue position
+        packet.Put(0);                                    // Unk 3.3.0
     }
 
     SendPacket(&packet);

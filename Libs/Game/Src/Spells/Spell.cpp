@@ -495,7 +495,7 @@ m_caster(caster), m_spellValue(new SpellValue(m_spellInfo))
         // wand case
         if ((m_caster->getClassMask() & CLASSMASK_WAND_USERS) != 0 && m_caster->GetTypeId() == TYPEID_PLAYER)
             if (Item* pItem = m_caster->ToPlayer()->GetWeaponForAttack(RANGED_ATTACK))
-                m_spellSchoolMask = SpellSchoolMask(1 << pItem->GetTemplate()->Damage[0].DamageType);
+                m_spellSchoolMask = SpellSchoolMask(1 << pItem->GetTemplate()->damagetype);
 
     if (originalCasterGUID)
         m_originalCasterGUID = originalCasterGUID;
@@ -2684,7 +2684,7 @@ void Spell::SelectEffectTargets(uint32 i, SpellImplicitTargetInfo const& cur)
                                 break;
                             }
                             maxSize = 10;
-                            power = POWER_MANA;
+                            power = MANA;
                             break;
                         default:
                             break;
@@ -2704,7 +2704,7 @@ void Spell::SelectEffectTargets(uint32 i, SpellImplicitTargetInfo const& cur)
                     else if (m_spellInfo->Id == 64904) // Hymn of Hope
                     {
                         maxSize = 3;
-                        power = POWER_MANA;
+                        power = MANA;
                     }
                     else
                         break;
@@ -3794,7 +3794,7 @@ void Spell::SendSpellStart()
          && m_spellInfo->PowerType != POWER_HEALTH)
         castFlags |= CAST_FLAG_POWER_LEFT_SELF;
 
-    if (m_spellInfo->RuneCostID && m_spellInfo->PowerType == POWER_RUNE)
+    if (m_spellInfo->RuneCostID && m_spellInfo->PowerType == RUNES)
         castFlags |= CAST_FLAG_UNKNOWN_19;
 
     WorldPacket data(SMSG_SPELL_START, (8+8+4+4+2));
@@ -3850,7 +3850,7 @@ void Spell::SendSpellGo()
     if ((m_caster->GetTypeId() == TYPEID_PLAYER)
         && (m_caster->getClass() == CLASS_DEATH_KNIGHT)
         && m_spellInfo->RuneCostID
-        && m_spellInfo->PowerType == POWER_RUNE)
+        && m_spellInfo->PowerType == RUNES)
     {
         castFlags |= CAST_FLAG_UNKNOWN_19;                   // same as in SMSG_SPELL_START
         castFlags |= CAST_FLAG_RUNE_LIST;                    // rune cooldowns list
@@ -4260,7 +4260,7 @@ void Spell::TakePower()
     bool hit = true;
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
     {
-        if (m_spellInfo->PowerType == POWER_RAGE || m_spellInfo->PowerType == POWER_ENERGY || m_spellInfo->PowerType == POWER_RUNE)
+        if (m_spellInfo->PowerType == RAGE || m_spellInfo->PowerType == ENERGY || m_spellInfo->PowerType == RUNES)
             if (uint64 targetGUID = m_targets.GetUnitTargetGUID())
                 for (std::list<TargetInfo>::iterator ihit= m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
                     if (ihit->targetGUID == targetGUID)
@@ -4279,7 +4279,7 @@ void Spell::TakePower()
 
     Powers powerType = Powers(m_spellInfo->PowerType);
 
-    if (powerType == POWER_RUNE)
+    if (powerType == RUNES)
     {
         TakeRunePower(hit);
         return;
@@ -4307,7 +4307,7 @@ void Spell::TakePower()
         m_caster->ModifyPower(powerType, -irand(0, m_powerCost/4));
 
     // Set the five second timer
-    if (powerType == POWER_MANA && m_powerCost > 0)
+    if (powerType == MANA && m_powerCost > 0)
         m_caster->SetLastManaUse(getMSTime());
 }
 
@@ -4340,7 +4340,7 @@ void Spell::TakeAmmo()
 
 SpellCastResult Spell::CheckRuneCost(uint32 runeCostID)
 {
-    if (m_spellInfo->PowerType != POWER_RUNE || !runeCostID)
+    if (m_spellInfo->PowerType != RUNES || !runeCostID)
         return SPELL_CAST_OK;
 
     if (m_caster->GetTypeId() != TYPEID_PLAYER)
@@ -4447,7 +4447,7 @@ void Spell::TakeRunePower(bool didHit)
     // you can gain some runic power when use runes
     if (didHit)
         if (int32 rp = int32(runeCostData->runePowerGain * sWorld->getRate(RATE_POWER_RUNICPOWER_INCOME)))
-            player->ModifyPower(POWER_RUNIC_POWER, int32(rp));
+            player->ModifyPower(RUNIC_POWER, int32(rp));
 }
 
 void Spell::TakeReagents()
@@ -5451,7 +5451,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (m_caster->GetTypeId() != TYPEID_PLAYER || m_CastItem)
                     break;
 
-                if (m_targets.GetUnitTarget()->getPowerType() != POWER_MANA)
+                if (m_targets.GetUnitTarget()->getPowerType() != MANA)
                     return SPELL_FAILED_BAD_TARGETS;
 
                 break;
@@ -5788,8 +5788,8 @@ SpellCastResult Spell::CheckPower()
         return SPELL_FAILED_UNKNOWN;
     }
 
-    //check rune cost only if a spell has PowerType == POWER_RUNE
-    if (m_spellInfo->PowerType == POWER_RUNE)
+    //check rune cost only if a spell has PowerType == RUNES
+    if (m_spellInfo->PowerType == RUNES)
     {
         SpellCastResult failReason = CheckRuneCost(m_spellInfo->RuneCostID);
         if (failReason != SPELL_CAST_OK)

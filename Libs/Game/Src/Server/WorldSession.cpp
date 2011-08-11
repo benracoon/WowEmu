@@ -46,7 +46,7 @@
 
 bool MapSessionFilter::Process(WorldPacket* packet)
 {
-    OpcodeHandler const &opHandle = opcodeTable[packet->GetOpcode()];
+    OpcodeHandler const &opHandle = opcodeTable[packet->GetOpcodeEnum()];
 
     //let's check if our opcode can be really processed in Map::Update()
     if (opHandle.packetProcessing == PROCESS_INPLACE)
@@ -68,7 +68,7 @@ bool MapSessionFilter::Process(WorldPacket* packet)
 //OR packet handler is not thread-safe!
 bool WorldSessionFilter::Process(WorldPacket* packet)
 {
-    OpcodeHandler const &opHandle = opcodeTable[packet->GetOpcode()];
+    OpcodeHandler const &opHandle = opcodeTable[packet->GetOpcodeEnum()];
     //check if packet handler is supposed to be safe
     if (opHandle.packetProcessing == PROCESS_INPLACE)
         return true;
@@ -134,7 +134,7 @@ WorldSession::~WorldSession()
 void WorldSession::SizeError(WorldPacket const &packet, uint32 size) const
 {
     sLog->outError("Client (account %u) send packet %s (%u) with size " SIZEFMTD " but expected %u (attempt to crash server?), skipped",
-        GetAccountId(), LookupOpcodeName(packet.GetOpcode()), packet.GetOpcode(), packet.size(), size);
+        GetAccountId(), LookupOpcodeName(packet.GetOpcodeEnum()), packet.GetOpcodeEnum(), packet.size(), size);
 }
 
 /// Get the player name
@@ -198,14 +198,14 @@ void WorldSession::LogUnexpectedOpcode(WorldPacket* packet, const char* status, 
 {
     sLog->outError("SESSION (account: %u, guidlow: %u, char: %s): received unexpected opcode %s (0x%.4X, status: %s) %s",
         GetAccountId(), m_GUIDLow, _player ? _player->GetName() : "<none>",
-        LookupOpcodeName(packet->GetOpcode()), packet->GetOpcode(), status, reason);
+        LookupOpcodeName(packet->GetOpcodeEnum()), packet->GetOpcodeEnum(), status, reason);
 }
 
 /// Logging helper for unexpected opcodes
 void WorldSession::LogUnprocessedTail(WorldPacket* packet)
 {
     sLog->outError("SESSION: opcode %s (0x%.4X) have unprocessed tail data (read stop at %u from %u)",
-        LookupOpcodeName(packet->GetOpcode()), packet->GetOpcode(), uint32(packet->rpos()), uint32(packet->wpos()));
+        LookupOpcodeName(packet->GetOpcodeEnum()), packet->GetOpcodeEnum(), uint32(packet->rpos()), uint32(packet->wpos()));
     packet->print_storage();
 }
 
@@ -225,14 +225,14 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     WorldPacket* packet = NULL;
     while (m_Socket && !m_Socket->IsClosed() && _recvQueue.next(packet, updater))
     {
-        if (packet->GetOpcode() >= NUM_MSG_TYPES)
+        if (packet->GetOpcodeEnum() >= NUM_MSG_TYPES)
         {
-            sLog->outError("SESSION: received non-existed opcode %s (0x%.4X)", LookupOpcodeName(packet->GetOpcode()), packet->GetOpcode());
+            sLog->outError("SESSION: received non-existed opcode %s (0x%.4X)", LookupOpcodeName(packet->GetOpcodeEnum()), packet->GetOpcodeEnum());
             sScriptMgr->OnUnknownPacketReceive(m_Socket, WorldPacket(*packet));
         }
         else
         {
-            OpcodeHandler &opHandle = opcodeTable[packet->GetOpcode()];
+            OpcodeHandler &opHandle = opcodeTable[packet->GetOpcodeEnum()];
             try
             {
                 switch (opHandle.status)
@@ -289,7 +289,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 
                         // single from authed time opcodes send in to after logout time
                         // and before other STATUS_LOGGEDIN_OR_RECENTLY_LOGGOUT opcodes.
-                        if (packet->GetOpcode() != CMSG_SET_ACTIVE_VOICE_CHANNEL)
+                        if (packet->GetOpcodeEnum() != CMSG_SET_ACTIVE_VOICE_CHANNEL)
                             m_playerRecentlyLogout = false;
 
                         sScriptMgr->OnPacketReceive(m_Socket, WorldPacket(*packet));
@@ -300,19 +300,19 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                     case STATUS_NEVER:
                         sLog->outError("SESSION (account: %u, guidlow: %u, char: %s): received not allowed opcode %s (0x%.4X)",
                             GetAccountId(), m_GUIDLow, _player ? _player->GetName() : "<none>",
-                            LookupOpcodeName(packet->GetOpcode()), packet->GetOpcode());
+                            LookupOpcodeName(packet->GetOpcodeEnum()), packet->GetOpcodeEnum());
                         break;
                     case STATUS_UNHANDLED:
                         sLog->outDebug(LOG_FILTER_NETWORKIO, "SESSION (account: %u, guidlow: %u, char: %s): received not handled opcode %s (0x%.4X)",
                             GetAccountId(), m_GUIDLow, _player ? _player->GetName() : "<none>",
-                            LookupOpcodeName(packet->GetOpcode()), packet->GetOpcode());
+                            LookupOpcodeName(packet->GetOpcodeEnum()), packet->GetOpcodeEnum());
                         break;
                 }
             }
             catch(ByteBufferException &)
             {
                 sLog->outError("WorldSession::Update ByteBufferException occured while parsing a packet (opcode: %u) from client %s, accountid=%i. Skipped packet.",
-                        packet->GetOpcode(), GetRemoteAddress().c_str(), GetAccountId());
+                        packet->GetOpcodeEnum(), GetRemoteAddress().c_str(), GetAccountId());
                 if (sLog->IsOutDebug())
                 {
                     sLog->outDebug(LOG_FILTER_NETWORKIO, "Dumping error causing packet:");
@@ -521,6 +521,14 @@ void WorldSession::KickPlayer()
         m_Socket->CloseSocket();
 }
 
+void WorldSession::HandleMoveToGraveyard(WorldPacket &recv_data)
+{
+    if (_player->isAlive() || !_player->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
+        return;
+
+    _player->RepopAtGraveyard();
+}
+
 void WorldSession::SendNotification(const char *format, ...)
 {
     if (format)
@@ -561,24 +569,24 @@ const char *WorldSession::GetStrings(int32 entry) const
     return sObjectMgr->GetStrings(entry, GetSessionDbLocaleIndex());
 }
 
-void WorldSession::Handle_NULL(WorldPacket& recvPacket)
+void WorldSession::HandleNULL(WorldPacket& recvPacket)
 {
-    sLog->outError("SESSION: received unhandled opcode %s (0x%.4X)", LookupOpcodeName(recvPacket.GetOpcode()), recvPacket.GetOpcode());
+    sLog->outError("SESSION: received unhandled opcode %s (0x%.4X)", LookupOpcodeName(recvPacket.GetOpcodeEnum()), recvPacket.GetOpcodeEnum());
 }
 
-void WorldSession::Handle_EarlyProccess(WorldPacket& recvPacket)
+void WorldSession::HandleEarlyProccess(WorldPacket& recvPacket)
 {
-    sLog->outError("SESSION: received opcode %s (0x%.4X) that must be processed in WorldSocket::OnRead", LookupOpcodeName(recvPacket.GetOpcode()), recvPacket.GetOpcode());
+    sLog->outError("SESSION: received opcode %s (0x%.4X) that must be processed in WorldSocket::OnRead", LookupOpcodeName(recvPacket.GetOpcodeEnum()), recvPacket.GetOpcodeEnum());
 }
 
-void WorldSession::Handle_ServerSide(WorldPacket& recvPacket)
+void WorldSession::HandleServerSide(WorldPacket& recvPacket)
 {
-    sLog->outError("SESSION: received server-side opcode %s (0x%.4X)", LookupOpcodeName(recvPacket.GetOpcode()), recvPacket.GetOpcode());
+    sLog->outError("SESSION: received server-side opcode %s (0x%.4X)", LookupOpcodeName(recvPacket.GetOpcodeEnum()), recvPacket.GetOpcodeEnum());
 }
 
-void WorldSession::Handle_Deprecated(WorldPacket& recvPacket)
+void WorldSession::HandleDeprecated(WorldPacket& recvPacket)
 {
-    sLog->outError("SESSION: received deprecated opcode %s (0x%.4X)", LookupOpcodeName(recvPacket.GetOpcode()), recvPacket.GetOpcode());
+    sLog->outError("SESSION: received deprecated opcode %s (0x%.4X)", LookupOpcodeName(recvPacket.GetOpcodeEnum()), recvPacket.GetOpcodeEnum());
 }
 
 void WorldSession::SendAuthWaitQue(uint32 position)
@@ -716,192 +724,6 @@ void WorldSession::SaveTutorialsData(SQLTransaction &trans)
     trans->Append(stmt);
 
     m_TutorialsChanged = false;
-}
-
-void WorldSession::ReadMovementInfo(WorldPacket &data, MovementInfo *mi)
-{
-    data >> mi->flags;
-    data >> mi->flags2;
-    data >> mi->time;
-    data >> mi->pos.PositionXYZOStream();
-
-    if (mi->HasMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
-    {
-        data.readPackGUID(mi->t_guid);
-
-        data >> mi->t_pos.PositionXYZOStream();
-        data >> mi->t_time;
-        data >> mi->t_seat;
-
-        if (mi->HasExtraMovementFlag(MOVEMENTFLAG2_INTERPOLATED_MOVEMENT))
-            data >> mi->t_time2;
-
-        if (mi->pos.m_positionX != mi->t_pos.m_positionX)
-            if (GetPlayer()->GetTransport())
-                GetPlayer()->GetTransport()->UpdatePosition(mi);
-    }
-
-    if (mi->HasMovementFlag(MovementFlags(MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING)) || (mi->HasExtraMovementFlag(MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING)))
-        data >> mi->pitch;
-
-    data >> mi->fallTime;
-
-    if (mi->HasMovementFlag(MOVEMENTFLAG_JUMPING))
-    {
-        data >> mi->j_zspeed;
-        data >> mi->j_sinAngle;
-        data >> mi->j_cosAngle;
-        data >> mi->j_xyspeed;
-    }
-
-    if (mi->HasMovementFlag(MOVEMENTFLAG_SPLINE_ELEVATION))
-        data >> mi->splineElevation;
-
-    // This must be a packet spoofing attempt. MOVEMENTFLAG_ROOT sent from the client is not valid,
-    // and when used in conjunction with any of the moving movement flags such as MOVEMENTFLAG_FORWARD
-    // it will freeze clients that receive this player's movement info.
-    if (mi->HasMovementFlag(MOVEMENTFLAG_ROOT))
-        mi->flags &= ~MOVEMENTFLAG_ROOT;
-
-    // Cannot hover and jump at the same time
-    if (mi->HasMovementFlag(MOVEMENTFLAG_HOVER) && mi->HasMovementFlag(MOVEMENTFLAG_JUMPING))
-        mi->flags &= ~MOVEMENTFLAG_JUMPING;
-
-    // Cannot ascend and descend at the same time
-    if (mi->HasMovementFlag(MOVEMENTFLAG_ASCENDING) && mi->HasMovementFlag(MOVEMENTFLAG_DESCENDING))
-        mi->flags &= ~(MOVEMENTFLAG_ASCENDING | MOVEMENTFLAG_DESCENDING);
-
-    // Cannot move left and right at the same time
-    if (mi->HasMovementFlag(MOVEMENTFLAG_LEFT) && mi->HasMovementFlag(MOVEMENTFLAG_RIGHT))
-        mi->flags &= ~(MOVEMENTFLAG_LEFT | MOVEMENTFLAG_RIGHT);
-
-    // Cannot strafe left and right at the same time
-    if (mi->HasMovementFlag(MOVEMENTFLAG_STRAFE_LEFT) && mi->HasMovementFlag(MOVEMENTFLAG_STRAFE_RIGHT))
-        mi->flags &= ~(MOVEMENTFLAG_STRAFE_LEFT | MOVEMENTFLAG_STRAFE_RIGHT);
-
-    // Cannot pitch up and down at the same time
-    if (mi->HasMovementFlag(MOVEMENTFLAG_PITCH_UP) && mi->HasMovementFlag(MOVEMENTFLAG_PITCH_DOWN))
-        mi->flags &= ~(MOVEMENTFLAG_PITCH_UP | MOVEMENTFLAG_PITCH_DOWN);
-
-    // Cannot move forwards and backwards at the same time
-    if (mi->HasMovementFlag(MOVEMENTFLAG_FORWARD) && mi->HasMovementFlag(MOVEMENTFLAG_BACKWARD))
-        mi->flags &= ~(MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD);
-}
-
-void WorldSession::WriteMovementInfo(WorldPacket *data, MovementInfo *mi)
-{
-    data->appendPackGUID(mi->guid);
-
-    *data << mi->flags;
-    *data << mi->flags2;
-    *data << mi->time;
-    *data << mi->pos.PositionXYZOStream();
-
-    if (mi->HasMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
-    {
-       data->appendPackGUID(mi->t_guid);
-
-       *data << mi->t_pos.PositionXYZOStream();
-       *data << mi->t_time;
-       *data << mi->t_seat;
-    }
-
-    if (mi->HasMovementFlag(MovementFlags(MOVEMENTFLAG_SWIMMING | MOVEMENTFLAG_FLYING)) || mi->HasExtraMovementFlag(MOVEMENTFLAG2_ALWAYS_ALLOW_PITCHING))
-        *data << mi->pitch;
-
-    *data << mi->fallTime;
-
-    if (mi->HasMovementFlag(MOVEMENTFLAG_JUMPING))
-    {
-        *data << mi->j_zspeed;
-        *data << mi->j_sinAngle;
-        *data << mi->j_cosAngle;
-        *data << mi->j_xyspeed;
-    }
-
-    if (mi->HasMovementFlag(MOVEMENTFLAG_SPLINE_ELEVATION))
-        *data << mi->splineElevation;
-}
-
-void WorldSession::ReadAddonsInfo(WorldPacket &data)
-{
-    if (data.rpos() + 4 > data.size())
-        return;
-    uint32 size;
-    data >> size;
-
-    if (!size)
-        return;
-
-    if (size > 0xFFFFF)
-    {
-        sLog->outError("WorldSession::ReadAddonsInfo addon info too big, size %u", size);
-        return;
-    }
-
-    uLongf uSize = size;
-
-    uint32 pos = data.rpos();
-
-    ByteBuffer addonInfo;
-    addonInfo.resize(size);
-
-    if (uncompress(const_cast<uint8 *>(addonInfo.contents()), &uSize, const_cast<uint8 *>(data.contents() + pos), data.size() - pos) == Z_OK)
-    {
-        uint32 addonsCount;
-        addonInfo >> addonsCount;                         // addons count
-
-        for (uint32 i = 0; i < addonsCount; ++i)
-        {
-            std::string addonName;
-            uint8 enabled;
-            uint32 crc, unk1;
-
-            // check next addon data format correctness
-            if (addonInfo.rpos() + 1 > addonInfo.size())
-                return;
-
-            addonInfo >> addonName;
-
-            addonInfo >> enabled >> crc >> unk1;
-
-            sLog->outDetail("ADDON: Name: %s, Enabled: 0x%x, CRC: 0x%x, Unknown2: 0x%x", addonName.c_str(), enabled, crc, unk1);
-
-            AddonInfo addon(addonName, enabled, crc, 2, true);
-
-            SavedAddon const* savedAddon = sAddonMgr->GetAddonInfo(addonName);
-            if (savedAddon)
-            {
-                bool match = true;
-
-                if (addon.CRC != savedAddon->CRC)
-                    match = false;
-
-                if (!match)
-                    sLog->outDetail("ADDON: %s was known, but didn't match known CRC (0x%x)!", addon.Name.c_str(), savedAddon->CRC);
-                else
-                    sLog->outDetail("ADDON: %s was known, CRC is correct (0x%x)", addon.Name.c_str(), savedAddon->CRC);
-            }
-            else
-            {
-                sAddonMgr->SaveAddon(addon);
-
-                sLog->outDetail("ADDON: %s (0x%x) was not known, saving...", addon.Name.c_str(), addon.CRC);
-            }
-
-            // TODO: Find out when to not use CRC/pubkey, and other possible states.
-            m_addonsList.push_back(addon);
-        }
-
-        uint32 currentTime;
-        addonInfo >> currentTime;
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "ADDON: CurrentTime: %u", currentTime);
-
-        if (addonInfo.rpos() != addonInfo.size())
-            sLog->outDebug(LOG_FILTER_NETWORKIO, "packet under-read!");
-    }
-    else
-        sLog->outError("Addon packet uncompress error!");
 }
 
 void WorldSession::SendAddonsInfo()

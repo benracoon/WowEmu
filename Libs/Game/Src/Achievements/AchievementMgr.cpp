@@ -2046,7 +2046,7 @@ void AchievementMgr::SendAllAchievementData() const
 {
     WorldPacket data(SMSG_ALL_ACHIEVEMENT_DATA, m_completedAchievements.size()*8+4+m_criteriaProgress.size()*38+4);
     BuildAllDataPacket(&data);
-    GetPlayer()->GetSession()->SendPacket(&data);
+    //GetPlayer()->GetSession()->SendPacket(&data);
 }
 
 void AchievementMgr::SendRespondInspectAchievements(Player* player) const
@@ -2054,7 +2054,7 @@ void AchievementMgr::SendRespondInspectAchievements(Player* player) const
     WorldPacket data(SMSG_RESPOND_INSPECT_ACHIEVEMENTS, 9+m_completedAchievements.size()*8+4+m_criteriaProgress.size()*38+4);
     data.append(GetPlayer()->GetPackGUID());
     BuildAllDataPacket(&data);
-    player->GetSession()->SendPacket(&data);
+    //player->GetSession()->SendPacket(&data);
 }
 
 /**

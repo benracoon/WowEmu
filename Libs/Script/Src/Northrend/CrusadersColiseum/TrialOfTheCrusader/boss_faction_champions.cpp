@@ -308,10 +308,10 @@ struct boss_faction_championsAI : public ScriptedAI
 
     void UpdatePower()
     {
-        if (me->getPowerType() == POWER_MANA)
-            me->ModifyPower(POWER_MANA, me->GetMaxPower(POWER_MANA) / 3);
-        //else if (me->getPowerType() == POWER_ENERGY)
-        //    me->ModifyPower(POWER_ENERGY, 100);
+        if (me->getPowerType() == MANA)
+            me->ModifyPower(MANA, me->GetMaxPower(MANA) / 3);
+        //else if (me->getPowerType() == ENERGY)
+        //    me->ModifyPower(ENERGY, 100);
     }
 
     void RemoveCC()
@@ -386,7 +386,7 @@ struct boss_faction_championsAI : public ScriptedAI
         for (iter = tList.begin(); iter!=tList.end(); ++iter)
         {
             target = Unit::GetUnit((*me), (*iter)->getUnitGuid());
-            if (target && target->getPowerType() == POWER_MANA)
+            if (target && target->getPowerType() == MANA)
                 return target;
         }
         return NULL;

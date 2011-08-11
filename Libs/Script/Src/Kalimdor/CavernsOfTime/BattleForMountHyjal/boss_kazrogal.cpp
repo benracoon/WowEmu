@@ -177,7 +177,7 @@ public:
                 for (std::list<HostileReference *>::const_iterator itr = t_list.begin(); itr!= t_list.end(); ++itr)
                 {
                     Unit* target = Unit::GetUnit(*me, (*itr)->getUnitGuid());
-                    if (target && target->GetTypeId() == TYPEID_PLAYER && target->getPowerType() == POWER_MANA)
+                    if (target && target->GetTypeId() == TYPEID_PLAYER && target->getPowerType() == MANA)
                     {
                         target->CastSpell(target, SPELL_MARK, true);//only cast on mana users
                     }

@@ -1523,6 +1523,10 @@
 			Name="Server"
 			>
 			<File
+				RelativePath="..\..\Src\Server\WorldPacket.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\Src\Server\WorldSession.cpp"
 				>
 			</File>
@@ -1553,6 +1557,10 @@
 			<Filter
 				Name="Protocol"
 				>
+				<File
+					RelativePath="..\..\Src\Server\MovementStructures.h"
+					>
+				</File>
 				<File
 					RelativePath="..\..\Src\Server\Protocol\Opcodes.cpp"
 					>

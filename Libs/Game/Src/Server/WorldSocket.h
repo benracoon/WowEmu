@@ -117,6 +117,10 @@ class WorldSocket : public WorldHandler
         /// Remove reference to this object.
         long RemoveReference (void);
 
+        /// New Auth check since 4.1.0
+        int SendResumeComms();
+        int HandleResumeComms(WorldPacket& recvPacket);
+
         /// things called by ACE framework.
 
         /// Called on open , the void* is the acceptor.

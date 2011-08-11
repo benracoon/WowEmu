@@ -90,6 +90,13 @@ enum BuyBankSlotResult
     ERR_BANKSLOT_OK                 = 3
 };
 
+enum TrainerBuySpellResult
+{
+    ERR_TRAINER_UNAVAILABLE = 0,
+    ERR_TRAINER_NOT_ENOUGH_MONEY = 1,
+    ERR_TRAINER_OK = 2,
+};
+
 enum PlayerSpellState
 {
     PLAYERSPELL_UNCHANGED = 0,
@@ -129,6 +136,24 @@ struct SpellModifier
 typedef UNORDERED_MAP<uint32, PlayerTalent*> PlayerTalentMap;
 typedef UNORDERED_MAP<uint32, PlayerSpell*> PlayerSpellMap;
 typedef std::list<SpellModifier*> SpellModList;
+
+enum PlayerCurrencyState
+{
+    PLAYERCURRENCY_UNCHANGED = 0,
+    PLAYERCURRENCY_CHANGED   = 1,
+    PLAYERCURRENCY_NEW       = 2,
+    PLAYERCURRENCY_REMOVED   = 3
+};
+
+struct PlayerCurrency
+{
+    PlayerCurrencyState state;
+    uint32 totalCount;
+    uint32 weekCount;
+};
+
+#define PLAYER_CURRENCY_PRECISION   100
+typedef UNORDERED_MAP<uint32, PlayerCurrency> PlayerCurrenciesMap;
 
 struct SpellCooldown
 {
@@ -1098,7 +1123,7 @@ class Player : public Unit, public GridObject<Player>
 
         void Update(uint32 time);
 
-        static bool BuildEnumData(QueryResult result, WorldPacket* data);
+        static void BuildEnumData(QueryResult result, WorldPacket* data);
 
         void SetInWater(bool apply);
 

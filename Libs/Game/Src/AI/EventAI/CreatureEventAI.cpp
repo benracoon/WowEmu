@@ -151,10 +151,10 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
         }
         case EVENT_T_MANA:
         {
-            if (!me->isInCombat() || !me->GetMaxPower(POWER_MANA))
+            if (!me->isInCombat() || !me->GetMaxPower(MANA))
                 return false;
 
-            uint32 perc = (me->GetPower(POWER_MANA)*100) / me->GetMaxPower(POWER_MANA);
+            uint32 perc = (me->GetPower(MANA)*100) / me->GetMaxPower(MANA);
 
             if (perc > event.percent_range.percentMax || perc < event.percent_range.percentMin)
                 return false;
@@ -276,10 +276,10 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
         }
         case EVENT_T_TARGET_MANA:
         {
-            if (!me->isInCombat() || !me->getVictim() || !me->getVictim()->GetMaxPower(POWER_MANA))
+            if (!me->isInCombat() || !me->getVictim() || !me->getVictim()->GetMaxPower(MANA))
                 return false;
 
-            uint32 perc = (me->getVictim()->GetPower(POWER_MANA)*100) / me->getVictim()->GetMaxPower(POWER_MANA);
+            uint32 perc = (me->getVictim()->GetPower(MANA)*100) / me->getVictim()->GetMaxPower(MANA);
 
             if (perc > event.percent_range.percentMax || perc < event.percent_range.percentMin)
                 return false;

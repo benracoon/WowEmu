@@ -67,11 +67,11 @@ void WorldSession::HandleChangeSeatsOnControlledVehicle(WorldPacket &recv_data)
     {
         recv_data.rfinish();                                // prevent warnings spam
         sLog->outError("HandleChangeSeatsOnControlledVehicle, Opcode: %u, Player %u tried to switch seats but current seatflags %u don't permit that.",
-            recv_data.GetOpcode(), GetPlayer()->GetGUIDLow(), seat->m_flags);
+            recv_data.GetOpcodeEnum(), GetPlayer()->GetGUIDLow(), seat->m_flags);
         return;
     }
 
-    switch (recv_data.GetOpcode())
+    switch (recv_data.GetOpcodeEnum())
     {
         case CMSG_REQUEST_VEHICLE_PREV_SEAT:
             GetPlayer()->ChangeSeat(-1, false);

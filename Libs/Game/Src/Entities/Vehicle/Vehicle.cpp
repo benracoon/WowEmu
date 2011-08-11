@@ -63,12 +63,12 @@ void Vehicle::Install()
             case POWER_BLOOD:
             case POWER_OOZE:
             case POWER_WRATH:
-                _me->setPowerType(POWER_ENERGY);
-                _me->SetMaxPower(POWER_ENERGY, 100);
+                _me->setPowerType(ENERGY);
+                _me->SetMaxPower(ENERGY, 100);
                 break;
             case POWER_PYRITE:
-                _me->setPowerType(POWER_ENERGY);
-                _me->SetMaxPower(POWER_ENERGY, 50);
+                _me->setPowerType(ENERGY);
+                _me->SetMaxPower(ENERGY, 50);
                 break;
             default:
                 for (uint32 i = 0; i < MAX_SPELL_VEHICLE; ++i)
@@ -80,10 +80,10 @@ void Vehicle::Install()
                     if (!spellInfo)
                         continue;
 
-                    if (spellInfo->PowerType == POWER_ENERGY)
+                    if (spellInfo->PowerType == ENERGY)
                     {
-                        _me->setPowerType(POWER_ENERGY);
-                        _me->SetMaxPower(POWER_ENERGY, 100);
+                        _me->setPowerType(ENERGY);
+                        _me->SetMaxPower(ENERGY, 100);
                         break;
                     }
                 }

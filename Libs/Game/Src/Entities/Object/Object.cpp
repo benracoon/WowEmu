@@ -741,7 +741,10 @@ void Object::BuildFieldsUpdate(Player *pl, UpdateDataMapType &data_map) const
 
     if (iter == data_map.end())
     {
-        std::pair<UpdateDataMapType::iterator, bool> p = data_map.insert(UpdateDataMapType::value_type(pl, UpdateData()));
+        UpdateData udata;
+        udata.m_map = pl->GetMapId();
+
+        std::pair<UpdateDataMapType::iterator, bool> p = data_map.insert(UpdateDataMapType::value_type(pl, udata));
         ASSERT(p.second);
         iter = p.first;
     }
@@ -2252,7 +2255,7 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
     pet->SetCreatorGUID(GetGUID());
     pet->SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, getFaction());
 
-    pet->setPowerType(POWER_MANA);
+    pet->setPowerType(MANA);
     pet->SetUInt32Value(UNIT_NPC_FLAGS , 0);
     pet->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
     pet->InitStatsForLevel(getLevel());
@@ -2268,7 +2271,7 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
             pet->SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
             pet->SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 1000);
             pet->SetFullHealth();
-            pet->SetPower(POWER_MANA, pet->GetMaxPower(POWER_MANA));
+            pet->SetPower(MANA, pet->GetMaxPower(MANA));
             pet->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(time(NULL))); // cast can't be helped in this case
             break;
         default:

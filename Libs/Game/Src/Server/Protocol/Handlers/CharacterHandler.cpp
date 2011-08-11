@@ -198,29 +198,95 @@ bool LoginQueryHolder::Initialize()
 
 void WorldSession::HandleCharEnum(QueryResult result)
 {
-    WorldPacket data(SMSG_CHAR_ENUM, 100);                  // we guess size
+    WorldPacket data(SMSG_CHAR_ENUM, 100); // we guess size
 
-    uint8 num = 0;
+    uint32 num = 0;
 
+    data << uint8(1 << 7); // 0 causes the client to free memory of charlist
+    data << uint32(0); // unk loop counter
     data << num;
 
     _allowedCharsToLogin.clear();
     if (result)
     {
+        uint8 curRes = 0;
+        uint8 curPos = 0;
         do
         {
             uint32 guidlow = (*result)[0].GetUInt32();
-            sLog->outDetail("Loading char guid %u from account %u.", guidlow, GetAccountId());
-            if (Player::BuildEnumData(result, &data))
+            uint8 pRace = (*result)[2].GetUInt8();
+            uint8 pClass = (*result)[3].GetUInt8();
+            uint32 atLoginFlags = (*result)[15].GetUInt32();
+
+            PlayerInfo const *info = sObjectMgr->GetPlayerInfo(pRace, pClass);
+            if (info != NULL)
             {
                 _allowedCharsToLogin.insert(guidlow);
                 ++num;
             }
+            else
+            {
+                sLog->outError("Player %u has incorrect race/class pair. Don't build enum.", guidlow);
+                continue;
+            }
+
+            for (int i = 0; i < 17; ++i)
+            {
+                if (curPos == 8)
+                {
+                    data << curRes;
+                    curRes = curPos = 0;
+                }
+
+                ++curPos;
+                uint8 offset = 8-curPos;
+                // Low PlayerGUID
+                if (i == 0) // v79
+                {
+                    if (uint8(guidlow) != 0)
+                        curRes |= (1 << offset);
+                }
+                else if (i == 7) // v68
+                {
+                    if (uint8(guidlow >> 8) != 0)
+                        curRes |= (1 << offset);
+                }
+                else if (i == 12) // v70
+                {
+                    if (uint8(guidlow >> 16) != 0)
+                        curRes |= (1 << offset);
+                }
+                else if (i == 11) // v78
+                {
+                    if (uint8(guidlow >> 24) != 0)
+                        curRes |= (1 << offset);
+                }
+                // Low PlayerGUID end
+                // First Login
+                else if (i == 1)
+                {
+                    if (atLoginFlags & AT_LOGIN_FIRST)
+                        curRes |= (1 << offset);
+                }
+                // Also sent in packet stream: Player High GUID, Guild GUID (8 bytes)
+            }
+        } while(result->NextRow(true));
+
+        // If some data is still there, but we didn't reach the max bit
+        if (curPos != 0)
+            data << curRes;
+
+        result->Reset();
+        do
+        {
+            uint32 guidlow = (*result)[0].GetUInt32();
+            sLog->outDetail("Loading char guid %u from account %u.",guidlow,GetAccountId());
+            Player::BuildEnumData(result, &data);
         }
         while (result->NextRow());
     }
 
-    data.put<uint8>(0, num);
+    data.put<uint32>(5, num);
 
     SendPacket(&data);
 }
@@ -758,24 +824,62 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket & recv_data)
     SendPacket(&data);
 }
 
+void WorldSession::HandleWorldLoginOpcode(WorldPacket& recv_data)
+{
+    sLog->outStaticDebug("WORLD: Recvd World Login Message");
+
+    recv_data.read_skip<uint32>();
+    recv_data.read_skip<uint8>();
+}
+
 void WorldSession::HandlePlayerLoginOpcode(WorldPacket & recv_data)
 {
     if (PlayerLoading() || GetPlayer() != NULL)
     {
-        sLog->outError("Player tryes to login again, AccountId = %d", GetAccountId());
+        sLog->outError("Player tries to login again, AccountId = %d",GetAccountId());
         return;
     }
 
     m_playerLoading = true;
     uint64 playerGuid = 0;
+    uint8 guidMark, byte;
 
     sLog->outStaticDebug("WORLD: Recvd Player Logon Message");
 
-    recv_data >> playerGuid;
+    //recv_data >> playerGuid;
+    recv_data >> guidMark;
 
-    if (!CharCanLogin(GUID_LOPART(playerGuid)))
+    // Bits are mixed up...
+    // Let's skip the highguid part -- it's 0x0000 for players anyway
+    if (guidMark & (1 << 2))
     {
-        sLog->outError("Account (%u) can't login with that character (%u).", GetAccountId(), GUID_LOPART(playerGuid));
+        recv_data >> byte;
+
+        playerGuid |= uint64(byte << 8);
+    }
+    if (guidMark & (1 << 5))
+    {
+        recv_data >> byte;
+
+        playerGuid |= uint64(byte << 16);
+    }
+    if (guidMark & (1 << 6))
+    {
+        recv_data >> byte;
+
+        playerGuid |= uint64(byte);
+    }
+    if (guidMark & (1 << 4))
+    {
+        recv_data >> byte;
+
+        playerGuid |= uint64(byte << 24);
+    }
+
+    sLog->outStaticDebug("GUID Marker: %u GUID: %u", guidMark, playerGuid);
+
+    if (!CharCanLogin(uint32(playerGuid)))
+    {
         KickPlayer();
         return;
     }
@@ -783,7 +887,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket & recv_data)
     LoginQueryHolder *holder = new LoginQueryHolder(GetAccountId(), playerGuid);
     if (!holder->Initialize())
     {
-        delete holder;                                      // delete all unprocessed queries
+        delete holder; // delete all unprocessed queries
         m_playerLoading = false;
         return;
     }
@@ -827,9 +931,11 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder * holder)
     LoadAccountData(holder->GetPreparedResult(PLAYER_LOGIN_QUERY_LOADACCOUNTDATA), PER_CHARACTER_CACHE_MASK);
     SendAccountDataTimes(PER_CHARACTER_CACHE_MASK);
 
-    data.Initialize(SMSG_FEATURE_SYSTEM_STATUS, 2);         // added in 2.2.0
+    data.Initialize(SMSG_FEATURE_SYSTEM_STATUS, 6);         // added in 2.2.0
     data << uint8(2);                                       // unknown value
     data << uint8(0);                                       // enable(1)/disable(0) voice chat interface in client
+    data << uint32(0);                                      // 4.2.0
+
     SendPacket(&data);
 
     // Send MOTD
@@ -1586,7 +1692,7 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recv_data)
     uint32 playerClass = fields[0].GetUInt32();
     uint32 level = fields[1].GetUInt32();
     uint32 at_loginFlags = fields[2].GetUInt16();
-    uint32 used_loginFlag = ((recv_data.GetOpcode() == CMSG_CHAR_RACE_CHANGE) ? AT_LOGIN_CHANGE_RACE : AT_LOGIN_CHANGE_FACTION);
+    uint32 used_loginFlag = ((recv_data.GetOpcodeEnum() == CMSG_CHAR_RACE_CHANGE) ? AT_LOGIN_CHANGE_RACE : AT_LOGIN_CHANGE_FACTION);
 
     if (!sObjectMgr->GetPlayerInfo(race, playerClass))
     {
@@ -1721,7 +1827,7 @@ void WorldSession::HandleCharFactionOrRaceChange(WorldPacket& recv_data)
         }
     }
 
-    if (recv_data.GetOpcode() == CMSG_CHAR_FACTION_CHANGE)
+    if (recv_data.GetOpcodeEnum() == CMSG_CHAR_FACTION_CHANGE)
     {
         // Delete all Flypaths
         trans->PAppend("UPDATE `characters` SET taxi_path = '' WHERE guid ='%u'", lowGuid);

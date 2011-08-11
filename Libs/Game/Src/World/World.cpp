@@ -421,18 +421,18 @@ void World::LoadConfigSettings(bool reload)
         sLog->outError("Rate.Health (%f) must be > 0. Using 1 instead.", rate_values[RATE_HEALTH]);
         rate_values[RATE_HEALTH] = 1;
     }
-    rate_values[RATE_POWER_MANA]  = sConfig->GetFloatDefault("Rate.Mana", 1);
-    if (rate_values[RATE_POWER_MANA] < 0)
+    rate_values[RATE_MANA]  = sConfig->GetFloatDefault("Rate.Mana", 1);
+    if (rate_values[RATE_MANA] < 0)
     {
-        sLog->outError("Rate.Mana (%f) must be > 0. Using 1 instead.", rate_values[RATE_POWER_MANA]);
-        rate_values[RATE_POWER_MANA] = 1;
+        sLog->outError("Rate.Mana (%f) must be > 0. Using 1 instead.", rate_values[RATE_MANA]);
+        rate_values[RATE_MANA] = 1;
     }
-    rate_values[RATE_POWER_RAGE_INCOME] = sConfig->GetFloatDefault("Rate.Rage.Income", 1);
-    rate_values[RATE_POWER_RAGE_LOSS]   = sConfig->GetFloatDefault("Rate.Rage.Loss", 1);
-    if (rate_values[RATE_POWER_RAGE_LOSS] < 0)
+    rate_values[RATE_RAGE_INCOME] = sConfig->GetFloatDefault("Rate.Rage.Income", 1);
+    rate_values[RATE_RAGE_LOSS]   = sConfig->GetFloatDefault("Rate.Rage.Loss", 1);
+    if (rate_values[RATE_RAGE_LOSS] < 0)
     {
-        sLog->outError("Rate.Rage.Loss (%f) must be > 0. Using 1 instead.", rate_values[RATE_POWER_RAGE_LOSS]);
-        rate_values[RATE_POWER_RAGE_LOSS] = 1;
+        sLog->outError("Rate.Rage.Loss (%f) must be > 0. Using 1 instead.", rate_values[RATE_RAGE_LOSS]);
+        rate_values[RATE_RAGE_LOSS] = 1;
     }
     rate_values[RATE_POWER_RUNICPOWER_INCOME] = sConfig->GetFloatDefault("Rate.RunicPower.Income", 1);
     rate_values[RATE_POWER_RUNICPOWER_LOSS]   = sConfig->GetFloatDefault("Rate.RunicPower.Loss", 1);
@@ -441,8 +441,8 @@ void World::LoadConfigSettings(bool reload)
         sLog->outError("Rate.RunicPower.Loss (%f) must be > 0. Using 1 instead.", rate_values[RATE_POWER_RUNICPOWER_LOSS]);
         rate_values[RATE_POWER_RUNICPOWER_LOSS] = 1;
     }
-    rate_values[RATE_POWER_FOCUS]  = sConfig->GetFloatDefault("Rate.Focus", 1.0f);
-    rate_values[RATE_POWER_ENERGY] = sConfig->GetFloatDefault("Rate.Energy", 1.0f);
+    rate_values[RATE_FOCUS]  = sConfig->GetFloatDefault("Rate.Focus", 1.0f);
+    rate_values[RATE_ENERGY] = sConfig->GetFloatDefault("Rate.Energy", 1.0f);
 
     rate_values[RATE_SKILL_DISCOVERY]      = sConfig->GetFloatDefault("Rate.Skill.Discovery", 1.0f);
 

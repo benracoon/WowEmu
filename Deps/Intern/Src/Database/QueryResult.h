@@ -48,6 +48,12 @@ class ResultSet
             return m_currentRow[index];
         }
 
+        void Reset()
+        {
+            mysql_data_seek (m_result, 0);
+            NextRow();
+        }
+
     protected:
         Field *m_currentRow;
         uint64 m_rowCount;

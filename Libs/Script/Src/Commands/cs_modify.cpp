@@ -138,8 +138,8 @@ public:
         if (handler->needReportToTarget(target))
             (ChatHandler(target)).PSendSysMessage(LANG_YOURS_MANA_CHANGED, handler->GetNameLink().c_str(), mana, manam);
 
-        target->SetMaxPower(POWER_MANA, manam);
-        target->SetPower(POWER_MANA, mana);
+        target->SetMaxPower(MANA, manam);
+        target->SetPower(MANA, mana);
 
         return true;
     }
@@ -187,10 +187,10 @@ public:
         if (handler->needReportToTarget(target))
             (ChatHandler(target)).PSendSysMessage(LANG_YOURS_ENERGY_CHANGED, handler->GetNameLink().c_str(), energy/10, energym/10);
 
-        target->SetMaxPower(POWER_ENERGY, energym);
-        target->SetPower(POWER_ENERGY, energy);
+        target->SetMaxPower(ENERGY, energym);
+        target->SetPower(ENERGY, energy);
 
-        sLog->outDetail(handler->GetStrings(LANG_CURRENT_ENERGY), target->GetMaxPower(POWER_ENERGY));
+        sLog->outDetail(handler->GetStrings(LANG_CURRENT_ENERGY), target->GetMaxPower(ENERGY));
 
         return true;
     }
@@ -238,8 +238,8 @@ public:
         if (handler->needReportToTarget(target))
             (ChatHandler(target)).PSendSysMessage(LANG_YOURS_RAGE_CHANGED, handler->GetNameLink().c_str(), rage/10, ragem/10);
 
-        target->SetMaxPower(POWER_RAGE, ragem);
-        target->SetPower(POWER_RAGE, rage);
+        target->SetMaxPower(RAGE, ragem);
+        target->SetPower(RAGE, rage);
 
         return true;
     }
@@ -272,8 +272,8 @@ public:
         if (handler->needReportToTarget(target))
             (ChatHandler(target)).PSendSysMessage(LANG_YOURS_RUNIC_POWER_CHANGED, handler->GetNameLink().c_str(), rune/10, runem/10);
 
-        target->SetMaxPower(POWER_RUNIC_POWER, runem);
-        target->SetPower(POWER_RUNIC_POWER, rune);
+        target->SetMaxPower(RUNIC_POWER, runem);
+        target->SetPower(RUNIC_POWER, rune);
 
         return true;
     }

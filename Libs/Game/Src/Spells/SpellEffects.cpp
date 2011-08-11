@@ -574,7 +574,7 @@ void Spell::SpellDamageSchoolDmg(SpellEffIndex effIndex)
                     // converts each extra point of energy into ($f1+$AP/410) additional damage
                     float ap = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
                     float multiple = ap / 410 + m_spellInfo->Effects[effIndex].DamageMultiplier;
-                    int32 energy = -(m_caster->ModifyPower(POWER_ENERGY, -30));
+                    int32 energy = -(m_caster->ModifyPower(ENERGY, -30));
                     damage += int32(energy * multiple);
                     damage += int32(CalculatePctN(m_caster->ToPlayer()->GetComboPoints() * ap, 7));
                 }
@@ -679,8 +679,8 @@ void Spell::SpellDamageSchoolDmg(SpellEffIndex effIndex)
                         Item *item = m_caster->ToPlayer()->GetWeaponForAttack(RANGED_ATTACK);
                         if (item)
                         {
-                            float dmg_min = item->GetTemplate()->Damage->DamageMin;
-                            float dmg_max = item->GetTemplate()->Damage->DamageMax;
+                            float dmg_min = item->GetTemplate()->GetMaxDamage();
+                            float dmg_max = item->GetTemplate()->GetMinDamage();
                             if (dmg_max == 0.0f && dmg_min > dmg_max)
                                 damage += int32(dmg_min);
                             else
@@ -1239,8 +1239,8 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
 
                 spell_id = 20647;
 
-                int32 rageUsed = std::min<int32>(300 - m_powerCost, m_caster->GetPower(POWER_RAGE));
-                int32 newRage = std::max<int32>(0, m_caster->GetPower(POWER_RAGE) - rageUsed);
+                int32 rageUsed = std::min<int32>(300 - m_powerCost, m_caster->GetPower(RAGE));
+                int32 newRage = std::max<int32>(0, m_caster->GetPower(RAGE) - rageUsed);
 
                 // Sudden Death rage save
                 if (AuraEffect * aurEff = m_caster->GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_GENERIC, 1989, EFFECT_0))
@@ -1249,7 +1249,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     newRage = std::max(newRage, ragesave);
                 }
 
-                m_caster->SetPower(POWER_RAGE, uint32(newRage));
+                m_caster->SetPower(RAGE, uint32(newRage));
 
                 // Glyph of Execution bonus
                 if (AuraEffect * aurEff = m_caster->GetAuraEffect(58367, EFFECT_0))
@@ -1405,7 +1405,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
             // Mana Spring Totem
             if (m_spellInfo->SpellFamilyFlags[0] & SPELLFAMILYFLAG_SHAMAN_MANA_SPRING)
             {
-                if (!unitTarget || unitTarget->getPowerType() != POWER_MANA)
+                if (!unitTarget || unitTarget->getPowerType() != MANA)
                     return;
                 m_caster->CastCustomSpell(unitTarget, 52032, &damage, 0, 0, true, 0, 0, m_originalCasterGUID);
                 return;
@@ -2091,7 +2091,7 @@ void Spell::EffectPowerDrain(SpellEffIndex effIndex)
 
     // resilience reduce mana draining effect at spell crit damage reduction (added in 2.4)
     int32 power = damage;
-    if (powerType == POWER_MANA)
+    if (powerType == MANA)
         power -= unitTarget->GetSpellCritDamageReduction(power);
 
     int32 newDamage = -(unitTarget->ModifyPower(powerType, -int32(power)));
@@ -2151,7 +2151,7 @@ void Spell::EffectPowerBurn(SpellEffIndex effIndex)
 
     int32 power = damage;
     // resilience reduce mana draining effect at spell crit damage reduction (added in 2.4)
-    if (powerType == POWER_MANA)
+    if (powerType == MANA)
         power -= unitTarget->GetSpellCritDamageReduction(power);
 
     int32 newDamage = -(unitTarget->ModifyPower(powerType, -power));
@@ -4024,7 +4024,7 @@ void Spell::SpellDamageWeaponDmg(SpellEffIndex effIndex)
             {
                 // Glyph of Death Strike
                 if (AuraEffect const* aurEff = m_caster->GetAuraEffect(59336, EFFECT_0))
-                    if (uint32 runic = std::min<uint32>(m_caster->GetPower(POWER_RUNIC_POWER), aurEff->GetSpellInfo()->Effects[EFFECT_1].CalcValue()))
+                    if (uint32 runic = std::min<uint32>(m_caster->GetPower(RUNIC_POWER), aurEff->GetSpellInfo()->Effects[EFFECT_1].CalcValue()))
                         AddPctN(totalDamagePercentMod, runic);
                 break;
             }
@@ -5813,7 +5813,7 @@ void Spell::EffectResurrect(SpellEffIndex effIndex)
         return;
 
     uint32 health = pTarget->CountPctFromMaxHealth(damage);
-    uint32 mana   = CalculatePctN(pTarget->GetMaxPower(POWER_MANA), damage);
+    uint32 mana   = CalculatePctN(pTarget->GetMaxPower(MANA), damage);
 
     ExecuteLogEffectResurrect(effIndex, pTarget);
 
@@ -5939,17 +5939,17 @@ void Spell::EffectSelfResurrect(SpellEffIndex effIndex)
     else
     {
         health = unitTarget->CountPctFromMaxHealth(damage);
-        if (unitTarget->GetMaxPower(POWER_MANA) > 0)
-            mana = CalculatePctN(unitTarget->GetMaxPower(POWER_MANA), damage);
+        if (unitTarget->GetMaxPower(MANA) > 0)
+            mana = CalculatePctN(unitTarget->GetMaxPower(MANA), damage);
     }
 
     Player* plr = unitTarget->ToPlayer();
     plr->ResurrectPlayer(0.0f);
 
     plr->SetHealth(health);
-    plr->SetPower(POWER_MANA, mana);
-    plr->SetPower(POWER_RAGE, 0);
-    plr->SetPower(POWER_ENERGY, plr->GetMaxPower(POWER_ENERGY));
+    plr->SetPower(MANA, mana);
+    plr->SetPower(RAGE, 0);
+    plr->SetPower(ENERGY, plr->GetMaxPower(ENERGY));
 
     plr->SpawnCorpseBones();
 }
@@ -6488,7 +6488,7 @@ void Spell::EffectSpiritHeal(SpellEffIndex /*effIndex*/)
         return;
 
     //m_spellInfo->Effects[i].BasePoints; == 99 (percent?)
-    //unitTarget->ToPlayer()->setResurrect(m_caster->GetGUID(), unitTarget->GetPositionX(), unitTarget->GetPositionY(), unitTarget->GetPositionZ(), unitTarget->GetMaxHealth(), unitTarget->GetMaxPower(POWER_MANA));
+    //unitTarget->ToPlayer()->setResurrect(m_caster->GetGUID(), unitTarget->GetPositionX(), unitTarget->GetPositionY(), unitTarget->GetPositionZ(), unitTarget->GetMaxHealth(), unitTarget->GetMaxPower(MANA));
     unitTarget->ToPlayer()->ResurrectPlayer(1.0f);
     unitTarget->ToPlayer()->SpawnCorpseBones();
     */
@@ -6990,7 +6990,7 @@ void Spell::EffectCastButtons(SpellEffIndex effIndex)
             continue;
         
         uint32 cost = spellInfo->CalcPowerCost(m_caster, spellInfo->GetSchoolMask());
-        if (m_caster->GetPower(POWER_MANA) < cost)
+        if (m_caster->GetPower(MANA) < cost)
             continue;
 
         TriggerCastFlags triggerFlags = TriggerCastFlags(TRIGGERED_IGNORE_GCD | TRIGGERED_IGNORE_CAST_IN_PROGRESS | TRIGGERED_CAST_DIRECTLY);

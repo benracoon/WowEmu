@@ -121,7 +121,7 @@ void WorldSession::SendTrainerList(uint64 guid, const std::string& strTitle)
 {
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: SendTrainerList");
 
-    Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_TRAINER);
+    Creature *unit = GetPlayer()->GetNPCIfCanInteractWith(guid,UNIT_NPC_FLAG_TRAINER);
     if (!unit)
     {
         sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: SendTrainerList - Unit (GUID: %u) not found or you can not interact with him.", uint32(GUID_LOPART(guid)));
@@ -133,14 +133,14 @@ void WorldSession::SendTrainerList(uint64 guid, const std::string& strTitle)
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
 
     // trainer list loaded at check;
-    if (!unit->isCanTrainingOf(_player, true))
+    if (!unit->isCanTrainingOf(_player,true))
         return;
 
-    CreatureTemplate const *ci = unit->GetCreatureInfo();
+    CreatureInfo const *ci = unit->GetCreatureInfo();
 
     if (!ci)
     {
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: SendTrainerList - (GUID: %u) NO CREATUREINFO!", GUID_LOPART(guid));
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: SendTrainerList - (GUID: %u) NO CREATUREINFO!",GUID_LOPART(guid));
         return;
     }
 
@@ -152,9 +152,10 @@ void WorldSession::SendTrainerList(uint64 guid, const std::string& strTitle)
         return;
     }
 
-    WorldPacket data(SMSG_TRAINER_LIST, 8+4+4+trainer_spells->spellList.size()*38 + strTitle.size()+1);
+    WorldPacket data(SMSG_TRAINER_LIST, 8 + 4 + 4 + trainer_spells->spellList.size() * 38 + strTitle.size() + 1);
     data << guid;
     data << uint32(trainer_spells->trainerType);
+    data << uint32(0xF);
 
     size_t count_pos = data.wpos();
     data << uint32(trainer_spells->spellList.size());
@@ -169,45 +170,37 @@ void WorldSession::SendTrainerList(uint64 guid, const std::string& strTitle)
         TrainerSpell const* tSpell = &itr->second;
 
         bool valid = true;
-        bool primary_prof_first_rank = false;
-        for (uint8 i = 0; i < MAX_SPELL_EFFECTS ; ++i)
-        {
-            if (!tSpell->learnedSpell[i])
-                continue;
-            if (!_player->IsSpellFitByClassAndRace(tSpell->learnedSpell[i]))
-            {
-                valid = false;
-                break;
-            }
-            SpellInfo const* learnedSpellInfo = sSpellMgr->GetSpellInfo(tSpell->learnedSpell[i]);
-            if (learnedSpellInfo && learnedSpellInfo->IsPrimaryProfessionFirstRank())
-                primary_prof_first_rank = true;
-        }
         if (!valid)
             continue;
 
         TrainerSpellState state = _player->GetTrainerSpellState(tSpell);
+        SpellChainNode const* chain_node = sSpellMgr->GetSpellChainNode(tSpell->learnedSpell[1]);
 
         data << uint32(tSpell->spell);                      // learned spell (or cast-spell in profession case)
-        data << uint8(state == TRAINER_SPELL_GREEN_DISABLED ? TRAINER_SPELL_GREEN : state);
+        data << uint8(state);
         data << uint32(floor(tSpell->spellCost * fDiscountMod));
-
-        data << uint32(primary_prof_first_rank && can_learn_primary_prof ? 1 : 0);
-                                                            // primary prof. learn confirmation dialog
-        data << uint32(primary_prof_first_rank ? 1 : 0);    // must be equal prev. field to have learn button in enabled state
         data << uint8(tSpell->reqLevel);
         data << uint32(tSpell->reqSkill);
         data << uint32(tSpell->reqSkillValue);
+        data << uint32(0);                                  // 4.0.3
+        data << uint32(0);
+        data << uint32(0);
+        data << uint32(0);
+
         //prev + req or req + 0
         uint8 maxReq = 0;
         for (uint8 i = 0; i < MAX_SPELL_EFFECTS ; ++i)
         {
             if (!tSpell->learnedSpell[i])
                 continue;
-            if (uint32 prevSpellId = sSpellMgr->GetPrevSpellInChain(tSpell->learnedSpell[i]))
+
+            if (SpellChainNode const* chain_node = sSpellMgr->GetSpellChainNode(tSpell->learnedSpell[i]))
             {
-                data << uint32(prevSpellId);
-                ++maxReq;
+                if (chain_node->prev)
+                {
+                    data << uint32(chain_node->prev);
+                    ++maxReq;
+                }
             }
             if (maxReq == 3)
                 break;
@@ -231,19 +224,20 @@ void WorldSession::SendTrainerList(uint64 guid, const std::string& strTitle)
 
     data << strTitle;
 
-    data.put<uint32>(count_pos, count);
+    data.put<uint32>(count_pos,count);
     SendPacket(&data);
 }
 
 void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket & recv_data)
 {
     uint64 guid;
-    uint32 spellId = 0;
+    uint32 unk = 0;                                         // 4.0.1
+    uint32 spellId = 0, result = ERR_TRAINER_OK;
 
-    recv_data >> guid >> spellId;
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_TRAINER_BUY_SPELL NpcGUID=%u, learn spell id is: %u", uint32(GUID_LOPART(guid)), spellId);
+    recv_data >> guid >> unk >> spellId;
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_TRAINER_BUY_SPELL NpcGUID=%u, learn spell id is: %u",uint32(GUID_LOPART(guid)), spellId);
 
-    Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_TRAINER);
+    Creature *unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_TRAINER);
     if (!unit)
     {
         sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleTrainerBuySpellOpcode - Unit (GUID: %u) not found or you can not interact with him.", uint32(GUID_LOPART(guid)));
@@ -254,7 +248,7 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket & recv_data)
     if (GetPlayer()->HasUnitState(UNIT_STAT_DIED))
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
 
-    if (!unit->isCanTrainingOf(_player, true))
+    if (!unit->isCanTrainingOf(_player,true))
         return;
 
     // check present spell in trainer spell list
@@ -276,22 +270,31 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket & recv_data)
 
     // check money requirement
     if (!_player->HasEnoughMoney(nSpellCost))
-        return;
+        result = ERR_TRAINER_NOT_ENOUGH_MONEY;
 
-    _player->ModifyMoney(-int32(nSpellCost));
+    if(result == ERR_TRAINER_OK)
+    {
+        WorldPacket data(SMSG_PLAY_SPELL_VISUAL, 12);           // visual effect on trainer
+        data << uint64(guid);
+        data << uint32(0xB3);                                   // index from SpellVisualKit.dbc
+        SendPacket(&data);
 
-    unit->SendPlaySpellVisual(179); // 53 SpellCastDirected
-    unit->SendPlaySpellImpact(_player->GetGUID(), 362); // 113 EmoteSalute
+        data.Initialize(SMSG_PLAY_SPELL_IMPACT, 12);            // visual effect on player
+        data << uint64(_player->GetGUID());
+        data << uint32(0x016A);                                 // index from SpellVisualKit.dbc
+        SendPacket(&data);
 
-    // learn explicitly or cast explicitly
-    if (trainer_spell->IsCastable())
-        _player->CastSpell(_player, trainer_spell->spell, true);
-    else
-        _player->learnSpell(spellId, false);
+        // learn explicitly or cast explicitly
+        if (trainer_spell->IsCastable())
+            _player->CastSpell(_player,trainer_spell->spell,true);
+        else
+            _player->learnSpell(spellId, false);
+    }
 
-    WorldPacket data(SMSG_TRAINER_BUY_SUCCEEDED, 12);
+    WorldPacket data(SMSG_TRAINER_BUY_RESULT, 16);
     data << uint64(guid);
-    data << uint32(spellId);                                // should be same as in packet from client
+    data << uint32(spellId);  
+    data << uint32(result);
     SendPacket(&data);
 }
 
@@ -489,7 +492,7 @@ void WorldSession::SendBindPoint(Creature *npc)
     // send spell for homebinding (3286)
     npc->CastSpell(_player, bindspell, true);
 
-    WorldPacket data(SMSG_TRAINER_BUY_SUCCEEDED, (8+4));
+    WorldPacket data(SMSG_TRAINER_BUY_RESULT, (8+4));
     data << uint64(npc->GetGUID());
     data << uint32(bindspell);
     SendPacket(&data);

@@ -543,18 +543,14 @@ inline uint8 ItemSubClassToDurabilityMultiplierId(uint32 ItemClass, uint32 ItemS
 #pragma pack(push, 1)
 #endif
 
-struct _Damage
-{
-    float   DamageMin;
-    float   DamageMax;
-    uint32  DamageType;                                     // id from Resistances.dbc
-};
-
 struct _ItemStat
 {
     uint32  ItemStatType;
     int32   ItemStatValue;
+    uint32  ItemStatType2;
+    int32   ItemStatValue2;
 };
+
 struct _Spell
 {
     int32 SpellId;                                         // id from Spell.dbc
@@ -572,7 +568,6 @@ struct _Socket
     uint32 Content;
 };
 
-#define MAX_ITEM_PROTO_DAMAGES 2                            // changed in 3.1.0
 #define MAX_ITEM_PROTO_SOCKETS 3
 #define MAX_ITEM_PROTO_SPELLS  5
 #define MAX_ITEM_PROTO_STATS  10
@@ -583,7 +578,7 @@ struct ItemTemplate
     uint32 Class;                                           // id from ItemClass.dbc
     uint32 SubClass;                                        // id from ItemSubClass.dbc
     int32  Unk0;
-    std::string  Name1;
+    std::string Name1;
     uint32 DisplayInfoID;                                   // id from ItemDisplayInfo.dbc
     uint32 Quality;
     uint32 Flags;
@@ -606,24 +601,15 @@ struct ItemTemplate
     int32  MaxCount;                                        // <= 0: no limit
     int32  Stackable;                                       // 0: not allowed, -1: put in player coin info tab and don't limit stacking (so 1 slot)
     uint32 ContainerSlots;
-    uint32 StatsCount;
     _ItemStat ItemStat[MAX_ITEM_PROTO_STATS];
     uint32 ScalingStatDistribution;                         // id from ScalingStatDistribution.dbc
     uint32 ScalingStatValue;                                // mask for selecting column in ScalingStatValues.dbc
-    _Damage Damage[MAX_ITEM_PROTO_DAMAGES];
-    uint32 Armor;
-    uint32 HolyRes;
-    uint32 FireRes;
-    uint32 NatureRes;
-    uint32 FrostRes;
-    uint32 ShadowRes;
-    uint32 ArcaneRes;
+    uint32 damagetype;
     uint32 Delay;
-    uint32 AmmoType;
     float  RangedModRange;
     _Spell Spells[MAX_ITEM_PROTO_SPELLS];
     uint32 Bonding;
-    std::string  Description;
+    char*  Description;
     uint32 PageText;
     uint32 LanguageID;
     uint32 PageMaterial;
@@ -648,6 +634,7 @@ struct ItemTemplate
     int32  Duration;                                        // negative = realtime, positive = ingame time
     uint32 ItemLimitCategory;                               // id from ItemLimitCategory.dbc
     uint32 HolidayId;                                       // id from Holidays.dbc
+    float  StatScalingFactor;
     uint32 ScriptId;
     uint32 DisenchantID;
     uint32 FoodType;
@@ -659,17 +646,17 @@ struct ItemTemplate
     {
         switch(InventoryType)
         {
-            case INVTYPE_RELIC:
-            case INVTYPE_SHIELD:
-            case INVTYPE_HOLDABLE:
-                return true;
+        case INVTYPE_RELIC:
+        case INVTYPE_SHIELD:
+        case INVTYPE_HOLDABLE:
+            return true;
         }
 
         switch(Class)
         {
-            case ITEM_CLASS_WEAPON:
-            case ITEM_CLASS_PROJECTILE:
-                return true;
+        case ITEM_CLASS_WEAPON:
+        case ITEM_CLASS_PROJECTILE:
+            return true;
         }
 
         return false;
@@ -680,20 +667,12 @@ struct ItemTemplate
         return (Stackable == 2147483647 || Stackable <= 0) ? uint32(0x7FFFFFFF-1) : uint32(Stackable);
     }
 
-    float getDPS() const
-    {
-        if (Delay == 0)
-            return 0;
-        float temp = 0;
-        for (int i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
-            temp+=Damage[i].DamageMin + Damage[i].DamageMax;
-        return temp*500/Delay;
-    }
+    float getDPS() const;
 
     int32 getFeralBonus(int32 extraDPS = 0) const
     {
         // 0x02A5F3 - is mask for Melee weapon from ItemSubClassMask.dbc
-        if (Class == ITEM_CLASS_WEAPON && (1<<SubClass)&0x02A5F3)
+        if (Class == ITEM_CLASS_WEAPON && (1 << SubClass)&0x02A5F3)
         {
             int32 bonus = int32((extraDPS + getDPS())*14.0f) - 767;
             if (bonus < 0)
@@ -708,29 +687,32 @@ struct ItemTemplate
         float itemLevel = (float)ItemLevel;
         switch (Quality)
         {
-            case ITEM_QUALITY_POOR:
-            case ITEM_QUALITY_NORMAL:
-            case ITEM_QUALITY_UNCOMMON:
-            case ITEM_QUALITY_ARTIFACT:
-            case ITEM_QUALITY_HEIRLOOM:
-                itemLevel -= 13; // leaving this as a separate statement since we do not know the real behavior in this case
-                break;
-            case ITEM_QUALITY_RARE:
-                itemLevel -= 13;
-                break;
-            case ITEM_QUALITY_EPIC:
-            case ITEM_QUALITY_LEGENDARY:
-            default:
-                break;
+        case ITEM_QUALITY_POOR:
+        case ITEM_QUALITY_NORMAL:
+        case ITEM_QUALITY_UNCOMMON:
+        case ITEM_QUALITY_ARTIFACT:
+        case ITEM_QUALITY_HEIRLOOM:
+            itemLevel -= 13; // leaving this as a separate statement since we do not know the real behavior in this case
+            break;
+        case ITEM_QUALITY_RARE:
+            itemLevel -= 13;
+            break;
+        case ITEM_QUALITY_EPIC:
+        case ITEM_QUALITY_LEGENDARY:
+        default:
+            break;
         }
         return itemLevel;
     }
+
+    uint32 GetArmor() const;
+    float GetMinDamage() const { return floor(getDPS() * float(Delay) / 1000.0f * 0.7f + 0.5f); }
+    float GetMaxDamage() const { return floor(getDPS() * float(Delay) / 1000.0f * 1.3f + 0.5f); }
 
     bool IsPotion() const { return Class == ITEM_CLASS_CONSUMABLE && SubClass == ITEM_SUBCLASS_POTION; }
     bool IsWeaponVellum() const { return Class == ITEM_CLASS_TRADE_GOODS && SubClass == ITEM_SUBCLASS_WEAPON_ENCHANTMENT; }
     bool IsArmorVellum() const { return Class == ITEM_CLASS_TRADE_GOODS && SubClass == ITEM_SUBCLASS_ARMOR_ENCHANTMENT; }
     bool IsConjuredConsumable() const { return Class == ITEM_CLASS_CONSUMABLE && (Flags & ITEM_PROTO_FLAG_CONJURED); }
-
 };
 
 // Benchmarked: Faster than std::map (insert/find)

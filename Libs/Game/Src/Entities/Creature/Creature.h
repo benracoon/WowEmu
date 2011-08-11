@@ -123,6 +123,7 @@ struct CreatureTemplate
     uint32  rangedattackpower;
     uint32  type;                                           // enum CreatureType values
     uint32  type_flags;                                     // enum CreatureTypeFlags mask values
+    uint32  type_flags2;                                    // New 4.1.0
     uint32  lootid;
     uint32  pickpocketLootId;
     uint32  SkinLootId;
@@ -148,6 +149,7 @@ struct CreatureTemplate
     uint32  ScriptID;
     uint32  GetRandomValidModelId() const;
     uint32  GetFirstValidModelId() const;
+    uint32  Unknown;
 
     // helpers
     SkillType GetRequiredLootSkill() const
@@ -177,7 +179,7 @@ typedef UNORDERED_MAP<uint32, CreatureTemplate> CreatureTemplateContainer;
 
 // Represents max amount of expansions.
 // TODO: Add MAX_EXPANSION constant.
-#define MAX_CREATURE_BASE_HP 3
+#define MAX_CREATURE_BASE_HP 4
 
 // Defines base stats for creatures (used to calculate HP/mana/armor).
 struct CreatureBaseStats

@@ -29,7 +29,6 @@
 #include "AddonMgr.h"
 #include "DatabaseEnv.h"
 #include "World.h"
-#include "WorldPacket.h"
 
 struct ItemTemplate;
 struct AuctionEntry;
@@ -169,7 +168,7 @@ public:
 class WorldSessionFilter : public PacketFilter
 {
 public:
-    explicit WorldSessionFilter(WorldSession * pSession) : PacketFilter(pSession) {}
+    explicit WorldSessionFilter(WorldSession* pSession) : PacketFilter(pSession) {}
     ~WorldSessionFilter() {}
 
     virtual bool Process(WorldPacket* packet);
@@ -199,7 +198,7 @@ class CharacterCreateInfo
         uint8 HairColor;
         uint8 FacialHair;
         uint8 OutfitId;
-        WorldPacket Data;
+        WorldPacket& Data;
 
         /// Server side data
         uint8 CharCount;
@@ -228,7 +227,7 @@ class WorldSession
         void SendAddonsInfo();
 
         void ReadMovementInfo(WorldPacket &data, MovementInfo *mi);
-        void WriteMovementInfo(WorldPacket *data, MovementInfo *mi);
+        void WriteMovementInfo(WorldPacket &data, MovementInfo *mi);
 
         void SendPacket(WorldPacket const* packet);
         void SendNotification(const char *format, ...) ATTR_PRINTF(2, 3);
@@ -271,6 +270,7 @@ class WorldSession
 
         void LogoutPlayer(bool Save);
         void KickPlayer();
+        void HandleMoveToGraveyard(WorldPacket &recv_data);
 
         void QueuePacket(WorldPacket* new_packet);
         bool Update(uint32 diff, PacketFilter& updater);
@@ -395,16 +395,17 @@ class WorldSession
 
     public:                                                 // opcodes handlers
 
-        void Handle_NULL(WorldPacket& recvPacket);          // not used
-        void Handle_EarlyProccess(WorldPacket& recvPacket);// just mark packets processed in WorldSocket::OnRead
-        void Handle_ServerSide(WorldPacket& recvPacket);    // sever side only, can't be accepted from client
-        void Handle_Deprecated(WorldPacket& recvPacket);    // never used anymore by client
+        void HandleNULL(WorldPacket& recvPacket);          // not used
+        void HandleEarlyProccess(WorldPacket& recvPacket);// just mark packets processed in WorldSocket::OnRead
+        void HandleServerSide(WorldPacket& recvPacket);    // sever side only, can't be accepted from client
+        void HandleDeprecated(WorldPacket& recvPacket);    // never used anymore by client
 
         void HandleCharEnumOpcode(WorldPacket& recvPacket);
         void HandleCharDeleteOpcode(WorldPacket& recvPacket);
         void HandleCharCreateOpcode(WorldPacket& recvPacket);
         void HandleCharCreateCallback(PreparedQueryResult result, CharacterCreateInfo* createInfo);
         void HandlePlayerLoginOpcode(WorldPacket& recvPacket);
+        void HandleWorldLoginOpcode(WorldPacket& recvPacket);
         void HandleCharEnum(QueryResult result);
         void HandlePlayerLogin(LoginQueryHolder * holder);
         void HandleCharFactionOrRaceChange(WorldPacket& recv_data);
@@ -481,7 +482,6 @@ class WorldSession
         void HandleDelIgnoreOpcode(WorldPacket& recvPacket);
         void HandleSetContactNotesOpcode(WorldPacket& recvPacket);
         void HandleBugOpcode(WorldPacket& recvPacket);
-        void HandleItemNameQueryOpcode(WorldPacket& recvPacket);
 
         void HandleAreaTriggerOpcode(WorldPacket& recvPacket);
 
@@ -960,4 +960,3 @@ class WorldSession
         ACE_Based::LockedQueue<WorldPacket*, ACE_Thread_Mutex> _recvQueue;
 };
 #endif
-/// @}

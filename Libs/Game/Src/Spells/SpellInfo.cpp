@@ -250,7 +250,7 @@ SpellEffectInfo::SpellEffectInfo(SpellEntry const* spellEntry, SpellInfo const* 
     ChainTarget = spellEffect->EffectChainTarget;
     ItemType = spellEffect->EffectItemType;
     TriggerSpell = spellEffect->EffectTriggerSpell;
-    SpellClassMask = spellEffect->EffectSpellClassMask;
+    SpellClassMask = spellEffect->EffectSpellClassMask[effIndex];
 }
 
 bool SpellEffectInfo::IsEffect() const
@@ -736,7 +736,7 @@ bool SpellInfo::IsStackableWithRanks() const
 {
     if (IsPassive())
         return false;
-    if (PowerType != POWER_MANA && PowerType != POWER_HEALTH)
+    if (PowerType != MANA && PowerType != POWER_HEALTH)
         return false;
     if (IsProfessionOrRiding())
         return false;
@@ -848,7 +848,7 @@ bool SpellInfo::IsAffectedBySpellMod(SpellModifier* mod) const
         return false;
 
     // true
-    if (mod->mask  & SpellFamilyFlags)
+    if (mod->mask & SpellFamilyFlags)
         return true;
 
     return false;
@@ -1534,17 +1534,17 @@ uint32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask) 
             case POWER_HEALTH:
                 powerCost += int32(CalculatePctU(caster->GetCreateHealth(), ManaCostPercentage));
                 break;
-            case POWER_MANA:
+            case MANA:
                 powerCost += int32(CalculatePctU(caster->GetCreateMana(), ManaCostPercentage));
                 break;
-            case POWER_RAGE:
-            case POWER_FOCUS:
-            case POWER_ENERGY:
-            case POWER_HAPPINESS:
+            case RAGE:
+            case FOCUS:
+            case ENERGY:
+            case HAPPINESS:
                 powerCost += int32(CalculatePctU(caster->GetMaxPower(Powers(PowerType)), ManaCostPercentage));
                 break;
-            case POWER_RUNE:
-            case POWER_RUNIC_POWER:
+            case RUNES:
+            case RUNIC_POWER:
                 sLog->outDebug(LOG_FILTER_SPELLS_AURAS, "CalculateManaCost: Not implemented yet!");
                 break;
             default:

@@ -81,7 +81,7 @@ bool Player::UpdateStats(Stats stat)
             break;
         case STAT_STAMINA:   UpdateMaxHealth(); break;
         case STAT_INTELLECT:
-            UpdateMaxPower(POWER_MANA);
+            UpdateMaxPower(MANA);
             UpdateAllSpellCritChances();
             UpdateArmor();                                  //SPELL_AURA_MOD_RESISTANCE_OF_INTELLECT_PERCENT, only armor currently
             break;
@@ -165,7 +165,7 @@ bool Player::UpdateAllStats()
     UpdateAttackPowerAndDamage(true);
     UpdateMaxHealth();
 
-    for (uint8 i = POWER_MANA; i < MAX_POWERS; ++i)
+    for (uint8 i = MANA; i < MAX_POWERS; ++i)
         UpdateMaxPower(Powers(i));
 
     UpdateAllRatings();
@@ -264,7 +264,7 @@ void Player::UpdateMaxPower(Powers power)
 {
     UnitMods unitMod = UnitMods(UNIT_MOD_POWER_START + power);
 
-    float bonusPower = (power == POWER_MANA && GetCreatePowers(power) > 0) ? GetManaBonusFromIntellect() : 0;
+    float bonusPower = (power == MANA && GetCreatePowers(power) > 0) ? GetManaBonusFromIntellect() : 0;
 
     float value = GetModifierValue(unitMod, BASE_VALUE) + GetCreatePowers(power);
     value *= GetModifierValue(unitMod, BASE_PCT);
@@ -764,10 +764,10 @@ void Player::UpdateManaRegen()
     // Mana regen from spirit and intellect
     float power_regen = sqrt(Intellect) * OCTRegenMPPerSpirit();
     // Apply PCT bonus from SPELL_AURA_MOD_POWER_REGEN_PERCENT aura on spirit base regen
-    power_regen *= GetTotalAuraMultiplierByMiscValue(SPELL_AURA_MOD_POWER_REGEN_PERCENT, POWER_MANA);
+    power_regen *= GetTotalAuraMultiplierByMiscValue(SPELL_AURA_MOD_POWER_REGEN_PERCENT, MANA);
 
     // Mana regen from SPELL_AURA_MOD_POWER_REGEN aura
-    float power_regen_mp5 = (GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN, POWER_MANA) + m_baseManaRegen) / 5.0f;
+    float power_regen_mp5 = (GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN, MANA) + m_baseManaRegen) / 5.0f;
 
     // Get bonus from SPELL_AURA_MOD_MANA_REGEN_FROM_STAT aura
     AuraEffectList const& regenAura = GetAuraEffectsByType(SPELL_AURA_MOD_MANA_REGEN_FROM_STAT);
@@ -847,7 +847,7 @@ bool Creature::UpdateAllStats()
     UpdateAttackPowerAndDamage();
     UpdateAttackPowerAndDamage(true);
 
-    for (uint8 i = POWER_MANA; i < MAX_POWERS; ++i)
+    for (uint8 i = MANA; i < MAX_POWERS; ++i)
         UpdateMaxPower(Powers(i));
 
     for (int8 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
@@ -1085,7 +1085,7 @@ bool Guardian::UpdateStats(Stats stat)
         case STAT_STRENGTH:         UpdateAttackPowerAndDamage();        break;
         case STAT_AGILITY:          UpdateArmor();                       break;
         case STAT_STAMINA:          UpdateMaxHealth();                   break;
-        case STAT_INTELLECT:        UpdateMaxPower(POWER_MANA);          break;
+        case STAT_INTELLECT:        UpdateMaxPower(MANA);          break;
         case STAT_SPIRIT:
         default:
             break;
@@ -1099,7 +1099,7 @@ bool Guardian::UpdateAllStats()
     for (uint8 i = STAT_STRENGTH; i < MAX_STATS; ++i)
         UpdateStats(Stats(i));
 
-    for (uint8 i = POWER_MANA; i < MAX_POWERS; ++i)
+    for (uint8 i = MANA; i < MAX_POWERS; ++i)
         UpdateMaxPower(Powers(i));
 
     for (uint8 i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
@@ -1171,7 +1171,7 @@ void Guardian::UpdateMaxPower(Powers power)
 {
     UnitMods unitMod = UnitMods(UNIT_MOD_POWER_START + power);
 
-    float addValue = (power == POWER_MANA) ? GetStat(STAT_INTELLECT) - GetCreateStat(STAT_INTELLECT) : 0.0f;
+    float addValue = (power == MANA) ? GetStat(STAT_INTELLECT) - GetCreateStat(STAT_INTELLECT) : 0.0f;
     float multiplicator = 15.0f;
 
     switch(GetEntry())

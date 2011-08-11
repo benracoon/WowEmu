@@ -713,10 +713,6 @@
 				RelativePath="..\..\Src\Packets\ByteBuffer.h"
 				>
 			</File>
-			<File
-				RelativePath="..\..\Src\Packets\WorldPacket.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Threading"

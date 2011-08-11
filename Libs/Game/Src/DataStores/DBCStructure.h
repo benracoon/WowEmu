@@ -1804,8 +1804,6 @@ struct SpellEntry
     uint32 SpellTotemsId;                                   // 46 - SpellTotems.dbc
     //uint32 ResearchProject;                               // 47 - ResearchProject.dbc
 
-    SpellEffectEntry const* GetSpellEffectEntry(uint32 spellId, uint8 effect);
-
     SpellAuraOptionsEntry const* GetSpellAuraOptions() const;
     SpellAuraRestrictionsEntry const* GetSpellAuraRestrictions() const;
     SpellCastingRequirementsEntry const* GetSpellCastingRequirements() const;
