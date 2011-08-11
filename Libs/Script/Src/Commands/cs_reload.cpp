@@ -465,7 +465,7 @@ public:
         const_cast<CreatureTemplate*>(cInfo)->maxrangedmg = fields[39].GetFloat();
         const_cast<CreatureTemplate*>(cInfo)->rangedattackpower = fields[40].GetUInt32();
         const_cast<CreatureTemplate*>(cInfo)->type = fields[41].GetUInt32();
-        const_cast<CreatureTemplate*>(cInfo)->type_flags = fields[42].GetUInt32();
+        const_cast<CreatureTemplate*>(cInfo)->type_flags[0] = fields[42].GetUInt32();
         const_cast<CreatureTemplate*>(cInfo)->lootid = fields[43].GetUInt32();
         const_cast<CreatureTemplate*>(cInfo)->pickpocketLootId = fields[44].GetUInt32();
         const_cast<CreatureTemplate*>(cInfo)->SkinLootId = fields[45].GetUInt32();

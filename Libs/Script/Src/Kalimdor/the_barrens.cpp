@@ -298,7 +298,7 @@ public:
 
         void ReceiveEmote(Player* /*player*/, uint32 emote)
         {
-            if (emote == TEXT_EMOTE_SALUTE)
+            if (emote == TEXTEMOTE_SALUTE)
             {
                 if (FlareCount >= 2)
                 {

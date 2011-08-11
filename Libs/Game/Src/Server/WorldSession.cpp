@@ -46,7 +46,7 @@
 
 bool MapSessionFilter::Process(WorldPacket* packet)
 {
-    OpcodeHandler const &opHandle = opcodeTable[packet->GetOpcodeEnum()];
+    OpcodeHandler const &opHandle = opcodeTable[packet->GetOpcode()];
 
     //let's check if our opcode can be really processed in Map::Update()
     if (opHandle.packetProcessing == PROCESS_INPLACE)
@@ -68,7 +68,7 @@ bool MapSessionFilter::Process(WorldPacket* packet)
 //OR packet handler is not thread-safe!
 bool WorldSessionFilter::Process(WorldPacket* packet)
 {
-    OpcodeHandler const &opHandle = opcodeTable[packet->GetOpcodeEnum()];
+    OpcodeHandler const &opHandle = opcodeTable[packet->GetOpcode()];
     //check if packet handler is supposed to be safe
     if (opHandle.packetProcessing == PROCESS_INPLACE)
         return true;
@@ -134,7 +134,7 @@ WorldSession::~WorldSession()
 void WorldSession::SizeError(WorldPacket const &packet, uint32 size) const
 {
     sLog->outError("Client (account %u) send packet %s (%u) with size " SIZEFMTD " but expected %u (attempt to crash server?), skipped",
-        GetAccountId(), LookupOpcodeName(packet.GetOpcodeEnum()), packet.GetOpcodeEnum(), packet.size(), size);
+        GetAccountId(), LookupOpcodeName(packet.GetOpcode()), packet.GetOpcode(), packet.size(), size);
 }
 
 /// Get the player name
@@ -198,14 +198,14 @@ void WorldSession::LogUnexpectedOpcode(WorldPacket* packet, const char* status, 
 {
     sLog->outError("SESSION (account: %u, guidlow: %u, char: %s): received unexpected opcode %s (0x%.4X, status: %s) %s",
         GetAccountId(), m_GUIDLow, _player ? _player->GetName() : "<none>",
-        LookupOpcodeName(packet->GetOpcodeEnum()), packet->GetOpcodeEnum(), status, reason);
+        LookupOpcodeName(packet->GetOpcode()), packet->GetOpcode(), status, reason);
 }
 
 /// Logging helper for unexpected opcodes
 void WorldSession::LogUnprocessedTail(WorldPacket* packet)
 {
     sLog->outError("SESSION: opcode %s (0x%.4X) have unprocessed tail data (read stop at %u from %u)",
-        LookupOpcodeName(packet->GetOpcodeEnum()), packet->GetOpcodeEnum(), uint32(packet->rpos()), uint32(packet->wpos()));
+        LookupOpcodeName(packet->GetOpcode()), packet->GetOpcode(), uint32(packet->rpos()), uint32(packet->wpos()));
     packet->print_storage();
 }
 
@@ -225,14 +225,14 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     WorldPacket* packet = NULL;
     while (m_Socket && !m_Socket->IsClosed() && _recvQueue.next(packet, updater))
     {
-        if (packet->GetOpcodeEnum() >= NUM_MSG_TYPES)
+        if (packet->GetOpcode() >= NUM_MSG_TYPES)
         {
-            sLog->outError("SESSION: received non-existed opcode %s (0x%.4X)", LookupOpcodeName(packet->GetOpcodeEnum()), packet->GetOpcodeEnum());
+            sLog->outError("SESSION: received non-existed opcode %s (0x%.4X)", LookupOpcodeName(packet->GetOpcode()), packet->GetOpcode());
             sScriptMgr->OnUnknownPacketReceive(m_Socket, WorldPacket(*packet));
         }
         else
         {
-            OpcodeHandler &opHandle = opcodeTable[packet->GetOpcodeEnum()];
+            OpcodeHandler &opHandle = opcodeTable[packet->GetOpcode()];
             try
             {
                 switch (opHandle.status)
@@ -300,19 +300,19 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                     case STATUS_NEVER:
                         sLog->outError("SESSION (account: %u, guidlow: %u, char: %s): received not allowed opcode %s (0x%.4X)",
                             GetAccountId(), m_GUIDLow, _player ? _player->GetName() : "<none>",
-                            LookupOpcodeName(packet->GetOpcodeEnum()), packet->GetOpcodeEnum());
+                            LookupOpcodeName(packet->GetOpcode()), packet->GetOpcode());
                         break;
                     case STATUS_UNHANDLED:
                         sLog->outDebug(LOG_FILTER_NETWORKIO, "SESSION (account: %u, guidlow: %u, char: %s): received not handled opcode %s (0x%.4X)",
                             GetAccountId(), m_GUIDLow, _player ? _player->GetName() : "<none>",
-                            LookupOpcodeName(packet->GetOpcodeEnum()), packet->GetOpcodeEnum());
+                            LookupOpcodeName(packet->GetOpcode()), packet->GetOpcode());
                         break;
                 }
             }
             catch(ByteBufferException &)
             {
                 sLog->outError("WorldSession::Update ByteBufferException occured while parsing a packet (opcode: %u) from client %s, accountid=%i. Skipped packet.",
-                        packet->GetOpcodeEnum(), GetRemoteAddress().c_str(), GetAccountId());
+                        packet->GetOpcode(), GetRemoteAddress().c_str(), GetAccountId());
                 if (sLog->IsOutDebug())
                 {
                     sLog->outDebug(LOG_FILTER_NETWORKIO, "Dumping error causing packet:");
@@ -571,22 +571,22 @@ const char *WorldSession::GetStrings(int32 entry) const
 
 void WorldSession::HandleNULL(WorldPacket& recvPacket)
 {
-    sLog->outError("SESSION: received unhandled opcode %s (0x%.4X)", LookupOpcodeName(recvPacket.GetOpcodeEnum()), recvPacket.GetOpcodeEnum());
+    sLog->outError("SESSION: received unhandled opcode %s (0x%.4X)", LookupOpcodeName(recvPacket.GetOpcode()), recvPacket.GetOpcode());
 }
 
 void WorldSession::HandleEarlyProccess(WorldPacket& recvPacket)
 {
-    sLog->outError("SESSION: received opcode %s (0x%.4X) that must be processed in WorldSocket::OnRead", LookupOpcodeName(recvPacket.GetOpcodeEnum()), recvPacket.GetOpcodeEnum());
+    sLog->outError("SESSION: received opcode %s (0x%.4X) that must be processed in WorldSocket::OnRead", LookupOpcodeName(recvPacket.GetOpcode()), recvPacket.GetOpcode());
 }
 
 void WorldSession::HandleServerSide(WorldPacket& recvPacket)
 {
-    sLog->outError("SESSION: received server-side opcode %s (0x%.4X)", LookupOpcodeName(recvPacket.GetOpcodeEnum()), recvPacket.GetOpcodeEnum());
+    sLog->outError("SESSION: received server-side opcode %s (0x%.4X)", LookupOpcodeName(recvPacket.GetOpcode()), recvPacket.GetOpcode());
 }
 
 void WorldSession::HandleDeprecated(WorldPacket& recvPacket)
 {
-    sLog->outError("SESSION: received deprecated opcode %s (0x%.4X)", LookupOpcodeName(recvPacket.GetOpcodeEnum()), recvPacket.GetOpcodeEnum());
+    sLog->outError("SESSION: received deprecated opcode %s (0x%.4X)", LookupOpcodeName(recvPacket.GetOpcode()), recvPacket.GetOpcode());
 }
 
 void WorldSession::SendAuthWaitQue(uint32 position)
@@ -724,6 +724,87 @@ void WorldSession::SaveTutorialsData(SQLTransaction &trans)
     trans->Append(stmt);
 
     m_TutorialsChanged = false;
+}
+
+void WorldSession::ReadAddonsInfo(WorldPacket &data)
+{
+    if (data.rpos() + 4 > data.size())
+        return;
+    uint32 size;
+    data >> size;
+
+    if (!size)
+        return;
+
+    if (size > 0xFFFFF)
+    {
+        sLog->outError("WorldSession::ReadAddonsInfo addon info too big, size %u", size);
+        return;
+    }
+
+    uLongf uSize = size;
+
+    uint32 pos = data.rpos();
+
+    ByteBuffer addonInfo;
+    addonInfo.resize(size);
+
+    if (uncompress(const_cast<uint8 *>(addonInfo.contents()), &uSize, const_cast<uint8 *>(data.contents() + pos), data.size() - pos) == Z_OK)
+    {
+        uint32 addonsCount;
+        addonInfo >> addonsCount;                         // addons count
+
+        for (uint32 i = 0; i < addonsCount; ++i)
+        {
+            std::string addonName;
+            uint8 enabled;
+            uint32 crc, unk1;
+
+            // check next addon data format correctness
+            if (addonInfo.rpos() + 1 > addonInfo.size())
+                return;
+
+            addonInfo >> addonName;
+
+            addonInfo >> enabled >> crc >> unk1;
+
+            sLog->outDetail("ADDON: Name: %s, Enabled: 0x%x, CRC: 0x%x, Unknown2: 0x%x", addonName.c_str(), enabled, crc, unk1);
+
+            AddonInfo addon(addonName, enabled, crc, 2, true);
+
+            SavedAddon const* savedAddon = sAddonMgr->GetAddonInfo(addonName);
+            if (savedAddon)
+            {
+                bool match = true;
+
+                if (addon.CRC != savedAddon->CRC)
+                    match = false;
+
+                if (!match)
+                    sLog->outDetail("ADDON: %s was known, but didn't match known CRC (0x%x)!", addon.Name.c_str(), savedAddon->CRC);
+                else
+                    sLog->outDetail("ADDON: %s was known, CRC is correct (0x%x)", addon.Name.c_str(), savedAddon->CRC);
+            }
+            else
+            {
+                sAddonMgr->SaveAddon(addon);
+
+                sLog->outDetail("ADDON: %s (0x%x) was not known, saving...", addon.Name.c_str(), addon.CRC);
+            }
+
+            // TODO: Find out when to not use CRC/pubkey, and other possible states.
+            m_addonsList.push_back(addon);
+        }
+
+        uint32 currentTime;
+        addonInfo >> currentTime;
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "ADDON: CurrentTime: %u", currentTime);
+
+        if (addonInfo.rpos() != addonInfo.size())
+            sLog->outDebug(LOG_FILTER_NETWORKIO, "packet under-read!");
+    }
+    else
+        sLog->outError("Addon packet uncompress error!");
 }
 
 void WorldSession::SendAddonsInfo()

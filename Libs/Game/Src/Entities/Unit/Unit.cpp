@@ -12244,7 +12244,7 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy)
             UpdateSpeed(MOVE_FLIGHT, true);
         }
 
-        if (!(creature->GetCreatureInfo()->type_flags & CREATURE_TYPEFLAGS_MOUNTED_COMBAT))
+        if (!(creature->GetCreatureInfo()->type_flags[0] & CREATURE_TYPEFLAGS_MOUNTED_COMBAT))
             Unmount();
     }
 

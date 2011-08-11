@@ -150,8 +150,8 @@ enum eFloppy
     SAY_VICTORY2                = -1800007, //Don't go toward the light, Mr. Floppy!
     SAY_VICTORY3                = -1800008, //Mr. Floppy, you're ok! Thank you so much for saving Mr. Floppy!
     SAY_VICTORY4                = -1800009, //I think I see the camp! We're almost home, Mr. Floppy! Let's go!
-    TEXT_EMOTE_WP1              = -1800010, //Mr. Floppy revives
-    TEXT_EMOTE_AGGRO            = -1800011, //The Ravenous Worg chomps down on Mr. Floppy
+    TEXTEMOTE_WP1              = -1800010, //Mr. Floppy revives
+    TEXTEMOTE_AGGRO            = -1800011, //The Ravenous Worg chomps down on Mr. Floppy
     SAY_QUEST_ACCEPT            = -1800012, //Are you ready, Mr. Floppy? Stay close to me and watch out for those wolves!
     SAY_QUEST_COMPLETE          = -1800013  //Thank you for helping me get back to the camp. Go tell Walter that I'm safe now!
 };

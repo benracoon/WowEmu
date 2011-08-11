@@ -802,25 +802,30 @@ struct CurrencyTypesEntry
 
 struct DestructibleModelDataEntry
 {
-    uint32  Id;
-    //uint32  DamagedUnk1;
-    //uint32  DamagedUnk2;
-    uint32  DamagedDisplayId;
-    //uint32  DamagedUnk3;
-    //uint32  DestroyedUnk1;
-    //uint32  DestroyedUnk2;
-    uint32  DestroyedDisplayId;
-    //uint32  DestroyedUnk3;
-    //uint32  RebuildingUnk1;
-    //uint32  RebuildingUnk2;
-    uint32  RebuildingDisplayId;
-    //uint32  RebuildingUnk3;
-    //uint32  SmokeUnk1;
-    //uint32  SmokeUnk2;
-    uint32  SmokeDisplayId;
-    //uint32  SmokeUnk3;
-    //uint32  Unk4;
-   //uint32  Unk5;
+    uint32  Id;                                             // 0
+    //uint32  DamagedUnk1;                                  // 1
+    //uint32  DamagedUnk2;                                  // 2
+    //uint32  DamagedUnk3;                                  // 3
+    //uint32  DamagedUnk4;                                  // 4
+    uint32  DamagedDisplayId;                               // 5
+    //uint32  DamagedUnk5;                                  // 6
+    //uint32  DestroyedUnk1;                                // 7
+    //uint32  DestroyedUnk2;                                // 8
+    //uint32  DestroyedUnk3;                                // 9
+    uint32  DestroyedDisplayId;                             // 10
+    //uint32  DestroyedUnk4;                                // 11
+    //uint32  RebuildingUnk1;                               // 12
+    //uint32  RebuildingUnk2;                               // 13
+    //uint32  RebuildingUnk3;                               // 14
+    uint32  RebuildingDisplayId;                            // 15
+    //uint32  RebuildingUnk4;                               // 16
+    //uint32  SmokeUnk1;                                    // 17
+    //uint32  SmokeUnk2;                                    // 18
+    //uint32  SmokeUnk3;                                    // 19
+    uint32  SmokeDisplayId;                                 // 20
+    //uint32  SmokeUnk4;                                    // 21
+    //uint32  Unk4;                                         // 22
+    //uint32  Unk5;                                         // 23
 };
 
 struct DungeonEncounterEntry
@@ -1820,7 +1825,6 @@ struct SpellEntry
     SpellShapeshiftEntry const* GetSpellShapeshift() const;
     SpellTargetRestrictionsEntry const* GetSpellTargetRestrictions() const;
     SpellTotemsEntry const* GetSpellTotems() const;
-
 };
 
 typedef std::set<uint32> SpellCategorySet;

@@ -114,7 +114,7 @@ public:
 
         void ReceiveEmote(Player* player, uint32 emote)
         {
-            if (emote == TEXT_EMOTE_SALUTE && player->GetQuestStatus(QUEST_SHATTERED_SALUTE) == QUEST_STATUS_INCOMPLETE)
+            if (emote == TEXTEMOTE_SALUTE && player->GetQuestStatus(QUEST_SHATTERED_SALUTE) == QUEST_STATUS_INCOMPLETE)
             {
                 if (CanEmote)
                 {

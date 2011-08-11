@@ -25,7 +25,7 @@ int WorldSocket::SendResumeComms()
     std::string ServerToClient = "RLD OF WARCRAFT CONNECTION - SERVER TO CLIENT";
     WorldPacket data(MSG_RESUME_COMMS, 45);
 
-    data.Put(ServerToClient);
+    data << ServerToClient;
 
     if (SendPacket(data) == -1)
         return -1;
@@ -36,17 +36,17 @@ int WorldSocket::SendResumeComms()
 void WorldSession::SendAuthResponse(uint8 AuthCode, bool shortForm, uint32 queuePos)
 {
     WorldPacket packet(SMSG_AUTH_RESPONSE, 1 + 4 + 1 + 4 + 1 + 1 + (shortForm ? 0 : (4 + 1)));
-    packet.Put(AuthCode);
-    packet.Put(uint32(0));                            // BillingTimeRemaining
-    packet.Put(uint32(0));                            // BillingPlanFlags
-    packet.Put(uint32(0));                            // BillingTimeRested
-    packet.Put(Expansion());                  // Account expansion
-    packet.Put(CONFIG_EXPANSION);             // Server expansion
+    packet << uint8(AuthCode);
+    packet << uint32(0);                                   // BillingTimeRemaining
+    packet << uint8(0);                                    // BillingPlanFlags
+    packet << uint32(0);                                   // BillingTimeRested
+    packet << uint8(Expansion());                          // Account expansion
+    packet << uint8(CONFIG_EXPANSION);                     // Server expansion
 
     if (!shortForm)
     {
-        packet.Put(queuePos);                             // Queue position
-        packet.Put(uint8(0));                                    // Unk 3.3.0
+        packet << uint32(queuePos);                             // Queue position
+        packet << uint8(0);                                     // Unk 3.3.0
     }
 
     SendPacket(&packet);

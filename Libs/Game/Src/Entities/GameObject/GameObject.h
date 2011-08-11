@@ -403,7 +403,7 @@ struct GameObjectTemplate
         } raw;
     };
 
-
+    uint32 Unknown;
     std::string AIName;
     uint32 ScriptId;
 

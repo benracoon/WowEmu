@@ -331,7 +331,7 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket & recv_data)
         data << int32(pProto->MaxCount);
         data << int32(pProto->Stackable);
         data << pProto->ContainerSlots;
-        //data << pProto->StatsCount;                         // item stats count
+
         for (uint32 i = 0; i < MAX_ITEM_PROTO_STATS; ++i)
         {
             data << pProto->ItemStat[i].ItemStatType;
@@ -366,9 +366,9 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket & recv_data)
                 }
                 else
                 {
-                    data << uint32(spell->RecoveryTime());
-                    data << uint32(spell->Category());
-                    data << uint32(spell->CategoryRecoveryTime());
+                    data << uint32(spell->RecoveryTime);
+                    data << uint32(spell->Category);
+                    data << uint32(spell->CategoryRecoveryTime);
                 }
             }
             else

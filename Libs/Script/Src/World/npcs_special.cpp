@@ -353,7 +353,7 @@ public:
         {
             switch(emote)
             {
-                case TEXT_EMOTE_CHICKEN:
+                case TEXTEMOTE_CHICKEN:
                     if (player->GetQuestStatus(QUEST_CLUCK) == QUEST_STATUS_NONE && rand()%30 == 1)
                     {
                         me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
@@ -361,7 +361,7 @@ public:
                         DoScriptText(EMOTE_HELLO, me);
                     }
                     break;
-                case TEXT_EMOTE_CHEER:
+                case TEXTEMOTE_CHEER:
                     if (player->GetQuestStatus(QUEST_CLUCK) == QUEST_STATUS_COMPLETE)
                     {
                         me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
@@ -458,11 +458,11 @@ public:
                 me->SendMessageToSet(&data, true);
                 switch(emote)
                 {
-                    case TEXT_EMOTE_KISS:    me->HandleEmoteCommand(EMOTE_ONESHOT_SHY); break;
-                    case TEXT_EMOTE_WAVE:    me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE); break;
-                    case TEXT_EMOTE_BOW:     me->HandleEmoteCommand(EMOTE_ONESHOT_BOW); break;
-                    case TEXT_EMOTE_JOKE:    me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH); break;
-                    case TEXT_EMOTE_DANCE:
+                    case TEXTEMOTE_KISS:    me->HandleEmoteCommand(EMOTE_ONESHOT_SHY); break;
+                    case TEXTEMOTE_WAVE:    me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE); break;
+                    case TEXTEMOTE_BOW:     me->HandleEmoteCommand(EMOTE_ONESHOT_BOW); break;
+                    case TEXTEMOTE_JOKE:    me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH); break;
+                    case TEXTEMOTE_DANCE:
                     {
                         if (!player->HasAura(SPELL_SEDUCTION))
                             DoCast(player, SPELL_SEDUCTION, true);
@@ -1591,7 +1591,7 @@ public:
             if (!IsHolidayActive(HOLIDAY_BREWFEST))
                 return;
 
-            if (emote == TEXT_EMOTE_DANCE)
+            if (emote == TEXTEMOTE_DANCE)
                 me->CastSpell(player, 41586, false);
         }
     };
@@ -1622,7 +1622,7 @@ public:
             if (player->HasAura(26218))
                 return;
 
-            if (emote == TEXT_EMOTE_KISS)
+            if (emote == TEXTEMOTE_KISS)
             {
                 me->CastSpell(me, 26218, false);
                 player->CastSpell(player, 26218, false);
@@ -1800,7 +1800,7 @@ public:
             Unit* own = me->GetOwner();
             if (!own || own->GetTypeId() != TYPEID_PLAYER || CAST_PLR(own)->GetTeam() != player->GetTeam())
                 return;
-            if (emote == TEXT_EMOTE_KISS)
+            if (emote == TEXTEMOTE_KISS)
             {
                 std::string whisp = "";
                 switch (rand()%8)

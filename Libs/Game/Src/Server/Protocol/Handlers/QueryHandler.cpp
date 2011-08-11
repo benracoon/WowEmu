@@ -199,7 +199,7 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket & recv_data)
         for (uint32 i = 0; i < MAX_CREATURE_QUEST_ITEMS; ++i)
             data << uint32(ci->questItems[i]);              // itemId[6], quest drop
         data << uint32(ci->movementId);                     // CreatureMovementInfo.dbc
-        data << uint32(0);                                  // Unknown
+        data << uint32(ci->Unknown);                        // Unknown
         SendPacket(&data);
         sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_CREATURE_QUERY_RESPONSE");
     }
@@ -254,10 +254,11 @@ void WorldSession::HandleGameObjectQueryOpcode(WorldPacket & recv_data)
         data << info->unk1;                                 // 2.0.3, string
         data.append(info->raw.data, 32);
         data << float(info->size);                          // go size
+
         for (uint32 i = 0; i < MAX_GAMEOBJECT_QUEST_ITEMS; ++i)
             data << uint32(info->questItems[i]);              // itemId[6], quest drop
 
-        data << uint32(0);
+        data << uint32(info->Unknown);
         SendPacket(&data);
         sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Sent SMSG_GAMEOBJECT_QUERY_RESPONSE");
     }

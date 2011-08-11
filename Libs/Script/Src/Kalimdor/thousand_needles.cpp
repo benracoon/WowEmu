@@ -351,7 +351,7 @@ public:
         {
             if (player->GetQuestStatus(QUEST_SCOOP) == QUEST_STATUS_INCOMPLETE)
             {
-                if (uiTextEmote == TEXT_EMOTE_BECKON)
+                if (uiTextEmote == TEXTEMOTE_BECKON)
                 {
                     me->setFaction(FACTION_FRIENDLY);
                     me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
@@ -359,7 +359,7 @@ public:
                 }
             }
 
-            if (uiTextEmote == TEXT_EMOTE_CHICKEN)
+            if (uiTextEmote == TEXTEMOTE_CHICKEN)
             {
                 if (me->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
                     return;

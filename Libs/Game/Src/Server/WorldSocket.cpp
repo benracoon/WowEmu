@@ -165,8 +165,8 @@ int WorldSocket::SendPacket (const WorldPacket& pct)
         sWorldLog->outTimestampLog ("SERVER:\nSOCKET: %u\nLENGTH: %u\nOPCODE: %s (0x%.4X)\nDATA:\n",
                      (uint32) get_handle(),
                      pct.size(),
-                     LookupOpcodeName (pct.GetOpcodeEnum()),
-                     pct.GetOpcodeEnum());
+                     LookupOpcodeName (pct.GetOpcode()),
+                     pct.GetOpcode());
 
         uint32 p = 0;
         while (p < pct.size())
@@ -182,7 +182,7 @@ int WorldSocket::SendPacket (const WorldPacket& pct)
     // Create a copy of the original packet; this is to avoid issues if a hook modifies it.
     sScriptMgr->OnPacketSend(this, WorldPacket(pct));
 
-    ServerPktHeader header(pct.size()+2, pct.GetOpcodeEnum());
+    ServerPktHeader header(pct.size()+2, pct.GetOpcode());
     m_Crypt.EncryptSend ((uint8*)header.header, header.getHeaderLength());
 
     if (m_OutBuffer->space() >= pct.size() + header.getHeaderLength() && msg_queue()->is_empty())
@@ -502,7 +502,7 @@ int WorldSocket::handle_input_header (void)
     EndianConvertReverse(header.size);
     EndianConvert(header.cmd);
 
-    if ((header.size < 4) || (header.size > 10240) || (header.cmd  > 10240))
+    if ((header.size < 4) || (header.size > 10240))
     {
         Player *_player = m_Session ? m_Session->GetPlayer() : NULL;
         sLog->outError ("WorldSocket::handle_input_header(): client (account: %u, char [GUID: %u, name: %s]) sent malformed packet (size: %d , cmd: %d)",
@@ -517,7 +517,7 @@ int WorldSocket::handle_input_header (void)
 
     header.size -= 4;
 
-    ACE_NEW_RETURN (m_RecvWPct, WorldPacket ((uint16) header.cmd, header.size), -1);
+    ACE_NEW_RETURN (m_RecvWPct, WorldPacket ((uint32) header.cmd, header.size), -1);
 
     if (header.size > 0)
     {
@@ -690,7 +690,7 @@ int WorldSocket::ProcessIncoming (WorldPacket* new_pct)
     // manage memory ;)
     ACE_Auto_Ptr<WorldPacket> aptr (new_pct);
 
-    const ACE_UINT16 opcode = new_pct->GetOpcodeEnum();
+    const ACE_UINT16 opcode = new_pct->GetOpcode();
 
     if (closing_)
         return -1;
@@ -701,8 +701,8 @@ int WorldSocket::ProcessIncoming (WorldPacket* new_pct)
         sWorldLog->outTimestampLog ("CLIENT:\nSOCKET: %u\nLENGTH: %u\nOPCODE: %s (0x%.4X)\nDATA:\n",
                      (uint32) get_handle(),
                      new_pct->size(),
-                     LookupOpcodeName (new_pct->GetOpcodeEnum()),
-                     new_pct->GetOpcodeEnum());
+                     LookupOpcodeName (new_pct->GetOpcode()),
+                     new_pct->GetOpcode());
 
         uint32 p = 0;
         while (p < new_pct->size())

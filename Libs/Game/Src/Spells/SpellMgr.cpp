@@ -2862,7 +2862,7 @@ void SpellMgr::LoadSpellCustomAttr()
 
 void SpellMgr::LoadDbcDataCorrections()
 {
-    uint32 oldMSTime = getMSTime();
+    /*uint32 oldMSTime = getMSTime();
 
     SpellEntry* spellEntry = NULL;
 
@@ -3382,5 +3382,5 @@ void SpellMgr::LoadDbcDataCorrections()
     properties->Type = SUMMON_TYPE_TOTEM;
 
     sLog->outString(">> Loading spell dbc data corrections  in %u ms", GetMSTimeDiffToNow(oldMSTime));
-    sLog->outString();
+    sLog->outString();*/
 }
