@@ -270,7 +270,7 @@ void WorldSession::HandleCharEnum(QueryResult result)
                 }
                 // Also sent in packet stream: Player High GUID, Guild GUID (8 bytes)
             }
-        } while(result->NextRow(true));
+        } while(result->NextRow());
 
         // If some data is still there, but we didn't reach the max bit
         if (curPos != 0)

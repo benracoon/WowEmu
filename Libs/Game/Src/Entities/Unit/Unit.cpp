@@ -17118,7 +17118,7 @@ void Unit::_ExitVehicle(Position const* exitPosition)
 
 void Unit::BuildMovementPacket(ByteBuffer *data) const
 {
-    witch (GetTypeId())
+    switch (GetTypeId())
     {
         case TYPEID_UNIT:
             if (canFly())
@@ -17204,6 +17204,7 @@ void Unit::BuildMovementPacket(ByteBuffer *data) const
 
     if (GetUnitMovementFlags() & MOVEMENTFLAG_SPLINE_ELEVATION)    // & 0x4000000
         *data << float(m_movementInfo.splineElevation);
+}
 
 void Unit::SetFlying(bool apply)
 {

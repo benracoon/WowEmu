@@ -2412,13 +2412,7 @@ void ObjectMgr::LoadItemTemplates()
             itemTemplate.ContainerSlots = MAX_BAG_SIZE;
         }
 
-        if (itemTemplate.StatsCount > MAX_ITEM_PROTO_STATS)
-        {
-            sLog->outErrorDb("Item (Entry: %u) has too large value in statscount (%u), replace by hardcoded limit (%u).", entry, itemTemplate.StatsCount, MAX_ITEM_PROTO_STATS);
-            itemTemplate.StatsCount = MAX_ITEM_PROTO_STATS;
-        }
-
-        for (uint8 j = 0; j < itemTemplate.StatsCount; ++j)
+        for (uint8 j = 0; j < MAX_ITEM_PROTO_STATS; ++j)
         {
             // for ItemStatValue != 0
             if (itemTemplate.ItemStat[j].ItemStatValue && itemTemplate.ItemStat[j].ItemStatType >= MAX_ITEM_MOD)
@@ -2438,13 +2432,10 @@ void ObjectMgr::LoadItemTemplates()
             }
         }
 
-        for (uint8 j = 0; j < MAX_ITEM_PROTO_DAMAGES; ++j)
+        if (itemTemplate.damagetype >= MAX_SPELL_SCHOOL)
         {
-            if (itemTemplate.Damage[j].DamageType >= MAX_SPELL_SCHOOL)
-            {
-                sLog->outErrorDb("Item (Entry: %u) has wrong dmg_type%d (%u)", entry, j+1, itemTemplate.Damage[j].DamageType);
-                itemTemplate.Damage[j].DamageType = 0;
-            }
+            sLog->outErrorDb("Item (Entry: %u) has wrong damagetype (%u)", entry, itemTemplate.damagetype);
+            itemTemplate.damagetype = 0;
         }
 
         // special format
@@ -3484,7 +3475,7 @@ void ObjectMgr::LoadPlayerInfo()
                 if (sWorld->getIntConfig(CONFIG_EXPANSION) < 2 && class_ == CLASS_DEATH_KNIGHT)
                     continue;
 
-                if (sWorld.getIntConfig(CONFIG_EXPANSION) < 3 && (race == RACE_GOBLIN || race == RACE_WORGEN))
+                if (sWorld->getIntConfig(CONFIG_EXPANSION) < 3 && (race == RACE_GOBLIN || race == RACE_WORGEN))
                     continue;
 
                 // fatal error if no level 1 data

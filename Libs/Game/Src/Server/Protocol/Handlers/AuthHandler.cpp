@@ -37,16 +37,16 @@ void WorldSession::SendAuthResponse(uint8 AuthCode, bool shortForm, uint32 queue
 {
     WorldPacket packet(SMSG_AUTH_RESPONSE, 1 + 4 + 1 + 4 + 1 + 1 + (shortForm ? 0 : (4 + 1)));
     packet.Put(AuthCode);
-    packet.Put(0);                            // BillingTimeRemaining
-    packet.Put(0);                            // BillingPlanFlags
-    packet.Put(0);                            // BillingTimeRested
+    packet.Put(uint32(0));                            // BillingTimeRemaining
+    packet.Put(uint32(0));                            // BillingPlanFlags
+    packet.Put(uint32(0));                            // BillingTimeRested
     packet.Put(Expansion());                  // Account expansion
     packet.Put(CONFIG_EXPANSION);             // Server expansion
 
     if (!shortForm)
     {
         packet.Put(queuePos);                             // Queue position
-        packet.Put(0);                                    // Unk 3.3.0
+        packet.Put(uint8(0));                                    // Unk 3.3.0
     }
 
     SendPacket(&packet);

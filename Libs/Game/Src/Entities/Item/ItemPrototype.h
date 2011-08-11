@@ -609,7 +609,7 @@ struct ItemTemplate
     float  RangedModRange;
     _Spell Spells[MAX_ITEM_PROTO_SPELLS];
     uint32 Bonding;
-    char*  Description;
+    std::string Description;
     uint32 PageText;
     uint32 LanguageID;
     uint32 PageMaterial;
