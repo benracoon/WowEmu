@@ -18141,7 +18141,7 @@ void Player::SaveToDB()
         ss << " 0 ";
     }
 
-    ss << "',";
+    ss << "', '";
 
     for (uint32 i = 0; i < KNOWN_TITLES_SIZE*2; ++i)
         ss << GetUInt32Value(PLAYER__FIELD_KNOWN_TITLES + i) << ' ';
