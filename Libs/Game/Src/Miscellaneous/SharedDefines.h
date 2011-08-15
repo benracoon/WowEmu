@@ -2706,6 +2706,12 @@ enum TrainerType                                            // this is important
 
 #define MAX_TRAINER_TYPE 4
 
+enum TrainerId
+{
+    TRAINER_ID_WARRIOR = 0x5B,
+    TRAINER_ID_MAGE    = 0x57,
+};
+
 // CreatureType.dbc
 enum CreatureType
 {

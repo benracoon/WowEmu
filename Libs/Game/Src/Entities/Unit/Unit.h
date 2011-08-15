@@ -1650,6 +1650,8 @@ class Unit : public WorldObject
         }
         bool isCharmedOwnedByPlayerOrPlayer() const { return IS_PLAYER_GUID(GetCharmerOrOwnerOrOwnGUID()); }
 
+        bool CanReachWithAttack(Unit* victim);
+
         Player* GetSpellModOwner() const;
 
         Unit* GetOwner() const;

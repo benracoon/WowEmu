@@ -155,7 +155,7 @@ void WorldSession::SendTrainerList(uint64 guid, const std::string& strTitle)
     WorldPacket data(SMSG_TRAINER_LIST, 8 + 4 + 4 + trainer_spells->spellList.size() * 38 + strTitle.size() + 1);
     data << guid;
     data << uint32(trainer_spells->trainerType);
-    data << uint32(0xF);
+    data << uint32(trainer_spells->trainerId);
 
     size_t count_pos = data.wpos();
     data << uint32(trainer_spells->spellList.size());
@@ -177,7 +177,7 @@ void WorldSession::SendTrainerList(uint64 guid, const std::string& strTitle)
         SpellChainNode const* chain_node = sSpellMgr->GetSpellChainNode(tSpell->learnedSpell[1]);
 
         data << uint32(tSpell->spell);                      // learned spell (or cast-spell in profession case)
-        data << uint8(state);
+        data << uint8(state == TRAINER_SPELL_GREEN_DISABLED ? TRAINER_SPELL_GREEN : state);
         data << uint32(floor(tSpell->spellCost * fDiscountMod));
         data << uint8(tSpell->reqLevel);
         data << uint32(tSpell->reqSkill);
@@ -194,25 +194,20 @@ void WorldSession::SendTrainerList(uint64 guid, const std::string& strTitle)
             if (!tSpell->learnedSpell[i])
                 continue;
 
-            if (SpellChainNode const* chain_node = sSpellMgr->GetSpellChainNode(tSpell->learnedSpell[i]))
-            {
-                if (chain_node->prev)
-                {
-                    data << uint32(chain_node->prev);
-                    ++maxReq;
-                }
-            }
             if (maxReq == 3)
                 break;
+
             SpellsRequiringSpellMapBounds spellsRequired = sSpellMgr->GetSpellsRequiredForSpellBounds(tSpell->learnedSpell[i]);
             for (SpellsRequiringSpellMap::const_iterator itr2 = spellsRequired.first; itr2 != spellsRequired.second && maxReq < 3; ++itr2)
             {
                 data << uint32(itr2->second);
                 ++maxReq;
             }
+
             if (maxReq == 3)
                 break;
         }
+
         while (maxReq < 3)
         {
             data << uint32(0);
@@ -231,11 +226,14 @@ void WorldSession::SendTrainerList(uint64 guid, const std::string& strTitle)
 void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket & recv_data)
 {
     uint64 guid;
-    uint32 unk = 0;                                         // 4.0.1
+    uint32 trainerId;
     uint32 spellId = 0, result = ERR_TRAINER_OK;
 
-    recv_data >> guid >> unk >> spellId;
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_TRAINER_BUY_SPELL NpcGUID=%u, learn spell id is: %u",uint32(GUID_LOPART(guid)), spellId);
+    recv_data >> guid;
+    recv_data >> trainerId;                                 // 4.0.1 - m_trainerID
+    recv_data >> spellId;
+
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_TRAINER_BUY_SPELL NpcGUID=%u, TrainerId: %u, learn spell id is: %u",uint32(GUID_LOPART(guid)), trainerId, spellId);
 
     Creature *unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_TRAINER);
     if (!unit)

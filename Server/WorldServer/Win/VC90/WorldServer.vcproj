@@ -362,6 +362,10 @@
 			RelativePath="..\..\Src\Master.h"
 			>
 		</File>
+		<File
+			RelativePath="..\..\..\..\Deps\Intern\Src\Debugging\WheatyExceptionReport.cpp"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

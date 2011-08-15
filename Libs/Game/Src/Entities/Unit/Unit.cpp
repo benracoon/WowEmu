@@ -9844,6 +9844,16 @@ Guardian* Unit::GetGuardianPet() const
     return NULL;
 }
 
+bool Unit::CanReachWithAttack(Unit* victim)
+{
+    float attackRadius = GetFloatValue(UNIT_FIELD_COMBATREACH) + GetFloatValue(UNIT_FIELD_BOUNDINGRADIUS) + 2.5f;
+
+    if (GetDistance2d(victim) > attackRadius * attackRadius)
+        return false;
+
+    return true;
+}
+
 Unit* Unit::GetCharm() const
 {
     if (uint64 charm_guid = GetCharmGUID())

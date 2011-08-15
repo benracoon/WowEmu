@@ -399,6 +399,7 @@ struct TrainerSpellData
     TrainerSpellMap spellList;
     uint32 trainerType;                                     // trainer type based at trainer spells, can be different from creature_template value.
                                                             // req. for correct show non-prof. trainers like weaponmaster, allowed values 0 and 2.
+    uint32 trainerId;                                       // trainer id - different for every class
     TrainerSpell const* Find(uint32 spell_id) const;
 };
 
