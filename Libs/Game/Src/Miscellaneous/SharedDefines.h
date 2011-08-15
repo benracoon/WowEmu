@@ -2708,8 +2708,8 @@ enum TrainerType                                            // this is important
 
 enum TrainerId
 {
-    TRAINER_ID_WARRIOR = 0x5B,
-    TRAINER_ID_MAGE    = 0x57,
+    TRAINER_ID_WARRIOR = 0x91,
+    TRAINER_ID_MAGE    = 0x87,
 };
 
 // CreatureType.dbc
