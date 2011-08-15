@@ -154,7 +154,7 @@ void WorldSession::SendTrainerList(uint64 guid, const std::string& strTitle)
 
     WorldPacket data(SMSG_TRAINER_LIST, 8 + 4 + 4 + trainer_spells->spellList.size() * 38 + strTitle.size() + 1);
     data << guid;
-    data << uint32(trainer_spells->trainerType);
+    data << uint32(trainer_spells->trainerType);    // 4.0.1 - m_trainerID, different for every trainer...
     data << uint32(trainer_spells->trainerId);
 
     size_t count_pos = data.wpos();
@@ -230,7 +230,7 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket & recv_data)
     uint32 spellId = 0, result = ERR_TRAINER_OK;
 
     recv_data >> guid;
-    recv_data >> trainerId;                                 // 4.0.1 - m_trainerID
+    recv_data >> trainerId;                                 // 4.0.1 - m_trainerID, different for every trainer...
     recv_data >> spellId;
 
     sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_TRAINER_BUY_SPELL NpcGUID=%u, TrainerId: %u, learn spell id is: %u",uint32(GUID_LOPART(guid)), trainerId, spellId);
