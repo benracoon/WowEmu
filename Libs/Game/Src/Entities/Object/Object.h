@@ -49,14 +49,15 @@
 
 enum TypeMask
 {
-    TYPEMASK_OBJECT         = 0x0001,
-    TYPEMASK_ITEM           = 0x0002,
-    TYPEMASK_CONTAINER      = 0x0006,                       // TYPEMASK_ITEM | 0x0004
-    TYPEMASK_UNIT           = 0x0008,   //creature or player
-    TYPEMASK_PLAYER         = 0x0010,
-    TYPEMASK_GAMEOBJECT     = 0x0020,
-    TYPEMASK_DYNAMICOBJECT  = 0x0040,
-    TYPEMASK_CORPSE         = 0x0080,
+    TYPEMASK_OBJECT         = 0x00001,
+    TYPEMASK_ITEM           = 0x00002,
+    TYPEMASK_CONTAINER      = 0x00006,                      // TYPEMASK_ITEM | 0x0004
+    TYPEMASK_UNIT           = 0x00008,                      //creature or player
+    TYPEMASK_PLAYER         = 0x00010,
+    TYPEMASK_GAMEOBJECT     = 0x00020,
+    TYPEMASK_DYNAMICOBJECT  = 0x00040,
+    TYPEMASK_CORPSE         = 0x00080,
+    TYPEMASK_IN_GUILD       = 0x10000,                      //only player with guild
     TYPEMASK_SEER           = TYPEMASK_UNIT | TYPEMASK_DYNAMICOBJECT
 };
 

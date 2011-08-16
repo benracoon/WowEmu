@@ -147,7 +147,7 @@ PreparedResultSet::~PreparedResultSet()
         delete[] m_rows[i];
 }
 
-bool ResultSet::NextRow()
+bool ResultSet::NextRow(bool no_cleanup)
 {
     MYSQL_ROW row;
 
@@ -157,7 +157,8 @@ bool ResultSet::NextRow()
     row = mysql_fetch_row(m_result);
     if (!row)
     {
-        CleanUp();
+        if (!no_cleanup)
+            CleanUp();
         return false;
     }
 

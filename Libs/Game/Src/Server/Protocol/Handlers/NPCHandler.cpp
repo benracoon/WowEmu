@@ -223,7 +223,7 @@ void WorldSession::SendTrainerList(uint64 guid, const std::string& strTitle)
     SendPacket(&data);
 }
 
-void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket & recv_data)
+void WorldSession::HandleTrainerBuyServiceOpcode(WorldPacket & recv_data)
 {
     uint64 guid;
     uint32 trainerId;
@@ -233,12 +233,12 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket & recv_data)
     recv_data >> trainerId;                                 // 4.0.1 - m_trainerID, different for every trainer...
     recv_data >> spellId;
 
-    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_TRAINER_BUY_SPELL NpcGUID=%u, TrainerId: %u, learn spell id is: %u",uint32(GUID_LOPART(guid)), trainerId, spellId);
+    sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: Received CMSG_TRAINER_BUY_SERVICE NpcGUID=%u, TrainerId: %u, learn spell id is: %u",uint32(GUID_LOPART(guid)), trainerId, spellId);
 
     Creature *unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_TRAINER);
     if (!unit)
     {
-        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleTrainerBuySpellOpcode - Unit (GUID: %u) not found or you can not interact with him.", uint32(GUID_LOPART(guid)));
+        sLog->outDebug(LOG_FILTER_NETWORKIO, "WORLD: HandleTrainerBuyServiceOpcode - Unit (GUID: %u) not found or you can not interact with him.", uint32(GUID_LOPART(guid)));
         return;
     }
 

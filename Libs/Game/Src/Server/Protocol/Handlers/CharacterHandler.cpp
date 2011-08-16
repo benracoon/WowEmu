@@ -198,7 +198,7 @@ bool LoginQueryHolder::Initialize()
 
 void WorldSession::HandleCharEnum(QueryResult result)
 {
-    WorldPacket data(SMSG_CHAR_ENUM, 100); // we guess size
+    WorldPacket data(SMSG_CHAR_ENUM, 360);                  // we guess size
 
     uint32 num = 0;
 
@@ -270,7 +270,7 @@ void WorldSession::HandleCharEnum(QueryResult result)
                 }
                 // Also sent in packet stream: Player High GUID, Guild GUID (8 bytes)
             }
-        } while(result->NextRow());
+        } while(result->NextRow(true));
 
         // If some data is still there, but we didn't reach the max bit
         if (curPos != 0)
@@ -280,7 +280,7 @@ void WorldSession::HandleCharEnum(QueryResult result)
         do
         {
             uint32 guidlow = (*result)[0].GetUInt32();
-            sLog->outDetail("Loading char guid %u from account %u.",guidlow,GetAccountId());
+            sLog->outDetail("Loading char guid %u from account %u.", guidlow, GetAccountId());
             Player::BuildEnumData(result, &data);
         }
         while (result->NextRow());
@@ -339,6 +339,11 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket & recv_data)
     recv_data >> race_;
     recv_data >> class_;
 
+    // extract other data required for player creating
+    uint8 gender, skin, face, hairStyle, hairColor, facialHair, outfitId;
+    recv_data >> gender >> skin >> face;
+    recv_data >> hairStyle >> hairColor >> facialHair >> outfitId;
+
     WorldPacket data(SMSG_CHAR_CREATE, 1);                  // returned with diff.values in all cases
 
     if (GetSecurity() == SEC_PLAYER)
@@ -350,8 +355,8 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket & recv_data)
             uint32 team = Player::TeamForRace(race_);
             switch (team)
             {
-                case ALLIANCE: disabled = mask & (1 << 0); break;
-                case HORDE:    disabled = mask & (1 << 1); break;
+            case ALLIANCE: disabled = mask & (1 << 0); break;
+            case HORDE:    disabled = mask & (1 << 1); break;
             }
 
             if (disabled)
@@ -461,12 +466,8 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket & recv_data)
         return;
     }
 
-    // extract other data required for player creating
-    uint8 gender, skin, face, hairStyle, hairColor, facialHair, outfitId;
-    recv_data >> gender >> skin >> face;
-    recv_data >> hairStyle >> hairColor >> facialHair >> outfitId;
-
     CharacterCreateInfo* charCreateInfo = new CharacterCreateInfo(name, race_, class_, gender, skin, face, hairStyle, hairColor, facialHair, outfitId, recv_data);
+    sObjectMgr->Data = recv_data;
 
     delete _charCreateCallback.GetParam();  // Delete existing if any, to make the callback chain reset to stage 0
     _charCreateCallback.SetParam(charCreateInfo);
@@ -698,10 +699,10 @@ void WorldSession::HandleCharCreateCallback(PreparedQueryResult result, Characte
                 return;
             }
 
-            if (createInfo->Data.rpos() < createInfo->Data.wpos())
+            if (sObjectMgr->Data.rpos() < sObjectMgr->Data.wpos())
             {
                 uint8 unk;
-                createInfo->Data >> unk;
+                sObjectMgr->Data >> unk;
                 sLog->outDebug(LOG_FILTER_NETWORKIO, "Character creation %s (account %u) has unhandled tail data: [%u]", createInfo->Name.c_str(), GetAccountId(), unk);
             }
 

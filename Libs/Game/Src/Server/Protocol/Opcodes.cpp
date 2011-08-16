@@ -293,7 +293,7 @@ void InitOpcodeTable()
 
     // Gossip Trainer
     OPCODE(CMSG_TRAINER_LIST,                    STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleTrainerListOpcode           );
-    OPCODE(CMSG_TRAINER_BUY_SPELL,               STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleTrainerBuySpellOpcode       );
+    OPCODE(CMSG_TRAINER_BUY_SERVICE,             STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleTrainerBuyServiceOpcode     );
 
     /***********************************************************/
     /********************** GROUP OPCODES **********************/

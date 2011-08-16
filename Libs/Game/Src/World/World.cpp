@@ -1164,7 +1164,7 @@ void World::SetInitialWorldSettings()
     sObjectMgr->SetHighestGuids();
 
     ///- Check the existence of the map files for all races' startup areas.
-    if (!MapManager::ExistMapAndVMap(0, -6240.32f, 331.033f)
+    /*if (!MapManager::ExistMapAndVMap(0, -6240.32f, 331.033f)
         || !MapManager::ExistMapAndVMap(0, -8949.95f, -132.493f)
         || !MapManager::ExistMapAndVMap(1, -618.518f, -4251.67f)
         || !MapManager::ExistMapAndVMap(0, 1676.35f, 1677.45f)
@@ -1176,7 +1176,7 @@ void World::SetInitialWorldSettings()
     {
         sLog->outError("Correct *.map files not found in path '%smaps' or *.vmtree/*.vmtile files in '%svmaps'. Please place *.map/*.vmtree/*.vmtile files in appropriate directories or correct the DataDir value in the worldserver.conf file.", m_dataPath.c_str(), m_dataPath.c_str());
         exit(1);
-    }
+    }*/
 
     ///- Initialize pool manager
     sPoolMgr->Initialize();

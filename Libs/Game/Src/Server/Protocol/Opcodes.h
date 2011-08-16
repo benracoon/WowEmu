@@ -246,7 +246,7 @@ enum Opcodes
 
     //GossipTrainer
     CMSG_TRAINER_LIST,
-    CMSG_TRAINER_BUY_SPELL,
+    CMSG_TRAINER_BUY_SERVICE,
 
     /***********************************************************/
     /**********************GROUPOPCODES**********************/

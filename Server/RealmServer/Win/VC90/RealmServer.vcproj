@@ -45,7 +45,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\..\..\Deps\Intern\Src;..\..\..\..\Deps\Intern\Src\Database;..\..\..\..\Deps\Intern\Src\Debugging;..\..\..\..\Deps\Intern\Src\Packets;..\..\..\..\Deps\Intern\Src\Cryptography;..\..\..\..\Deps\Intern\Src\Cryptography\Authentication;..\..\..\..\Deps\Intern\Src\Logging;..\..\..\..\Deps\Intern\Src\Threading;..\..\..\..\Deps\Intern\Src\Utilities;..\..\Src;..\..\Src\Auth;..\..\Src\Realms;..\..\Src\Server;..\..\..\..\Deps\Extern\Src\Ace;..\..\..\..\Deps\Extern\Src\MySql\extra\yassl\include;..\..\..\..\Deps\Extern\Src\MySql\include"
+				AdditionalIncludeDirectories="..\..\..\..\Libs\Game\Src\Server;..\..\..\..\Libs\Game\Src\Server\Protocol;..\..\..\..\Deps\Intern\Src;..\..\..\..\Deps\Intern\Src\Database;..\..\..\..\Deps\Intern\Src\Debugging;..\..\..\..\Deps\Intern\Src\Packets;..\..\..\..\Deps\Intern\Src\Cryptography;..\..\..\..\Deps\Intern\Src\Cryptography\Authentication;..\..\..\..\Deps\Intern\Src\Logging;..\..\..\..\Deps\Intern\Src\Threading;..\..\..\..\Deps\Intern\Src\Utilities;..\..\Src;..\..\Src\Auth;..\..\Src\Realms;..\..\Src\Server;..\..\..\..\Deps\Extern\Src\Ace;..\..\..\..\Deps\Extern\Src\MySql\extra\yassl\include;..\..\..\..\Deps\Extern\Src\MySql\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_SECURE_SCL=0"
 				StringPooling="true"
 				RuntimeLibrary="2"

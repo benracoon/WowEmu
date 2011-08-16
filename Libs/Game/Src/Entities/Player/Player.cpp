@@ -963,11 +963,14 @@ bool Player::Create(uint32 guidlow, CharacterCreateInfo* createInfo)
     SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);               // fix cast time showed in spell tooltip on client
     SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 1.0f);            // default for players in 3.0.3
 
-                                                            // -1 is default value
+    // -1 is default value
     SetInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, uint32(-1));
 
     SetUInt32Value(PLAYER_BYTES, (createInfo->Skin | (createInfo->Face << 8) | (createInfo->HairStyle << 16) | (createInfo->HairColor << 24)));
-    SetUInt32Value(PLAYER_BYTES_2, (createInfo->FacialHair | (0x00 << 8) | (0x00 << 16) | (0x02 << 24)));
+    SetUInt32Value(PLAYER_BYTES_2, (createInfo->FacialHair |
+        (0x00 << 8) |
+        (0x00 << 16) |
+        (((GetSession()->IsARecruiter() || GetSession()->GetRecruiterId() != 0) ? REST_STATE_RAF_LINKED : REST_STATE_NOT_RAF_LINKED) << 24)));
     SetByteValue(PLAYER_BYTES_3, 0, createInfo->Gender);
     SetByteValue(PLAYER_BYTES_3, 3, 0);                     // BattlefieldArenaFaction (0 or 1)
 
@@ -1124,12 +1127,12 @@ bool Player::Create(uint32 guidlow, CharacterCreateInfo* createInfo)
             {
                 switch(iProto->Spells[0].SpellCategory)
                 {
-                    case SPELL_CATEGORY_FOOD:                                // food
-                        count = getClass() == CLASS_DEATH_KNIGHT ? 10 : 4;
-                        break;
-                    case SPELL_CATEGORY_DRINK:                                // drink
-                        count = 2;
-                        break;
+                case SPELL_CATEGORY_FOOD:                                // food
+                    count = getClass() == CLASS_DEATH_KNIGHT ? 10 : 4;
+                    break;
+                case SPELL_CATEGORY_DRINK:                                // drink
+                    count = 2;
+                    break;
                 }
                 if (iProto->GetMaxStackSize() < count)
                     count = iProto->GetMaxStackSize();
@@ -1166,9 +1169,6 @@ bool Player::Create(uint32 guidlow, CharacterCreateInfo* createInfo)
                     RemoveItem(INVENTORY_SLOT_BAG_0, i, true);
                     pItem = StoreItem(sDest, pItem, true);
                 }
-
-                // if  this is ammo then use it
-                msg = CanUseAmmo(pItem->GetEntry());
             }
         }
     }
@@ -1845,8 +1845,8 @@ void Player::BuildEnumData(QueryResult result, WorldPacket* data)
 
     Field *fields = result->Fetch();
 
-    uint8 pRace = fields[2].GetUInt8();
-    uint8 pClass = fields[3].GetUInt8();
+    uint8 playerRace = fields[2].GetUInt8();
+    uint8 playerClass = fields[3].GetUInt8();
     uint32 guid = fields[0].GetUInt32();
     uint32 playerBytes = fields[5].GetUInt32();
     uint32 playerFlags = fields[14].GetUInt32();
@@ -1855,8 +1855,8 @@ void Player::BuildEnumData(QueryResult result, WorldPacket* data)
     uint32 petDisplayId = 0;
     uint32 petLevel   = 0;
     uint32 petFamily  = 0;
-    // show pet at selection character in character list only for non-ghost character	
-    if (result && !(playerFlags & PLAYER_FLAGS_GHOST) && (pClass == CLASS_WARLOCK || pClass == CLASS_HUNTER || pClass == CLASS_DEATH_KNIGHT))	
+    // show pet at selection character in character list only for non-ghost character
+    if (result && !(playerFlags & PLAYER_FLAGS_GHOST) && (playerClass == CLASS_WARLOCK || playerClass == CLASS_HUNTER || playerClass == CLASS_DEATH_KNIGHT))
     {
         uint32 entry = fields[16].GetUInt32();
         CreatureTemplate const* creatureInfo = sObjectMgr->GetCreatureTemplate(entry);
@@ -1869,63 +1869,63 @@ void Player::BuildEnumData(QueryResult result, WorldPacket* data)
     }
 
     *data << uint8(playerBytes >> 24);                    // Hair color
-    *data << uint8(fields[4].GetUInt8());                 // Gender	
+    *data << uint8(fields[4].GetUInt8());                 // Gender
     *data << uint8(fields[7].GetUInt8());                 // Level
 
-    *data << uint32(zone);                                // Zone id	
+    *data << uint32(zone);                                // Zone id
     *data << uint32(petDisplayId);                        // Pet DisplayID
 
-    if (uint8(guid >> 8) != 0)	
+    if (uint8(guid >> 8) != 0)
         *data << uint8(guid >> 8);
 
-    *data << uint8(pRace);                                // Race
+    *data << uint8(playerRace);                                // Race
 
     if (uint8(guid >> 24) != 0)
         *data << uint8(guid >> 24);
 
-    uint32 char_flags = 0;	
+    uint32 charFlags = 0;
     if (playerFlags & PLAYER_FLAGS_HIDE_HELM)
-        char_flags |= CHARACTER_FLAG_HIDE_HELM;	
+        charFlags |= CHARACTER_FLAG_HIDE_HELM;
     if (playerFlags & PLAYER_FLAGS_HIDE_CLOAK)
-        char_flags |= CHARACTER_FLAG_HIDE_CLOAK;	
+        charFlags |= CHARACTER_FLAG_HIDE_CLOAK;
     if (playerFlags & PLAYER_FLAGS_GHOST)
-        char_flags |= CHARACTER_FLAG_GHOST;
+        charFlags |= CHARACTER_FLAG_GHOST;
     if (atLoginFlags & AT_LOGIN_RENAME)
-        char_flags |= CHARACTER_FLAG_RENAME;
+        charFlags |= CHARACTER_FLAG_RENAME;
     if (fields[20].GetUInt32())
-        char_flags |= CHARACTER_FLAG_LOCKED_BY_BILLING;
-    if (sWorld->getBoolConfig(CONFIG_DECLINED_NAMES_USED))	
+        charFlags |= CHARACTER_FLAG_LOCKED_BY_BILLING;
+    if (sWorld->getBoolConfig(CONFIG_DECLINED_NAMES_USED))
     {
         if (!fields[21].GetString().empty())
-            char_flags |= CHARACTER_FLAG_DECLINED;
-    }	
+            charFlags |= CHARACTER_FLAG_DECLINED;
+    }
     else
-        char_flags |= CHARACTER_FLAG_DECLINED;		
-    *data << uint32(char_flags);                          // character flags
+        charFlags |= CHARACTER_FLAG_DECLINED;
+    *data << uint32(charFlags);                          // character flags
 
     *data << uint32(petFamily);                           // Pet Family
     *data << uint8(playerBytes >> 16);                    // Hair style
     *data << uint8(0);                                    // character order id (used for char list positioning)
 
-    Tokens tokenData(fields[19].GetString(), ' ');
+    Tokens equipment(fields[19].GetString(), ' ');
     for (uint8 slot = 0; slot < EQUIPMENT_SLOT_END; ++slot)
     {
         uint32 visualbase = slot * 2;
-        uint32 itemId = GetUInt32ValueFromArray(tokenData, visualbase);
+        uint32 itemId = GetUInt32ValueFromArray(equipment, visualbase);
         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
         if (!proto)
         {
             *data << uint32(0);
             *data << uint32(0);
-            *data << uint8(0);	
-            continue;	
+            *data << uint8(0);
+            continue;
         }
 
-        SpellItemEnchantmentEntry const *enchant = NULL;	
-        uint32 enchants = GetUInt32ValueFromArray(tokenData, visualbase + 1);	
+        SpellItemEnchantmentEntry const *enchant = NULL;
+        uint32 enchants = GetUInt32ValueFromArray(equipment, visualbase + 1);
         for (uint8 enchantSlot = PERM_ENCHANTMENT_SLOT; enchantSlot <= TEMP_ENCHANTMENT_SLOT; ++enchantSlot)
-        {	
-            // values stored in 2 uint16	
+        {
+            // values stored in 2 uint16
             uint32 enchantId = 0x0000FFFF & (enchants >> enchantSlot*16);
             if (!enchantId)
                 continue;
@@ -1953,14 +1953,14 @@ void Player::BuildEnumData(QueryResult result, WorldPacket* data)
     if (uint8(guid >> 16) != 0)
         *data << uint8(guid >> 16); // + 298
 
-    *data << uint8(pClass);                               // class
+    *data << uint8(playerClass);                          // class
 
     *data << fields[10].GetFloat();                       // x
     *data << fields[11].GetFloat();                       // y
     *data << fields[12].GetFloat();                       // z
 
     if (uint8(guid) != 0)
-        *data << uint8(guid); // + 296	
+        *data << uint8(guid); // + 296
 
     *data << fields[1].GetString();                       // name
     *data << uint32(fields[9].GetUInt32());               // map
@@ -21226,7 +21226,8 @@ void Player::SendInitialPacketsAfterAddToMap()
     // update zone
     uint32 newzone, newarea;
     GetZoneAndAreaId(newzone, newarea);
-    UpdateZone(newzone, newarea);                            // also call SendInitWorldStates();
+    SendInitWorldStates(newzone, newarea);
+    UpdateZone(newzone,newarea);
 
     ResetTimeSync();
     SendTimeSync();

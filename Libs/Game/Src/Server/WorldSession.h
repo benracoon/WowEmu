@@ -184,7 +184,7 @@ class CharacterCreateInfo
     protected:
         CharacterCreateInfo(std::string name, uint8 race, uint8 cclass, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair, uint8 outfitId,
         WorldPacket& data) : Name(name), Race(race), Class(cclass), Gender(gender), Skin(skin), Face(face), HairStyle(hairStyle), HairColor(hairColor), FacialHair(facialHair),
-        OutfitId(outfitId), Data(data), CharCount(0), Stage(0)
+        OutfitId(outfitId), CharCount(0), Stage(0)
         {}
 
         /// User specified variables
@@ -198,7 +198,6 @@ class CharacterCreateInfo
         uint8 HairColor;
         uint8 FacialHair;
         uint8 OutfitId;
-        WorldPacket& Data;
 
         /// Server side data
         uint8 CharCount;
@@ -584,7 +583,7 @@ class WorldSession
         void HandleBankerActivateOpcode(WorldPacket& recvPacket);
         void HandleBuyBankSlotOpcode(WorldPacket& recvPacket);
         void HandleTrainerListOpcode(WorldPacket& recvPacket);
-        void HandleTrainerBuySpellOpcode(WorldPacket& recvPacket);
+        void HandleTrainerBuyServiceOpcode(WorldPacket& recvPacket);
         void HandlePetitionShowListOpcode(WorldPacket& recvPacket);
         void HandleGossipHelloOpcode(WorldPacket& recvPacket);
         void HandleGossipSelectOptionOpcode(WorldPacket& recvPacket);

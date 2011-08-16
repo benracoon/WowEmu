@@ -458,8 +458,6 @@ void Object::_BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask 
 
     uint32 valuesCount = m_valuesCount;
     if(GetTypeId() == TYPEID_PLAYER && target != this)
-        valuesCount = valuesCount = m_valuesCount;
-    if(GetTypeId() == TYPEID_PLAYER && target != this)
         valuesCount = PLAYER_FIELD_INV_SLOT_HEAD;;
 
     bool IsActivateToQuest = false;
@@ -786,12 +784,15 @@ void Object::_SetUpdateBits(UpdateMask *updateMask, Player* target) const
 
 void Object::_SetCreateBits(UpdateMask *updateMask, Player* target) const
 {
+    uint32 *value = m_uint32Values;
+    
     uint32 valuesCount = m_valuesCount;
+    
     if(GetTypeId() == TYPEID_PLAYER && target != this)
         valuesCount = PLAYER_FIELD_INV_SLOT_HEAD;
 
-    for (uint16 index = 0; index < valuesCount; ++index, ++valuesCount)
-        if (valuesCount)
+    for (uint16 index = 0; index < valuesCount; ++index, ++value)
+        if (*value)
             updateMask->SetBit(index);
 }
 
