@@ -1794,7 +1794,7 @@ void Spell::SearchChainTarget(std::list<Unit*> &TagUnitMap, float max_range, uin
                 && !m_caster->isInFrontInMap(*next, max_range))
                 || !m_caster->canSeeOrDetect(*next)
                 || !cur->IsWithinLOSInMap(*next)
-                || ((GetSpellInfo()->AttributesEx6 & SPELL_ATTR6_IGNORE_CROWD_CONTROL_TARGETS) && !(*next)->CanFreeMove()))
+                || ((GetSpellInfo()->AttributesEx6 & SPELL_ATTR6_CANT_TARGET_CROWD_CONTROLLED) && !(*next)->CanFreeMove()))
             {
                 ++next;
                 if (next == tempUnitMap.end() || cur->GetDistance(*next) > CHAIN_SPELL_JUMP_RADIUS) // Don't search beyond the max jump radius
@@ -1840,7 +1840,7 @@ void Spell::SearchAreaTarget(std::list<Unit*> &TagUnitMap, float radius, SpellNo
     }
 
     Strawberry::SpellNotifierCreatureAndPlayer notifier(m_caster, TagUnitMap, radius, type, TargetType, pos, entry, m_spellInfo);
-    if ((m_spellInfo->AttributesEx3 & SPELL_ATTR3_PLAYERS_ONLY) || (TargetType == SPELL_TARGETS_ENTRY && !entry))
+    if ((m_spellInfo->AttributesEx3 & SPELL_ATTR3_ONLY_TARGET_PLAYERS) || (TargetType == SPELL_TARGETS_ENTRY && !entry))
     {
         m_caster->GetMap()->VisitWorld(pos->m_positionX, pos->m_positionY, radius, notifier);
         TagUnitMap.remove_if(Strawberry::ObjectTypeIdCheck(TYPEID_PLAYER, false)); // above line will select also pets and totems, remove them
@@ -2936,11 +2936,12 @@ void Spell::prepare(SpellCastTargets const* targets, AuraEffect const* triggered
     SpellCastResult result = CheckCast(true);
     if (result != SPELL_CAST_OK && !IsAutoRepeat())          //always cast autorepeat dummy for triggering
     {
-        if (triggeredByAura && !triggeredByAura->GetBase()->IsPassive())
+        if (triggeredByAura && triggeredByAura->GetSpellInfo()->IsChanneled())
         {
             SendChannelUpdate(0);
             triggeredByAura->GetBase()->SetDuration(0);
         }
+
         SendCastResult(result);
 
         finish(false);
@@ -4126,37 +4127,13 @@ void Spell::SendChannelUpdate(uint32 time)
 
 void Spell::SendChannelStart(uint32 duration)
 {
-    WorldObject* target = NULL;
-
-    // select first not resisted target from target list for first available effect
-    if (!m_UniqueTargetInfo.empty())
-    {
-        for (std::list<TargetInfo>::const_iterator itr = m_UniqueTargetInfo.begin(); itr != m_UniqueTargetInfo.end(); ++itr)
-        {
-            for (uint8 effIndex = EFFECT_0; effIndex < MAX_SPELL_EFFECTS; ++effIndex)
-            {
-                if ((itr->effectMask & (1 << effIndex)) && itr->reflectResult == SPELL_MISS_NONE && itr->targetGUID != m_caster->GetGUID())
-                {
-                    target = ObjectAccessor::GetUnit(*m_caster, itr->targetGUID);
-                    break;
-                }
-            }
-        }
-    }
-    else if (!m_UniqueGOTargetInfo.empty())
-    {
-        for (std::list<GOTargetInfo>::const_iterator itr = m_UniqueGOTargetInfo.begin(); itr != m_UniqueGOTargetInfo.end(); ++itr)
-        {
-            for (uint8 effIndex = EFFECT_0; effIndex < MAX_SPELL_EFFECTS; ++effIndex)
-            {
-                if (itr->effectMask & (1 << effIndex))
-                {
-                    target = m_caster->GetMap()->GetGameObject(itr->targetGUID);
-                    break;
-                }
-            }
-        }
-    }
+    uint64 channelTarget = 0;
+    if (m_targets.GetUnitTargetGUID())
+        channelTarget = m_targets.GetUnitTargetGUID();
+    else if (m_targets.GetGOTargetGUID())
+        channelTarget = m_targets.GetGOTargetGUID();
+    else if (m_targets.GetCorpseTargetGUID())
+        channelTarget = m_targets.GetCorpseTargetGUID();
 
     WorldPacket data(MSG_CHANNEL_START, (8+4+4));
     data.append(m_caster->GetPackGUID());
@@ -4166,8 +4143,10 @@ void Spell::SendChannelStart(uint32 duration)
     m_caster->SendMessageToSet(&data, true);
 
     m_timer = duration;
-    if (target)
-        m_caster->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, target->GetGUID());
+
+    if (channelTarget)
+        m_caster->SetUInt64Value(UNIT_FIELD_CHANNEL_OBJECT, channelTarget);
+
     m_caster->SetUInt32Value(UNIT_CHANNEL_SPELL, m_spellInfo->Id);
 }
 
@@ -4819,7 +4798,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 return SPELL_FAILED_NOT_INFRONT;
 
             // Target must not be in combat
-            if (m_spellInfo->AttributesEx & SPELL_ATTR1_NOT_IN_COMBAT_TARGET && target->isInCombat())
+            if (m_spellInfo->AttributesEx & SPELL_ATTR1_CANT_TARGET_IN_COMBAT  && target->isInCombat())
                 return SPELL_FAILED_TARGET_AFFECTING_COMBAT;
         }
 

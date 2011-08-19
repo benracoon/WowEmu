@@ -979,7 +979,7 @@ void Unit::CastCustomSpell(uint32 spellId, CustomSpellValues const& value, Unit*
 }
 
 // used for scripting
-void Unit::CastSpell(float x, float y, float z, uint32 spellId, bool triggered, Item* castItem, AuraEffect const* triggeredByAura, uint64 originalCaster, Unit* OriginalVictim)
+void Unit::CastSpell(float x, float y, float z, uint32 spellId, bool triggered, Item* castItem, AuraEffect const* triggeredByAura, uint64 originalCaster)
 {
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
 
@@ -999,8 +999,7 @@ void Unit::CastSpell(float x, float y, float z, uint32 spellId, bool triggered, 
 
     SpellCastTargets targets;
     targets.SetDst(x, y, z, GetOrientation());
-    if (OriginalVictim)
-        targets.SetUnitTarget(OriginalVictim);
+
     spell->m_CastItem = castItem;
     spell->prepare(&targets, triggeredByAura);
 }
@@ -8773,7 +8772,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
         case 72256:
             // this should be handled by targetAuraSpell, but because 72408 is not passive
             // one failed proc will remove the entire aura
-            CastSpell(NULL, trigger_spell_id, true, NULL, triggeredByAura);
+            CastSpell((Unit*)NULL, trigger_spell_id, true, NULL, triggeredByAura);
             return true;
         case 15337: // Improved Spirit Tap (Rank 1)
         case 15338: // Improved Spirit Tap (Rank 2)
@@ -11772,6 +11771,7 @@ void Unit::MeleeDamageBonus(Unit* victim, uint32 *pdamage, WeaponAttackType attT
     // ..done
     AuraEffectList const& mModDamagePercentDone = GetAuraEffectsByType(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
     for (AuraEffectList::const_iterator i = mModDamagePercentDone.begin(); i != mModDamagePercentDone.end(); ++i)
+    {
         if (spellProto)
         {
             if ((*i)->GetMiscValue() & spellProto->GetSchoolMask())
@@ -11789,28 +11789,12 @@ void Unit::MeleeDamageBonus(Unit* victim, uint32 *pdamage, WeaponAttackType attT
                     AddPctN(DoneTotalMod, (*i)->GetAmount());
                 }
         }
-        else if (player)
+        else
         {
-            if (!((*i)->GetSpellInfo()->AttributesEx5 & SPELL_ATTR5_SPECIAL_ITEM_CLASS_CHECK))
-            {
-                EquipmentSlots slot;
-
-                switch (attType)
-                {
-                    case BASE_ATTACK:   slot = EQUIPMENT_SLOT_MAINHAND; break;
-                    case OFF_ATTACK:    slot = EQUIPMENT_SLOT_OFFHAND;  break;
-                    case RANGED_ATTACK: slot = EQUIPMENT_SLOT_RANGED;   break;
-                    default: return;
-                }
-
-                Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
-
-                if (item && !item->IsBroken() && item->IsFitToSpellRequirements((*i)->GetSpellInfo()))
-                    AddPctN(DoneTotalMod, (*i)->GetAmount());
-            }
-            else if (player->HasItemFitToSpellRequirements((*i)->GetSpellInfo()))
+            if ((*i)->GetMiscValue() & GetMeleeDamageSchoolMask() && (*i)->GetSpellInfo()->EquippedItemClass == -1)
                 AddPctN(DoneTotalMod, (*i)->GetAmount());
         }
+    }
 
     AuraEffectList const& mDamageDoneVersus = GetAuraEffectsByType(SPELL_AURA_MOD_DAMAGE_DONE_VERSUS);
     for (AuraEffectList::const_iterator i = mDamageDoneVersus.begin(); i != mDamageDoneVersus.end(); ++i)
@@ -12351,8 +12335,8 @@ bool Unit::canAttack(Unit const* target, bool force) const
 
 bool Unit::isAttackableByAOE(SpellInfo const* spellProto) const
 {
-    bool targetMustBeDead = spellProto ? bool(spellProto->AttributesEx3 & SPELL_ATTR3_REQUIRE_DEAD_TARGET) : false;
-    bool targetCanBeDead = spellProto ? bool(spellProto->AttributesEx2 & SPELL_ATTR2_ALLOW_DEAD_TARGET) : false;
+    bool targetMustBeDead = spellProto ? bool(spellProto->AttributesEx3 & SPELL_ATTR3_ONLY_TARGET_GHOSTS) : false;
+    bool targetCanBeDead = spellProto ? bool(spellProto->AttributesEx2 & SPELL_ATTR2_CAN_TARGET_DEAD) : false;
 
     if (targetMustBeDead && isAlive())
         return false;
@@ -16352,7 +16336,7 @@ Aura* Unit::AddAura(uint32 spellId, Unit* target)
     if (!spellInfo)
         return NULL;
 
-    if (!target->isAlive() && !(spellInfo->Attributes & SPELL_ATTR0_PASSIVE) && !(spellInfo->AttributesEx2 & SPELL_ATTR2_ALLOW_DEAD_TARGET))
+    if (!target->isAlive() && !(spellInfo->Attributes & SPELL_ATTR0_PASSIVE) && !(spellInfo->AttributesEx2 & SPELL_ATTR2_CAN_TARGET_DEAD))
         return NULL;
 
     return AddAura(spellInfo, MAX_EFFECT_MASK, target);
