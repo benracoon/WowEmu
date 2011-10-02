@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -27,7 +29,7 @@
 
 CreatureGroupInfoType   CreatureGroupMap;
 
-void CreatureGroupManager::AddCreatureToGroup(uint32 groupId, Creature* member)
+void CreatureGroupManager::AddCreatureToGroup(uint32 groupId, Creature *member)
 {
     Map *map = member->FindMap();
     if (!map)
@@ -51,7 +53,7 @@ void CreatureGroupManager::AddCreatureToGroup(uint32 groupId, Creature* member)
     }
 }
 
-void CreatureGroupManager::RemoveCreatureFromGroup(CreatureGroup* group, Creature* member)
+void CreatureGroupManager::RemoveCreatureFromGroup(CreatureGroup *group, Creature *member)
 {
     sLog->outDebug(LOG_FILTER_UNITS, "Deleting member pointer to GUID: %u from group %u", group->GetId(), member->GetDBTableGUIDLow());
     group->RemoveMember(member);
@@ -72,7 +74,7 @@ void CreatureGroupManager::LoadCreatureFormations()
 {
     uint32 oldMSTime = getMSTime();
 
-    for (CreatureGroupInfoType::iterator itr = CreatureGroupMap.begin(); itr != CreatureGroupMap.end(); ++itr) // for reload case
+    for (CreatureGroupInfoType::iterator itr = CreatureGroupMap.begin(); itr != CreatureGroupMap.end(); ++itr) // for reload case 
         delete itr->second;
     CreatureGroupMap.clear();
 
@@ -81,7 +83,11 @@ void CreatureGroupManager::LoadCreatureFormations()
 
     if (!result)
     {
-        sLog->outErrorDb(">>  Loaded 0 creatures in formations. DB table `creature_formations` is empty!");
+        if (!(sWorld->getBoolConfig(CONFIG_SHOW_EMPTY_TABLE_ERROR)))
+            sLog->outString(">> DB table `creature_formations` is empty!");
+        else
+            sLog->outErrorDb(">> DB table `creature_formations` is empty!");
+
         sLog->outString();
         return;
     }
@@ -152,7 +158,7 @@ void CreatureGroupManager::LoadCreatureFormations()
     sLog->outString();
 }
 
-void CreatureGroup::AddMember(Creature* member)
+void CreatureGroup::AddMember(Creature *member)
 {
     sLog->outDebug(LOG_FILTER_UNITS, "CreatureGroup::AddMember: Adding unit GUID: %u.", member->GetGUIDLow());
 
@@ -167,7 +173,7 @@ void CreatureGroup::AddMember(Creature* member)
     member->SetFormation(this);
 }
 
-void CreatureGroup::RemoveMember(Creature* member)
+void CreatureGroup::RemoveMember(Creature *member)
 {
     if (m_leader == member)
         m_leader = NULL;
@@ -176,7 +182,7 @@ void CreatureGroup::RemoveMember(Creature* member)
     member->SetFormation(NULL);
 }
 
-void CreatureGroup::MemberAttackStart(Creature* member, Unit* target)
+void CreatureGroup::MemberAttackStart(Creature *member, Unit *target)
 {
     uint8 groupAI = CreatureGroupMap[member->GetDBTableGUIDLow()]->groupAI;
     if (!groupAI)
@@ -230,7 +236,7 @@ void CreatureGroup::LeaderMoveTo(float x, float y, float z)
 
     for (CreatureGroupMemberType::iterator itr = m_members.begin(); itr != m_members.end(); ++itr)
     {
-        Creature* member = itr->first;
+        Creature *member = itr->first;
         if (member == m_leader || !member->isAlive() || member->getVictim())
             continue;
 

@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment:
 SDCategory: Zul'Gurub
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "zulgurub.h"
 
 #define SPELL_LIGHTNINGCLOUD         25033
@@ -41,7 +40,7 @@ class boss_wushoolay : public CreatureScript
 
         struct boss_wushoolayAI : public ScriptedAI
         {
-            boss_wushoolayAI(Creature* c) : ScriptedAI(c) {}
+            boss_wushoolayAI(Creature *c) : ScriptedAI(c) {}
 
             uint32 LightningCloud_Timer;
             uint32 LightningWave_Timer;
@@ -52,7 +51,7 @@ class boss_wushoolay : public CreatureScript
                 LightningWave_Timer = 8000 + rand()%8000;
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit * /*who*/)
             {
             }
 
@@ -71,9 +70,9 @@ class boss_wushoolay : public CreatureScript
                 //LightningWave_Timer
                 if (LightningWave_Timer <= diff)
                 {
-                    Unit* target = NULL;
-                    target = SelectTarget(SELECT_TARGET_RANDOM, 0);
-                    if (target) DoCast(target, SPELL_LIGHTNINGWAVE);
+                    Unit *pTarget = NULL;
+                    pTarget = SelectTarget(SELECT_TARGET_RANDOM,0);
+                    if (pTarget) DoCast(pTarget, SPELL_LIGHTNINGWAVE);
 
                     LightningWave_Timer = 12000 + rand()%4000;
                 } else LightningWave_Timer -= diff;

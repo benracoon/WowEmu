@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -34,21 +36,16 @@ enum AURA_FLAGS
     AFLAG_NEGATIVE          = 0x80
 };
 
-// these are modes, in which aura effect handler may be called
-
 enum AuraEffectHandleModes
 {
     AURA_EFFECT_HANDLE_DEFAULT = 0x0,
-    AURA_EFFECT_HANDLE_REAL = 0x01, // handler applies/removes effect from unit
-    AURA_EFFECT_HANDLE_SEND_FOR_CLIENT = 0x02, // handler sends apply/remove packet to unit
-    AURA_EFFECT_HANDLE_CHANGE_AMOUNT = 0x04, // handler updates effect on target after effect amount change
-    AURA_EFFECT_HANDLE_REAPPLY = 0x08, // handler updates effect on target after aura is reapplied on target
-    AURA_EFFECT_HANDLE_STAT = 0x10, // handler updates effect on target when stat removal/apply is needed for calculations by core
-    AURA_EFFECT_HANDLE_SKILL = 0x20, // handler updates effect on target when skill removal/apply is needed for calculations by core
-    AURA_EFFECT_HANDLE_SEND_FOR_CLIENT_MASK = (AURA_EFFECT_HANDLE_SEND_FOR_CLIENT | AURA_EFFECT_HANDLE_REAL), // any case handler need to send packet
-    AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK = (AURA_EFFECT_HANDLE_CHANGE_AMOUNT | AURA_EFFECT_HANDLE_REAL), // any case handler applies effect depending on amount
+    AURA_EFFECT_HANDLE_REAL = 0x01,
+    AURA_EFFECT_HANDLE_SEND_FOR_CLIENT = 0x02,
+    AURA_EFFECT_HANDLE_CHANGE_AMOUNT = 0x04,
+    AURA_EFFECT_HANDLE_STAT = 0x08,
+    AURA_EFFECT_HANDLE_SEND_FOR_CLIENT_MASK = (AURA_EFFECT_HANDLE_SEND_FOR_CLIENT | AURA_EFFECT_HANDLE_REAL),
+    AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK = (AURA_EFFECT_HANDLE_CHANGE_AMOUNT | AURA_EFFECT_HANDLE_REAL),
     AURA_EFFECT_HANDLE_CHANGE_AMOUNT_SEND_FOR_CLIENT_MASK = (AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK | AURA_EFFECT_HANDLE_SEND_FOR_CLIENT_MASK),
-    AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK = (AURA_EFFECT_HANDLE_REAPPLY | AURA_EFFECT_HANDLE_REAL),
 };
 
 //m_schoolAbsorb
@@ -80,7 +77,7 @@ enum AuraType
     SPELL_AURA_MOD_STEALTH_DETECT = 17,
     SPELL_AURA_MOD_INVISIBILITY = 18,
     SPELL_AURA_MOD_INVISIBILITY_DETECT = 19,
-    SPELL_AURA_OBS_MOD_HEALTH = 20,                         //20, 21 unofficial
+    SPELL_AURA_OBS_MOD_HEALTH = 20,                         //20,21 unofficial
     SPELL_AURA_OBS_MOD_POWER = 21,
     SPELL_AURA_MOD_RESISTANCE = 22,
     SPELL_AURA_PERIODIC_TRIGGER_SPELL = 23,
@@ -223,7 +220,7 @@ enum AuraType
     SPELL_AURA_MOD_AOE_AVOIDANCE = 160,
     SPELL_AURA_MOD_HEALTH_REGEN_IN_COMBAT = 161,
     SPELL_AURA_POWER_BURN_MANA = 162,
-    SPELL_AURA_MOD_CRIT_DAMAGE_BONUS = 163,
+    SPELL_AURA_MOD_CRIT_DAMAGE_BONUS_MELEE = 163,
     SPELL_AURA_164 = 164,
     SPELL_AURA_MELEE_ATTACK_POWER_ATTACKER_BONUS = 165,
     SPELL_AURA_MOD_ATTACK_POWER_PCT = 166,
@@ -377,7 +374,44 @@ enum AuraType
     SPELL_AURA_PREVENT_RESSURECTION = 314,
     SPELL_AURA_UNDERWATER_WALKING = 315,
     SPELL_AURA_PERIODIC_HASTE = 316,
-    TOTAL_AURAS = 317
+    SPELL_AURA_317 = 317,
+    SPELL_AURA_318 = 318,
+    SPELL_AURA_319 = 319,
+    SPELL_AURA_320 = 320,
+    SPELL_AURA_321 = 321,
+    SPELL_AURA_INTERFERE_TARGETTING = 322,
+    SPELL_AURA_323 = 323,
+    SPELL_AURA_324 = 324,
+    SPELL_AURA_325 = 325,
+    SPELL_AURA_326 = 326,
+    SPELL_AURA_327 = 327,
+    SPELL_AURA_328 = 328,
+    SPELL_AURA_329 = 329,
+    SPELL_AURA_WALK_AND_CAST = 330,
+    SPELL_AURA_331 = 331,
+    SPELL_AURA_332 = 332,
+    SPELL_AURA_333 = 333,
+    SPELL_AURA_334 = 334,
+    SPELL_AURA_335 = 335,
+    SPELL_AURA_336 = 336,
+    SPELL_AURA_337 = 337,
+    SPELL_AURA_338 = 338,
+    SPELL_AURA_339 = 339,
+    SPELL_AURA_340 = 340,
+    SPELL_AURA_341 = 341,
+    SPELL_AURA_342 = 342,
+    SPELL_AURA_343 = 343,
+    SPELL_AURA_344 = 344,
+    SPELL_AURA_345 = 345,
+    SPELL_AURA_346 = 346,
+    SPELL_AURA_347 = 347,
+    SPELL_AURA_348 = 348,
+    SPELL_AURA_349 = 349,
+    SPELL_AURA_350 = 350,
+    SPELL_AURA_351 = 351,
+    SPELL_AURA_352 = 352,
+    SPELL_AURA_353 = 353,
+    TOTAL_AURAS    = 354
 };
 
 enum AuraObjectType

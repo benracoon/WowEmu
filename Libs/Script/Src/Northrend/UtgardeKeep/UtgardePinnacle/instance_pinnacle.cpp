@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -16,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "utgarde_pinnacle.h"
 
 #define MAX_ENCOUNTER     4
@@ -126,17 +125,17 @@ public:
             {
                 case ENTRY_SKADI_THE_RUTHLESS_DOOR:
                     uiSkadiTheRuthlessDoor = go->GetGUID();
-                    if (m_auiEncounter[2] == DONE) HandleGameObject(0, true, go);
+                    if (m_auiEncounter[2] == DONE) HandleGameObject(NULL, true, go);
                     break;
                 case ENTRY_KING_YMIRON_DOOR:
                     uiKingYmironDoor = go->GetGUID();
-                    if (m_auiEncounter[3] == DONE) HandleGameObject(0, true, go);
+                    if (m_auiEncounter[3] == DONE) HandleGameObject(NULL, true, go);
                     break;
                 case ENTRY_GORK_PALEHOOF_SPHERE:
                     uiGortokPalehoofSphere = go->GetGUID();
                     if (m_auiEncounter[1] == DONE)
                     {
-                        HandleGameObject(0, true, go);
+                        HandleGameObject(NULL, true, go);
                         go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_UNK1);
                     }
                     break;
@@ -212,8 +211,8 @@ public:
             OUT_SAVE_INST_DATA;
 
             std::ostringstream saveStream;
-            saveStream << "U P " << m_auiEncounter[0] << ' ' << m_auiEncounter[1] << ' '
-                << m_auiEncounter[2] << ' ' << m_auiEncounter[3];
+            saveStream << "U P " << m_auiEncounter[0] << " " << m_auiEncounter[1] << " "
+                << m_auiEncounter[2] << " " << m_auiEncounter[3];
 
             str_data = saveStream.str();
 

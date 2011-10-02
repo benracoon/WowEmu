@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment: place holder
 SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 
 #define SPELL_POISON_SHOCK          25993
 #define SPELL_POISONBOLT_VOLLEY     25991

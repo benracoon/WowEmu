@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -19,6 +21,7 @@
 
 #include "QuestDef.h"
 #include "Player.h"
+#include "Unit.h"
 #include "World.h"
 
 Quest::Quest(Field * questRecord)
@@ -167,7 +170,7 @@ Quest::Quest(Field * questRecord)
     QuestCompleteScript = questRecord[171].GetUInt32();
 
     QuestFlags |= SpecialFlags << 20;
-    if (QuestFlags & QUEST_STRAWBERRY_FLAGS_AUTO_ACCEPT)
+    if (QuestFlags & QUEST_SPECIAL_FLAGS_AUTO_ACCEPT)
         QuestFlags |= QUEST_FLAGS_AUTO_ACCEPT;
 
     m_reqitemscount = 0;
@@ -216,14 +219,7 @@ uint32 Quest::XPValue(Player *pPlayer) const
             diffFactor = 10;
 
         uint32 xp = diffFactor * xpentry->Exp[XPId] / 10;
-        if (xp <= 100)
-            xp = 5 * ((xp + 2) / 5);
-        else if (xp <= 500)
-            xp = 10 * ((xp + 5) / 10);
-        else if (xp <= 1000)
-            xp = 25 * ((xp + 12) / 25);
-        else
-            xp = 50 * ((xp + 25) / 50);
+        xp = 5 * ((xp + 2) / 5);
 
         return xp;
     }
@@ -247,7 +243,8 @@ bool Quest::IsAllowedInRaid() const
     return sWorld->getBoolConfig(CONFIG_QUEST_IGNORE_RAID);
 }
 
-/*uint32 Quest::CalculateHonorGain(uint8 level) const
+/* 
+uint32 Quest::CalculateHonorGain(uint8 level) const
 {
     if (level > GT_MAX_LEVEL)
         level = GT_MAX_LEVEL;
@@ -256,8 +253,7 @@ bool Quest::IsAllowedInRaid() const
 
     if (GetRewHonorAddition() > 0 || GetRewHonorMultiplier() > 0.0f)
     {
-        // values stored from 0.. for 1...
-        honor = uint32(GetRewHonorMultiplier() * 0.1000000014901161);
+        honor = uint32(getLevel() * GetRewHonorMultiplier() * 0.1000000014901161);
         honor += GetRewHonorAddition();
     }
 

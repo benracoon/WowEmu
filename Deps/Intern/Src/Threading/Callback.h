@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -24,24 +23,23 @@
 #include "QueryResult.h"
 
 typedef ACE_Future<QueryResult> QueryResultFuture;
-typedef ACE_Future<PreparedQueryResult> PreparedQueryResultFuture;
 
 /*! A simple template using ACE_Future to manage callbacks from the thread and object that
     issued the request. <ParamType> is variable type of parameter that is used as parameter
     for the callback function.
 */
-template <typename Result, typename ParamType>
+template <typename ParamType>
 class QueryCallback
 {
     public:
         QueryCallback() {}
 
-        void SetFutureResult(ACE_Future<Result> value)
+        void SetFutureResult(QueryResultFuture value)
         {
             result = value;
         }
 
-        ACE_Future<Result> GetFutureResult()
+        QueryResultFuture GetFutureResult()
         {
             return result;
         }
@@ -51,7 +49,7 @@ class QueryCallback
             return result.ready();
         }
 
-        void GetResult(Result& res)
+        void GetResult(QueryResult& res)
         {
             result.get(res);
         }
@@ -72,22 +70,22 @@ class QueryCallback
         }
 
     private:
-        ACE_Future<Result> result;
+        QueryResultFuture result;
         ParamType param;
 };
 
-template <typename Result, typename ParamType1, typename ParamType2>
+template <typename ParamType1, typename ParamType2>
 class QueryCallback_2
 {
     public:
         QueryCallback_2() {}
 
-        void SetFutureResult(ACE_Future<Result> value)
+        void SetFutureResult(QueryResultFuture value)
         {
             result = value;
         }
 
-        ACE_Future<Result> GetFutureResult()
+        QueryResultFuture GetFutureResult()
         {
             return result;
         }
@@ -97,7 +95,7 @@ class QueryCallback_2
             return result.ready();
         }
 
-        void GetResult(Result& res)
+        void GetResult(QueryResult& res)
         {
             result.get(res);
         }
@@ -128,7 +126,7 @@ class QueryCallback_2
         }
 
     private:
-        ACE_Future<Result> result;
+        QueryResultFuture result;
         ParamType1 param_1;
         ParamType2 param_2;
 };

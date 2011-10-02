@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment: Teleport not included, spell reflect not effecting dots (Core problem
 SDCategory: Azshara
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 
 #define SAY_TELEPORT            -1000100
 
@@ -41,14 +40,14 @@ class boss_azuregos : public CreatureScript
 public:
     boss_azuregos() : CreatureScript("boss_azuregos") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_azuregosAI (creature);
+        return new boss_azuregosAI (pCreature);
     }
 
     struct boss_azuregosAI : public ScriptedAI
     {
-        boss_azuregosAI(Creature* c) : ScriptedAI(c) {}
+        boss_azuregosAI(Creature *c) : ScriptedAI(c) {}
 
         uint32 MarkOfFrost_Timer;
         uint32 ManaStorm_Timer;
@@ -73,7 +72,7 @@ public:
             Enraged = false;
         }
 
-        void EnterCombat(Unit* /*who*/) {}
+        void EnterCombat(Unit * /*who*/) {}
 
         void UpdateAI(const uint32 diff)
         {
@@ -123,8 +122,8 @@ public:
             //ManaStorm_Timer
             if (ManaStorm_Timer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                    DoCast(target, SPELL_MANASTORM);
+                if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM,0))
+                    DoCast(pTarget, SPELL_MANASTORM);
                 ManaStorm_Timer = 7500 + rand()%5000;
             } else ManaStorm_Timer -= diff;
 

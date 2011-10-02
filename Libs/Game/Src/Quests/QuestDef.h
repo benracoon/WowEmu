@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -32,7 +34,6 @@ class Player;
 class ObjectMgr;
 
 #define MAX_QUEST_LOG_SIZE 25
-
 #define QUEST_OBJECTIVES_COUNT 4
 #define QUEST_CURRENCY_OBJECTIVES_COUNT 4
 #define QUEST_ITEM_OBJECTIVES_COUNT 6
@@ -46,19 +47,19 @@ class ObjectMgr;
 
 enum QuestFailedReasons
 {
-    INVALIDREASON_DONT_HAVE_REQ                 = 0,
-    INVALIDREASON_QUEST_FAILED_LOW_LEVEL        = 1,        // You are not high enough level for that quest.
-    INVALIDREASON_QUEST_FAILED_WRONG_RACE       = 6,        // That quest is not available to your race.
-    INVALIDREASON_QUEST_ALREADY_DONE            = 7,        // You have completed that quest.
-    INVALIDREASON_QUEST_ONLY_ONE_TIMED          = 12,       // You can only be on one timed quest at a time.
-    INVALIDREASON_QUEST_ALREADY_ON              = 13,       // You are already on that quest.
-    INVALIDREASON_QUEST_FAILED_EXPANSION        = 16,       // This quest requires an expansion enabled account.
-    INVALIDREASON_QUEST_ALREADY_ON2             = 18,       // You are already on that quest.
-    INVALIDREASON_QUEST_FAILED_MISSING_ITEMS    = 21,       // You don't have the required items with you. Check storage.
-    INVALIDREASON_QUEST_FAILED_NOT_ENOUGH_MONEY = 23,       // You don't have enough money for that quest.
-    INVALIDREASON_DAILY_QUESTS_REMAINING        = 26,       // You have already completed 25 daily quests today.
-    INVALIDREASON_QUEST_FAILED_CAIS             = 27,       // You cannot complete quests once you have reached tired time.
-    INVALIDREASON_DAILY_QUEST_COMPLETED_TODAY   = 29        // You have completed that daily quest today.
+    INVALIDREASON_DONT_HAVE_REQ                       = 0,  // this is default case
+    INVALIDREASON_QUEST_FAILED_LOW_LEVEL              = 1,  // You are not high enough level for that quest.
+    INVALIDREASON_QUEST_FAILED_WRONG_RACE             = 6,  // That quest is not available to your race.
+    INVALIDREASON_QUEST_ALREADY_DONE                  = 7,  // You have completed that quest.
+    INVALIDREASON_QUEST_ONLY_ONE_TIMED                = 12, // You can only be on one timed quest at a time.
+    INVALIDREASON_QUEST_ALREADY_ON                    = 13, // You are already on that quest.
+    INVALIDREASON_QUEST_FAILED_EXPANSION              = 16, // This quest requires an expansion enabled account.
+    INVALIDREASON_QUEST_ALREADY_ON2                   = 18, // You are already on that quest.
+    INVALIDREASON_QUEST_FAILED_MISSING_ITEMS          = 21, // You don't have the required items with you. Check storage.
+    INVALIDREASON_QUEST_FAILED_NOT_ENOUGH_MONEY       = 23, // You don't have enough money for that quest.
+    INVALIDREASON_QUEST_FAILED_TOO_MANY_DAILY_QUESTS  = 26, // You have already completed 25 daily quests today.
+    INVALIDREASON_QUEST_FAILED_CAIS                   = 27, // You cannot complete quests once you have reached tired time.
+    INVALIDREASON_DAILY_QUEST_DONE_TODAY              = 29  // You have completed that daily quest today.
 };
 
 enum QuestShareMessages
@@ -146,21 +147,21 @@ enum __QuestFlags
     QUEST_FLAGS_AUTOCOMPLETE   = 0x00010000,                // auto complete
     QUEST_FLAGS_SPECIAL_ITEM   = 0x00020000,                // has something to do with ReqItemId and SrcItemId
     QUEST_FLAGS_OBJ_TEXT       = 0x00040000,                // use Objective text as Complete text
-    QUEST_FLAGS_AUTO_ACCEPT    = 0x00080000,                // The client recognizes this flag as auto-accept. However, NONE of the current quests (3.3.5a) have this flag. Maybe blizz used to use it, or will use it in the future.
+    QUEST_FLAGS_AUTO_ACCEPT    = 0x00080000,                // Auto accept quests from questgiver. Don't need to use accept button from questgiver. Used in 4.0.0+
 
-    // Strawberry flags for set SpecialFlags in DB if required but used only at server
-    QUEST_STRAWBERRY_FLAGS_REPEATABLE           = 0x00100000,   // Set by 1 in SpecialFlags from DB
-    QUEST_STRAWBERRY_FLAGS_EXPLORATION_OR_EVENT = 0x00200000,   // Set by 2 in SpecialFlags from DB (if reequired area explore, spell SPELL_EFFECT_QUEST_COMPLETE casting, table `*_script` command SCRIPT_COMMAND_QUEST_EXPLORED use, set from script)
-    QUEST_STRAWBERRY_FLAGS_AUTO_ACCEPT          = 0x00400000,   // Set by 4 in SpecialFlags in DB if the quest is to be auto-accepted.
-    QUEST_STRAWBERRY_FLAGS_DF_QUEST             = 0x00800000,   // Set by 8 in SpecialFlags in DB if the quest is used by Dungeon Finder.
+    // Flags for set SpecialFlags in DB if required but used only at server
+    QUEST_SPECIAL_FLAGS_REPEATABLE           = 0x00100000,  // Set by 1 in SpecialFlags from DB
+    QUEST_SPECIAL_FLAGS_EXPLORATION_OR_EVENT = 0x00200000,  // Set by 2 in SpecialFlags from DB (if required area explore, spell SPELL_EFFECT_QUEST_COMPLETE casting, table `*_script` command SCRIPT_COMMAND_QUEST_EXPLORED use, set from script)
+    QUEST_SPECIAL_FLAGS_AUTO_ACCEPT          = 0x00400000,  // Set by 4 in SpecialFlags in DB if the quest is to be auto-accepted.
+    QUEST_SPECIAL_FLAGS_DF_QUEST             = 0x00800000,  // Set by 8 in SpecialFlags in DB if the quest is used by Dungeon Finder.
 
-    QUEST_STRAWBERRY_FLAGS_DB_ALLOWED = 0xFFFFF | QUEST_STRAWBERRY_FLAGS_REPEATABLE | QUEST_STRAWBERRY_FLAGS_EXPLORATION_OR_EVENT | QUEST_STRAWBERRY_FLAGS_AUTO_ACCEPT | QUEST_STRAWBERRY_FLAGS_DF_QUEST,
+    QUEST_SPECIAL_FLAGS_DB_ALLOWED = 0xFFFFF | QUEST_SPECIAL_FLAGS_REPEATABLE | QUEST_SPECIAL_FLAGS_EXPLORATION_OR_EVENT | QUEST_SPECIAL_FLAGS_AUTO_ACCEPT | QUEST_SPECIAL_FLAGS_DF_QUEST,
 
-    // Strawberry flags for internal use only
-    QUEST_STRAWBERRY_FLAGS_DELIVER              = 0x04000000,   // Internal flag computed only
-    QUEST_STRAWBERRY_FLAGS_SPEAKTO              = 0x08000000,   // Internal flag computed only
-    QUEST_STRAWBERRY_FLAGS_KILL_OR_CAST         = 0x10000000,   // Internal flag computed only
-    QUEST_STRAWBERRY_FLAGS_TIMED                = 0x20000000,   // Internal flag computed only
+    // Flags for internal use only
+    QUEST_INTERNAL_FLAGS_DELIVER              = 0x04000000, // Internal flag computed only
+    QUEST_INTERNAL_FLAGS_SPEAKTO              = 0x08000000, // Internal flag computed only
+    QUEST_INTERNAL_FLAGS_KILL_OR_CAST         = 0x10000000, // Internal flag computed only
+    QUEST_INTERNAL_FLAGS_TIMED                = 0x20000000, // Internal flag computed only
 };
 
 struct QuestLocale
@@ -259,7 +260,7 @@ class Quest
         int32  GetSoundId2() const { return SoundTurnIn; }
         uint32 GetQuestStartScript() const { return QuestStartScript; }
         uint32 GetQuestCompleteScript() const { return QuestCompleteScript; }
-        bool   IsRepeatable() const { return QuestFlags & QUEST_STRAWBERRY_FLAGS_REPEATABLE; }
+        bool   IsRepeatable() const { return QuestFlags & QUEST_SPECIAL_FLAGS_REPEATABLE; }
         bool   IsAutoComplete() const { return QuestMethod ? false : true; }
         uint32 GetFlags() const { return QuestFlags; }
         bool   IsDaily() const { return QuestFlags & QUEST_FLAGS_DAILY; }
@@ -268,7 +269,7 @@ class Quest
         bool   IsAutoAccept() const { return QuestFlags & QUEST_FLAGS_AUTO_ACCEPT; }
         bool   IsRaidQuest() const { return Type == QUEST_TYPE_RAID || Type == QUEST_TYPE_RAID_10 || Type == QUEST_TYPE_RAID_25; }
         bool   IsAllowedInRaid() const;
-        bool   IsDFQuest() const { return QuestFlags & QUEST_STRAWBERRY_FLAGS_DF_QUEST; }
+        bool   IsDFQuest() const { return QuestFlags & QUEST_SPECIAL_FLAGS_DF_QUEST; }
         //uint32 CalculateHonorGain(uint8 level) const;
 
         // multiple values

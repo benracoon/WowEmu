@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -20,8 +22,8 @@
 #include "Common.h"
 #include "SharedDefines.h"
 #include "WorldPacket.h"
-#include "Opcodes.h"
 #include "Log.h"
+#include "OpcodeHandler.h"
 #include "World.h"
 #include "Object.h"
 #include "Creature.h"
@@ -114,6 +116,7 @@ Object::~Object()
 
     delete [] m_uint32Values;
     delete [] m_uint32Values_mirror;
+
 }
 
 void Object::_InitValues()
@@ -155,7 +158,7 @@ std::string Object::_ConcatFields(uint16 startIndex, uint16 size) const
 {
     std::ostringstream ss;
     for (uint16 index = 0; index < size; ++index)
-        ss << GetUInt32Value(index + startIndex) << ' ';
+        ss << GetUInt32Value(index + startIndex) << " ";
     return ss.str();
 }
 
@@ -198,17 +201,17 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData *data, Player *target) c
         {
             switch(this->ToGameObject()->GetGoType())
             {
-            case GAMEOBJECT_TYPE_TRAP:
-            case GAMEOBJECT_TYPE_DUEL_ARBITER:
-            case GAMEOBJECT_TYPE_FLAGSTAND:
-            case GAMEOBJECT_TYPE_FLAGDROP:
-                updatetype = UPDATETYPE_CREATE_OBJECT2;
-                break;
-            case GAMEOBJECT_TYPE_TRANSPORT:
-                flags |= UPDATEFLAG_TRANSPORT;
-                break;
-            default:
-                break;
+                case GAMEOBJECT_TYPE_TRAP:
+                case GAMEOBJECT_TYPE_DUEL_ARBITER:
+                case GAMEOBJECT_TYPE_FLAGSTAND:
+                case GAMEOBJECT_TYPE_FLAGDROP:
+                    updatetype = UPDATETYPE_CREATE_OBJECT2;
+                    break;
+                case GAMEOBJECT_TYPE_TRANSPORT:
+                    flags |= UPDATEFLAG_TRANSPORT;
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -251,11 +254,10 @@ void Object::SendUpdateToPlayer(Player* player)
 
 void Object::BuildValuesUpdateBlockForPlayer(UpdateData *data, Player *target) const
 {
+    ByteBuffer buf(500);
     data->m_map = target->GetMapId();
 
-    ByteBuffer buf(500);
-
-    buf << (uint8) UPDATETYPE_VALUES;
+    buf << uint8(UPDATETYPE_VALUES);
     buf.append(GetPackGUID());
 
     UpdateMask updateMask;
@@ -329,40 +331,40 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint16 flags) const
                         *data << float(player->GetPositionZ());
                     }
 
-                    TaxiPathNodeList& path = const_cast<TaxiPathNodeList&>(fmg->GetPath());
+            TaxiPathNodeList& path = const_cast<TaxiPathNodeList&>(fmg->GetPath());
 
-                    float x, y, z;
-                    player->GetPosition(x, y, z);
+            float x, y, z;
+            player->GetPosition(x, y, z);
 
-                    uint32 inflighttime = uint32(path.GetPassedLength(fmg->GetCurrentNode(), x, y, z) * 32);
-                    uint32 traveltime = uint32(path.GetTotalLength() * 32);
+            uint32 inflighttime = uint32(path.GetPassedLength(fmg->GetCurrentNode(), x, y, z) * 32);
+            uint32 traveltime = uint32(path.GetTotalLength() * 32);
 
-                    *data << uint32(inflighttime);                  // passed move time?
-                    *data << uint32(traveltime);                    // full move time?
-                    *data << uint32(0);                             // ticks count?
+            *data << uint32(inflighttime);                  // passed move time?
+            *data << uint32(traveltime);                    // full move time?
+            *data << uint32(0);                             // ticks count?
 
-                    *data << float(0);                              // added in 3.1
-                    *data << float(0);                              // added in 3.1
+            *data << float(0);                              // added in 3.1
+            *data << float(0);                              // added in 3.1
 
-                    // data as in SMSG_MONSTER_MOVE with flag SPLINEFLAG_TRAJECTORY
-                    *data << float(0);                              // parabolic speed, added in 3.1
-                    *data << uint32(0);                             // parabolic time, added in 3.1
+            // data as in SMSG_MONSTER_MOVE with flag SPLINEFLAG_TRAJECTORY
+            *data << float(0);                              // parabolic speed, added in 3.1
+            *data << uint32(0);                             // parabolic time, added in 3.1
 
-                    uint32 poscount = uint32(path.size());
-                    *data << uint32(poscount);                      // points count
+            uint32 poscount = uint32(path.size());
+            *data << uint32(poscount);                      // points count
 
-                    for (uint32 i = 0; i < poscount; ++i)
-                    {
-                        *data << float(path[i].x);
-                        *data << float(path[i].y);
-                        *data << float(path[i].z);
-                    }
+            for (uint32 i = 0; i < poscount; ++i)
+            {
+                *data << float(path[i].x);
+                *data << float(path[i].y);
+                *data << float(path[i].z);
+            }
 
-                    *data << uint8(0);                              // added in 3.0.8
+            *data << uint8(0);                              // added in 3.0.8
 
-                    *data << float(path[poscount-1].x);
-                    *data << float(path[poscount-1].y);
-                    *data << float(path[poscount-1].z);
+            *data << float(path[poscount-1].x);
+            *data << float(path[poscount-1].y);
+            *data << float(path[poscount-1].z);
         }
     }
     else
@@ -457,6 +459,8 @@ void Object::_BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask 
         return;
 
     uint32 valuesCount = m_valuesCount;
+    if(GetTypeId() == TYPEID_PLAYER && target != this)
+        valuesCount = valuesCount = m_valuesCount;
     if(GetTypeId() == TYPEID_PLAYER && target != this)
         valuesCount = PLAYER_FIELD_INV_SLOT_HEAD;;
 
@@ -564,7 +568,7 @@ void Object::_BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask 
                 {
                     if (GetTypeId() == TYPEID_UNIT)
                     {
-                        const CreatureTemplate* cinfo = this->ToCreature()->GetCreatureInfo();
+                        const CreatureInfo* cinfo = this->ToCreature()->GetCreatureInfo();
                         if (cinfo->flags_extra & CREATURE_FLAG_EXTRA_TRIGGER)
                         {
                             if (target->isGameMaster())
@@ -668,32 +672,32 @@ void Object::_BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask 
                     {
                         switch(this->ToGameObject()->GetGoType())
                         {
-                        case GAMEOBJECT_TYPE_CHEST:
-                            if (target->isGameMaster())
-                                *data << uint16(GO_DYNFLAG_LO_ACTIVATE);
-                            else
-                                *data << uint16(GO_DYNFLAG_LO_ACTIVATE | GO_DYNFLAG_LO_SPARKLE);
-                            *data << uint16(-1);
-                            break;
-                        case GAMEOBJECT_TYPE_GENERIC:
-                            if (target->isGameMaster())
+                            case GAMEOBJECT_TYPE_CHEST:
+                                if (target->isGameMaster())
+                                    *data << uint16(GO_DYNFLAG_LO_ACTIVATE);
+                                else
+                                    *data << uint16(GO_DYNFLAG_LO_ACTIVATE | GO_DYNFLAG_LO_SPARKLE);
+                                *data << uint16(-1);
+                                break;
+                            case GAMEOBJECT_TYPE_GENERIC:
+                                if (target->isGameMaster())
+                                    *data << uint16(0);
+                                else
+                                    *data << uint16(GO_DYNFLAG_LO_SPARKLE);
+                                *data << uint16(-1);
+                                break;
+                            case GAMEOBJECT_TYPE_GOOBER:
+                                if (target->isGameMaster())
+                                    *data << uint16(GO_DYNFLAG_LO_ACTIVATE);
+                                else
+                                    *data << uint16(GO_DYNFLAG_LO_ACTIVATE | GO_DYNFLAG_LO_SPARKLE);
+                                *data << uint16(-1);
+                                break;
+                            default:
+                                // unknown, not happen.
                                 *data << uint16(0);
-                            else
-                                *data << uint16(GO_DYNFLAG_LO_SPARKLE);
-                            *data << uint16(-1);
-                            break;
-                        case GAMEOBJECT_TYPE_GOOBER:
-                            if (target->isGameMaster())
-                                *data << uint16(GO_DYNFLAG_LO_ACTIVATE);
-                            else
-                                *data << uint16(GO_DYNFLAG_LO_ACTIVATE | GO_DYNFLAG_LO_SPARKLE);
-                            *data << uint16(-1);
-                            break;
-                        default:
-                            // unknown, not happen.
-                            *data << uint16(0);
-                            *data << uint16(-1);
-                            break;
+                                *data << uint16(-1);
+                                break;
                         }
                     }
                     else
@@ -739,15 +743,27 @@ void Object::BuildFieldsUpdate(Player *pl, UpdateDataMapType &data_map) const
 
     if (iter == data_map.end())
     {
-        UpdateData udata;
-        udata.m_map = pl->GetMapId();
-
-        std::pair<UpdateDataMapType::iterator, bool> p = data_map.insert(UpdateDataMapType::value_type(pl, udata));
+        std::pair<UpdateDataMapType::iterator, bool> p = data_map.insert(UpdateDataMapType::value_type(pl, UpdateData()));
         ASSERT(p.second);
         iter = p.first;
     }
 
     BuildValuesUpdateBlockForPlayer(&iter->second, iter->first);
+}
+
+bool Object::LoadValues(const char* data)
+{
+    if (!m_uint32Values) _InitValues();
+
+    Tokens tokens(data, ' ');
+
+    if (tokens.size() != m_valuesCount)
+        return false;
+
+    for (uint16 index = 0; index < m_valuesCount; ++index)
+        m_uint32Values[index] = atol(tokens[index]);
+
+    return true;
 }
 
 void Object::_LoadIntoDataField(const char* data, uint32 startOffset, uint32 count)
@@ -765,7 +781,9 @@ void Object::_LoadIntoDataField(const char* data, uint32 startOffset, uint32 cou
     Tokens::iterator iter;
     uint32 index;
     for (iter = tokens.begin(), index = 0; index < count; ++iter, ++index)
+    {
         m_uint32Values[startOffset + index] = atol(tokens[index]);
+    }
 }
 
 void Object::_SetUpdateBits(UpdateMask *updateMask, Player* target) const
@@ -778,22 +796,25 @@ void Object::_SetUpdateBits(UpdateMask *updateMask, Player* target) const
         valuesCount = PLAYER_FIELD_INV_SLOT_HEAD;
 
     for (uint16 index = 0; index < valuesCount; ++index, ++value, ++mirror)
+    {
         if (*mirror != *value)
             updateMask->SetBit(index);
+    }
 }
 
 void Object::_SetCreateBits(UpdateMask *updateMask, Player* target) const
 {
     uint32 *value = m_uint32Values;
-    
+
     uint32 valuesCount = m_valuesCount;
-    
     if(GetTypeId() == TYPEID_PLAYER && target != this)
         valuesCount = PLAYER_FIELD_INV_SLOT_HEAD;
 
     for (uint16 index = 0; index < valuesCount; ++index, ++value)
+    {
         if (*value)
             updateMask->SetBit(index);
+    }
 }
 
 void Object::SetInt32Value(uint16 index, int32 value)
@@ -841,7 +862,7 @@ void Object::UpdateUInt32Value(uint16 index, uint32 value)
     m_uint32Values[ index ] = value;
 }
 
-void Object::SetUInt64Value(uint16 index, const uint64 value)
+void Object::SetUInt64Value(uint16 index, const uint64 &value)
 {
     ASSERT(index + 1 < m_valuesCount || PrintIndexError(index, true));
     if (*((uint64*)&(m_uint32Values[ index ])) != value)
@@ -860,7 +881,7 @@ void Object::SetUInt64Value(uint16 index, const uint64 value)
     }
 }
 
-bool Object::AddUInt64Value(uint16 index, const uint64 value)
+bool Object::AddUInt64Value(uint16 index, const uint64 &value)
 {
     ASSERT(index + 1 < m_valuesCount || PrintIndexError(index , true));
     if (value && !*((uint64*)&(m_uint32Values[index])))
@@ -881,7 +902,7 @@ bool Object::AddUInt64Value(uint16 index, const uint64 value)
     return false;
 }
 
-bool Object::RemoveUInt64Value(uint16 index, const uint64 value)
+bool Object::RemoveUInt64Value(uint16 index, const uint64 &value)
 {
     ASSERT(index + 1 < m_valuesCount || PrintIndexError(index , true));
     if (value && *((uint64*)&(m_uint32Values[index])) == value)
@@ -1117,13 +1138,13 @@ void Object::RemoveByteFlag(uint16 index, uint8 offset, uint8 oldFlag)
 
 bool Object::PrintIndexError(uint32 index, bool set) const
 {
-    sLog->outError("Attempt %s non-existed value field: %u (count: %u) for object typeid: %u type mask: %u", (set ? "set value to" : "get value from"), index, m_valuesCount, GetTypeId(), m_objectType);
+    sLog->outError("Attempt %s non-existed value field: %u (count: %u) for object typeid: %u type mask: %u",(set ? "set value to" : "get value from"),index,m_valuesCount,GetTypeId(),m_objectType);
 
     // ASSERT must fail after function call
     return false;
 }
 
-bool Position::HasInLine(const Unit* const target, float distance, float width) const
+bool Position::HasInLine(const Unit * const target, float distance, float width) const
 {
     if (!HasInArc(M_PI, target) || !target->IsWithinDist3d(m_positionX, m_positionY, m_positionZ, distance))
         return false;
@@ -1325,15 +1346,15 @@ bool WorldObject::_IsWithinDist(WorldObject const* obj, float dist2compare, bool
 bool WorldObject::IsWithinLOSInMap(const WorldObject* obj) const
 {
     if (!IsInMap(obj)) return false;
-    float ox, oy, oz;
-    obj->GetPosition(ox, oy, oz);
+    float ox,oy,oz;
+    obj->GetPosition(ox,oy,oz);
     return(IsWithinLOS(ox, oy, oz));
 }
 
 bool WorldObject::IsWithinLOS(float ox, float oy, float oz) const
 {
-    float x, y, z;
-    GetPosition(x, y, z);
+    float x,y,z;
+    GetPosition(x,y,z);
     VMAP::IVMapManager *vMapManager = VMAP::VMapFactory::createOrGetVMapManager();
     return vMapManager->isInLineOfSight(GetMapId(), x, y, z+2.0f, ox, oy, oz+2.0f);
 }
@@ -1496,7 +1517,7 @@ bool Position::HasInArc(float arc, const Position *obj) const
 
     // move angle to range -pi ... +pi
     angle = MapManager::NormalizeOrientation(angle);
-    if (angle > M_PI)
+    if(angle > M_PI)
         angle -= 2.0f*M_PI;
 
     float lborder =  -1 * (arc/2.0f);                       // in range -pi..0
@@ -1547,19 +1568,52 @@ void WorldObject::GetRandomPoint(const Position &pos, float distance, float &ran
 
     Strawberry::NormalizeMapCoord(rand_x);
     Strawberry::NormalizeMapCoord(rand_y);
-    UpdateGroundPositionZ(rand_x, rand_y, rand_z);            // update to LOS height if available
+    UpdateGroundPositionZ(rand_x,rand_y,rand_z);            // update to LOS height if available
 }
 
 void WorldObject::UpdateGroundPositionZ(float x, float y, float &z) const
 {
-    float new_z = GetBaseMap()->GetHeight(x, y, z, true);
+    float new_z = GetBaseMap()->GetHeight(x,y,z,true);
     if (new_z > INVALID_HEIGHT)
         z = new_z+ 0.05f;                                   // just to be sure that we are not a few pixel under the surface
 }
 
 bool Position::IsPositionValid() const
 {
-    return Strawberry::IsValidMapCoord(m_positionX, m_positionY, m_positionZ, m_orientation);
+    return Strawberry::IsValidMapCoord(m_positionX,m_positionY,m_positionZ,m_orientation);
+}
+
+void WorldObject::MonsterSay(const char* text, uint32 language, uint64 TargetGuid)
+{
+    WorldPacket data(SMSG_MESSAGECHAT, 200);
+    BuildMonsterChat(&data,CHAT_MSG_MONSTER_SAY,text,language,GetName(),TargetGuid);
+    SendMessageToSetInRange(&data,sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY),true);
+}
+
+void WorldObject::MonsterYell(const char* text, uint32 language, uint64 TargetGuid)
+{
+    WorldPacket data(SMSG_MESSAGECHAT, 200);
+    BuildMonsterChat(&data,CHAT_MSG_MONSTER_YELL,text,language,GetName(),TargetGuid);
+    SendMessageToSetInRange(&data,sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL),true);
+}
+
+void WorldObject::MonsterTextEmote(const char* text, uint64 TargetGuid, bool IsBossEmote)
+{
+    WorldPacket data(SMSG_MESSAGECHAT, 200);
+    BuildMonsterChat(&data,IsBossEmote ? CHAT_MSG_RAID_BOSS_EMOTE : CHAT_MSG_MONSTER_EMOTE,text,LANG_UNIVERSAL,GetName(),TargetGuid);
+    SendMessageToSetInRange(&data,sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE),true);
+}
+
+void WorldObject::MonsterWhisper(const char* text, uint64 receiver, bool IsBossWhisper)
+{
+    Player *player = sObjectMgr->GetPlayer(receiver);
+    if (!player || !player->GetSession())
+        return;
+
+    WorldPacket data(SMSG_MESSAGECHAT, 200);
+    BuildMonsterChat(&data,IsBossWhisper ? CHAT_MSG_RAID_BOSS_WHISPER : CHAT_MSG_MONSTER_WHISPER,text,LANG_UNIVERSAL,GetName(),receiver);
+
+    player->GetSession()->SendPacket(&data);
 }
 
 bool WorldObject::isValid() const
@@ -1753,7 +1807,7 @@ bool WorldObject::canDetectStealthOf(WorldObject const* obj) const
     float combatReach = 0.0f;
 
     if (isType(TYPEMASK_UNIT))
-        combatReach = ((Unit*)this)->GetCombatReach();
+        combatReach = this->ToUnit()->GetCombatReach();
 
     if (distance < combatReach)
         return true;
@@ -1767,7 +1821,7 @@ bool WorldObject::canDetectStealthOf(WorldObject const* obj) const
             continue;
 
         if (isType(TYPEMASK_UNIT))
-            if (((Unit*)this)->HasAuraTypeWithMiscvalue(SPELL_AURA_DETECT_STEALTH, i))
+            if (this->ToUnit()->HasAuraTypeWithMiscvalue(SPELL_AURA_DETECT_STEALTH, i))
                 return true;
 
         // Starting points
@@ -1827,10 +1881,10 @@ namespace Strawberry
                 : i_object(obj), i_msgtype(msgtype), i_textId(textId), i_language(language), i_targetGUID(targetGUID) {}
             void operator()(WorldPacket& data, LocaleConstant loc_idx)
             {
-                char const* text = sObjectMgr->GetStrings(i_textId, loc_idx);
+                char const* text = sObjectMgr->GetString(i_textId,loc_idx);
 
                 // TODO: i_object.GetName() also must be localized?
-                i_object.BuildMonsterChat(&data, i_msgtype, text, i_language, i_object.GetNameForLocaleIdx(loc_idx), i_targetGUID);
+                i_object.BuildMonsterChat(&data,i_msgtype,text,i_language,i_object.GetNameForLocaleIdx(loc_idx),i_targetGUID);
             }
 
         private:
@@ -1840,41 +1894,7 @@ namespace Strawberry
             uint32 i_language;
             uint64 i_targetGUID;
     };
-
-    class MonsterCustomChatBuilder
-    {
-        public:
-            MonsterCustomChatBuilder(WorldObject const& obj, ChatMsg msgtype, const char* text, uint32 language, uint64 targetGUID)
-                : i_object(obj), i_msgtype(msgtype), i_text(text), i_language(language), i_targetGUID(targetGUID) {}
-            void operator()(WorldPacket& data, LocaleConstant loc_idx)
-            {
-                // TODO: i_object.GetName() also must be localized?
-                i_object.BuildMonsterChat(&data, i_msgtype, i_text, i_language, i_object.GetNameForLocaleIdx(loc_idx), i_targetGUID);
-            }
-
-        private:
-            WorldObject const& i_object;
-            ChatMsg i_msgtype;
-            const char* i_text;
-            uint32 i_language;
-            uint64 i_targetGUID;
-    };
 }                                                           // namespace Strawberry
-
-void WorldObject::MonsterSay(const char* text, uint32 language, uint64 TargetGuid)
-{
-    CellPair p = Strawberry::ComputeCellPair(GetPositionX(), GetPositionY());
-
-    Cell cell(p);
-    cell.data.Part.reserved = ALL_DISTRICT;
-    cell.SetNoCreate();
-
-    Strawberry::MonsterCustomChatBuilder say_build(*this, CHAT_MSG_MONSTER_SAY, text, language, TargetGuid);
-    Strawberry::LocalizedPacketDo<Strawberry::MonsterCustomChatBuilder> say_do(say_build);
-    Strawberry::PlayerDistWorker<Strawberry::LocalizedPacketDo<Strawberry::MonsterCustomChatBuilder> > say_worker(this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), say_do);
-    TypeContainerVisitor<Strawberry::PlayerDistWorker<Strawberry::LocalizedPacketDo<Strawberry::MonsterCustomChatBuilder> >, WorldTypeMapContainer > message(say_worker);
-    cell.Visit(p, message, *GetMap(), *this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY));
-}
 
 void WorldObject::MonsterSay(int32 textId, uint32 language, uint64 TargetGuid)
 {
@@ -1884,26 +1904,11 @@ void WorldObject::MonsterSay(int32 textId, uint32 language, uint64 TargetGuid)
     cell.data.Part.reserved = ALL_DISTRICT;
     cell.SetNoCreate();
 
-    Strawberry::MonsterChatBuilder say_build(*this, CHAT_MSG_MONSTER_SAY, textId, language, TargetGuid);
+    Strawberry::MonsterChatBuilder say_build(*this, CHAT_MSG_MONSTER_SAY, textId,language,TargetGuid);
     Strawberry::LocalizedPacketDo<Strawberry::MonsterChatBuilder> say_do(say_build);
-    Strawberry::PlayerDistWorker<Strawberry::LocalizedPacketDo<Strawberry::MonsterChatBuilder> > say_worker(this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), say_do);
+    Strawberry::PlayerDistWorker<Strawberry::LocalizedPacketDo<Strawberry::MonsterChatBuilder> > say_worker(this,sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY),say_do);
     TypeContainerVisitor<Strawberry::PlayerDistWorker<Strawberry::LocalizedPacketDo<Strawberry::MonsterChatBuilder> >, WorldTypeMapContainer > message(say_worker);
     cell.Visit(p, message, *GetMap(), *this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY));
-}
-
-void WorldObject::MonsterYell(const char* text, uint32 language, uint64 TargetGuid)
-{
-    CellPair p = Strawberry::ComputeCellPair(GetPositionX(), GetPositionY());
-
-    Cell cell(p);
-    cell.data.Part.reserved = ALL_DISTRICT;
-    cell.SetNoCreate();
-
-    Strawberry::MonsterCustomChatBuilder say_build(*this, CHAT_MSG_MONSTER_YELL, text, language, TargetGuid);
-    Strawberry::LocalizedPacketDo<Strawberry::MonsterCustomChatBuilder> say_do(say_build);
-    Strawberry::PlayerDistWorker<Strawberry::LocalizedPacketDo<Strawberry::MonsterCustomChatBuilder> > say_worker(this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL), say_do);
-    TypeContainerVisitor<Strawberry::PlayerDistWorker<Strawberry::LocalizedPacketDo<Strawberry::MonsterCustomChatBuilder> >, WorldTypeMapContainer > message(say_worker);
-    cell.Visit(p, message, *GetMap(), *this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL));
 }
 
 void WorldObject::MonsterYell(int32 textId, uint32 language, uint64 TargetGuid)
@@ -1914,16 +1919,16 @@ void WorldObject::MonsterYell(int32 textId, uint32 language, uint64 TargetGuid)
     cell.data.Part.reserved = ALL_DISTRICT;
     cell.SetNoCreate();
 
-    Strawberry::MonsterChatBuilder say_build(*this, CHAT_MSG_MONSTER_YELL, textId, language, TargetGuid);
+    Strawberry::MonsterChatBuilder say_build(*this, CHAT_MSG_MONSTER_YELL, textId,language,TargetGuid);
     Strawberry::LocalizedPacketDo<Strawberry::MonsterChatBuilder> say_do(say_build);
-    Strawberry::PlayerDistWorker<Strawberry::LocalizedPacketDo<Strawberry::MonsterChatBuilder> > say_worker(this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL), say_do);
+    Strawberry::PlayerDistWorker<Strawberry::LocalizedPacketDo<Strawberry::MonsterChatBuilder> > say_worker(this,sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL),say_do);
     TypeContainerVisitor<Strawberry::PlayerDistWorker<Strawberry::LocalizedPacketDo<Strawberry::MonsterChatBuilder> >, WorldTypeMapContainer > message(say_worker);
     cell.Visit(p, message, *GetMap(), *this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL));
 }
 
 void WorldObject::MonsterYellToZone(int32 textId, uint32 language, uint64 TargetGuid)
 {
-    Strawberry::MonsterChatBuilder say_build(*this, CHAT_MSG_MONSTER_YELL, textId, language, TargetGuid);
+    Strawberry::MonsterChatBuilder say_build(*this, CHAT_MSG_MONSTER_YELL, textId,language,TargetGuid);
     Strawberry::LocalizedPacketDo<Strawberry::MonsterChatBuilder> say_do(say_build);
 
     uint32 zoneid = GetZoneId();
@@ -1934,13 +1939,6 @@ void WorldObject::MonsterYellToZone(int32 textId, uint32 language, uint64 Target
             say_do(itr->getSource());
 }
 
-void WorldObject::MonsterTextEmote(const char* text, uint64 TargetGuid, bool IsBossEmote)
-{
-    WorldPacket data(SMSG_MESSAGECHAT, 200);
-    BuildMonsterChat(&data, IsBossEmote ? CHAT_MSG_RAID_BOSS_EMOTE : CHAT_MSG_MONSTER_EMOTE, text, LANG_UNIVERSAL, GetName(), TargetGuid);
-    SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), true);
-}
-
 void WorldObject::MonsterTextEmote(int32 textId, uint64 TargetGuid, bool IsBossEmote)
 {
     CellPair p = Strawberry::ComputeCellPair(GetPositionX(), GetPositionY());
@@ -1949,38 +1947,24 @@ void WorldObject::MonsterTextEmote(int32 textId, uint64 TargetGuid, bool IsBossE
     cell.data.Part.reserved = ALL_DISTRICT;
     cell.SetNoCreate();
 
-    Strawberry::MonsterChatBuilder say_build(*this, IsBossEmote ? CHAT_MSG_RAID_BOSS_EMOTE : CHAT_MSG_MONSTER_EMOTE, textId, LANG_UNIVERSAL, TargetGuid);
+    Strawberry::MonsterChatBuilder say_build(*this, IsBossEmote ? CHAT_MSG_RAID_BOSS_EMOTE : CHAT_MSG_MONSTER_EMOTE, textId,LANG_UNIVERSAL,TargetGuid);
     Strawberry::LocalizedPacketDo<Strawberry::MonsterChatBuilder> say_do(say_build);
-    Strawberry::PlayerDistWorker<Strawberry::LocalizedPacketDo<Strawberry::MonsterChatBuilder> > say_worker(this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), say_do);
+    Strawberry::PlayerDistWorker<Strawberry::LocalizedPacketDo<Strawberry::MonsterChatBuilder> > say_worker(this,sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE),say_do);
     TypeContainerVisitor<Strawberry::PlayerDistWorker<Strawberry::LocalizedPacketDo<Strawberry::MonsterChatBuilder> >, WorldTypeMapContainer > message(say_worker);
     cell.Visit(p, message, *GetMap(), *this, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE));
 }
 
-void WorldObject::MonsterWhisper(const char* text, uint64 receiver, bool IsBossWhisper)
-{
-    Player* player = ObjectAccessor::FindPlayer(receiver);
-    if (!player || !player->GetSession())
-        return;
-
-    LocaleConstant loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
-
-    WorldPacket data(SMSG_MESSAGECHAT, 200);
-    BuildMonsterChat(&data, IsBossWhisper ? CHAT_MSG_RAID_BOSS_WHISPER : CHAT_MSG_MONSTER_WHISPER, text, LANG_UNIVERSAL, GetNameForLocaleIdx(loc_idx), receiver);
-
-    player->GetSession()->SendPacket(&data);
-}
-
 void WorldObject::MonsterWhisper(int32 textId, uint64 receiver, bool IsBossWhisper)
 {
-    Player* player = ObjectAccessor::FindPlayer(receiver);
+    Player *player = sObjectMgr->GetPlayer(receiver);
     if (!player || !player->GetSession())
         return;
 
     LocaleConstant loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
-    char const* text = sObjectMgr->GetStrings(textId, loc_idx);
+    char const* text = sObjectMgr->GetString(textId, loc_idx);
 
     WorldPacket data(SMSG_MESSAGECHAT, 200);
-    BuildMonsterChat(&data, IsBossWhisper ? CHAT_MSG_RAID_BOSS_WHISPER : CHAT_MSG_MONSTER_WHISPER, text, LANG_UNIVERSAL, GetNameForLocaleIdx(loc_idx), receiver);
+    BuildMonsterChat(&data,IsBossWhisper ? CHAT_MSG_RAID_BOSS_WHISPER : CHAT_MSG_MONSTER_WHISPER,text,LANG_UNIVERSAL,GetNameForLocaleIdx(loc_idx),receiver);
 
     player->GetSession()->SendPacket(&data);
 }
@@ -2011,7 +1995,7 @@ void Unit::BuildHeartBeatMsg(WorldPacket *data) const
     BuildMovementPacket(data);
 }
 
-void WorldObject::SendMessageToSetInRange(WorldPacket *data, float dist, bool /*self*/)
+void WorldObject::SendMessageToSetInRange(WorldPacket *data, float dist, bool /*bToSelf*/)
 {
     Strawberry::MessageDistDeliverer notifier(this, data, dist);
     VisitNearbyWorldObject(dist, notifier);
@@ -2073,64 +2057,47 @@ void WorldObject::AddObjectToRemoveList()
     Map* map = FindMap();
     if (!map)
     {
-        sLog->outError("Object (TypeId: %u Entry: %u GUID: %u) at attempt add to move list not have valid map (Id: %u).", GetTypeId(), GetEntry(), GetGUIDLow(), GetMapId());
+        sLog->outError("Object (TypeId: %u Entry: %u GUID: %u) at attempt add to move list not have valid map (Id: %u).",GetTypeId(),GetEntry(),GetGUIDLow(),GetMapId());
         return;
     }
 
     map->AddObjectToRemoveList(this);
 }
 
-TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties /*= NULL*/, uint32 duration /*= 0*/, Unit* summoner /*= NULL*/, uint32 spellId /*= 0*/, uint32 vehId /*= 0*/)
+TempSummon *Map::SummonCreature(uint32 entry, const Position &pos, SummonPropertiesEntry const *properties, uint32 duration, Unit *summoner, uint32 vehId, uint32 lowGUID)
 {
     uint32 mask = UNIT_MASK_SUMMON;
     if (properties)
     {
-        switch (properties->Category)
+        switch(properties->Category)
         {
-            case SUMMON_CATEGORY_PET:
-                mask = UNIT_MASK_GUARDIAN;
-                break;
-            case SUMMON_CATEGORY_PUPPET:
-                mask = UNIT_MASK_PUPPET;
-                break;
-            case SUMMON_CATEGORY_VEHICLE:
-                mask = UNIT_MASK_MINION;
-                break;
-            case SUMMON_CATEGORY_WILD:
-            case SUMMON_CATEGORY_ALLY:
-            case SUMMON_CATEGORY_UNK:
-            {
-                switch (properties->Type)
+            case SUMMON_CATEGORY_PET:       mask = UNIT_MASK_GUARDIAN;  break;
+            case SUMMON_CATEGORY_PUPPET:    mask = UNIT_MASK_PUPPET;    break;
+            case SUMMON_CATEGORY_VEHICLE:   mask = UNIT_MASK_MINION;    break;
+            default:
+                switch(properties->Type)
                 {
-                case SUMMON_TYPE_MINION:
-                case SUMMON_TYPE_GUARDIAN:
-                case SUMMON_TYPE_GUARDIAN2:
-                    mask = UNIT_MASK_GUARDIAN;
-                    break;
-                case SUMMON_TYPE_TOTEM:
-                    mask = UNIT_MASK_TOTEM;
-                    break;
-                case SUMMON_TYPE_VEHICLE:
-                case SUMMON_TYPE_VEHICLE2:
-                    mask = UNIT_MASK_SUMMON;
-                    break;
-                case SUMMON_TYPE_MINIPET:
-                    mask = UNIT_MASK_MINION;
-                    break;
-                default:
-                    if (properties->Flags & 512) // Mirror Image, Summon Gargoyle
-                        mask = UNIT_MASK_GUARDIAN;
-                    break;
+                    case SUMMON_TYPE_MINION:
+                    case SUMMON_TYPE_GUARDIAN:
+                    case SUMMON_TYPE_GUARDIAN2:
+                        mask = UNIT_MASK_GUARDIAN;  break;
+                    case SUMMON_TYPE_TOTEM:
+                        mask = UNIT_MASK_TOTEM;     break;
+                    case SUMMON_TYPE_VEHICLE:
+                    case SUMMON_TYPE_VEHICLE2:
+                        mask = UNIT_MASK_SUMMON;    break;
+                    case SUMMON_TYPE_MINIPET:
+                        mask = UNIT_MASK_MINION;    break;
+                    default:
+                        if (properties->Flags & 512) // Mirror Image, Summon Gargoyle
+                            mask = UNIT_MASK_GUARDIAN;
+                        break;
                 }
                 break;
-            }
-            default:
-                return NULL;
         }
     }
 
-    uint32 phase = PHASEMASK_NORMAL;
-    uint32 team = 0;
+    uint32 phase = PHASEMASK_NORMAL, team = 0;
     if (summoner)
     {
         phase = summoner->GetPhaseMask();
@@ -2138,35 +2105,25 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
             team = summoner->ToPlayer()->GetTeam();
     }
 
-    TempSummon* summon = NULL;
-    switch (mask)
+    TempSummon *summon = NULL;
+    switch(mask)
     {
-        case UNIT_MASK_SUMMON:
-            summon = new TempSummon(properties, summoner);
-            break;
-        case UNIT_MASK_GUARDIAN:
-            summon = new Guardian(properties, summoner);
-            break;
-        case UNIT_MASK_PUPPET:
-            summon = new Puppet(properties, summoner);
-            break;
-        case UNIT_MASK_TOTEM:
-            summon = new Totem(properties, summoner);
-            break;
-        case UNIT_MASK_MINION:
-            summon = new Minion(properties, summoner);
-            break;
-        default:
-            return NULL;
+        case UNIT_MASK_SUMMON:    summon = new TempSummon (properties, summoner);  break;
+        case UNIT_MASK_GUARDIAN:  summon = new Guardian   (properties, summoner);  break;
+        case UNIT_MASK_PUPPET:    summon = new Puppet     (properties, summoner);  break;
+        case UNIT_MASK_TOTEM:     summon = new Totem      (properties, summoner);  break;
+        case UNIT_MASK_MINION:    summon = new Minion     (properties, summoner);  break;
+        default:    return NULL;
     }
 
-    if (!summon->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT), this, phase, entry, vehId, team, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation()))
+    if(!lowGUID)
+        lowGUID = sObjectMgr->GenerateLowGuid(HIGHGUID_UNIT);
+
+    if (!summon->Create(lowGUID, this, phase, entry, vehId, team, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation()))
     {
         delete summon;
         return NULL;
     }
-
-    summon->SetUInt32Value(UNIT_CREATED_BY_SPELL, spellId);
 
     summon->SetHomePosition(pos);
 
@@ -2204,11 +2161,11 @@ TempSummon* WorldObject::SummonCreature(uint32 entry, const Position &pos, TempS
     return NULL;
 }
 
-Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, uint32 duration)
+Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, uint32 duration, PetSlot slotID)
 {
     Pet* pet = new Pet(this, petType);
 
-    if (petType == SUMMON_PET && pet->LoadPetFromDB(this, entry))
+    if (petType == SUMMON_PET && pet->LoadPetFromDB(this, entry, 0, slotID != PET_SLOT_UNK_SLOT, slotID))
     {
         // Remove Demonic Sacrifice auras (known pet)
         Unit::AuraEffectList const& auraClassScripts = GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
@@ -2239,7 +2196,7 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
     pet->Relocate(x, y, z, ang);
     if (!pet->IsPositionValid())
     {
-        sLog->outError("Pet (guidlow %d, entry %d) not summoned. Suggested coordinates isn't valid (X: %f Y: %f)", pet->GetGUIDLow(), pet->GetEntry(), pet->GetPositionX(), pet->GetPositionY());
+        sLog->outError("Pet (guidlow %d, entry %d) not summoned. Suggested coordinates isn't valid (X: %f Y: %f)",pet->GetGUIDLow(),pet->GetEntry(),pet->GetPositionX(),pet->GetPositionY());
         delete pet;
         return NULL;
     }
@@ -2258,10 +2215,11 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
 
     pet->setPowerType(MANA);
     pet->SetUInt32Value(UNIT_NPC_FLAGS , 0);
-    pet->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
+    pet->SetUInt32Value(UNIT_FIELD_BYTES_1,0);
     pet->InitStatsForLevel(getLevel());
 
-    SetMinion(pet, true);
+    //only slot 100, as it's not hunter pet.
+    SetMinion(pet, true, PET_SLOT_OTHER_PET);
 
     switch(petType)
     {
@@ -2286,7 +2244,7 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
         case SUMMON_PET:
             pet->InitPetCreateSpells();
             pet->InitTalentForLevel();
-            pet->SavePetToDB(PET_SAVE_AS_CURRENT);
+            pet->SavePetToDB(PET_SLOT_ACTUAL_PET_SLOT);
             PetSpellInitialize();
             break;
         default:
@@ -2322,7 +2280,7 @@ GameObject* WorldObject::SummonGameObject(uint32 entry, float x, float y, float 
     if (!IsInWorld())
         return NULL;
 
-    GameObjectTemplate const* goinfo = sObjectMgr->GetGameObjectTemplate(entry);
+    GameObjectInfo const* goinfo = ObjectMgr::GetGameObjectInfo(entry);
     if (!goinfo)
     {
         sLog->outErrorDb("Gameobject template %u not found in database!", entry);
@@ -2330,14 +2288,14 @@ GameObject* WorldObject::SummonGameObject(uint32 entry, float x, float y, float 
     }
     Map *map = GetMap();
     GameObject *go = new GameObject();
-    if (!go->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT), entry, map, GetPhaseMask(), x, y, z, ang, rotation0, rotation1, rotation2, rotation3, 100, GO_STATE_READY))
+    if (!go->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT), entry, map, GetPhaseMask(), x,y,z,ang,rotation0,rotation1,rotation2,rotation3,100,GO_STATE_READY))
     {
         delete go;
         return NULL;
     }
     go->SetRespawnTime(respawnTime);
     if (GetTypeId() == TYPEID_PLAYER || GetTypeId() == TYPEID_UNIT) //not sure how to handle this
-        ((Unit*)this)->AddGameObject(go);
+        this->ToUnit()->AddGameObject(go);
     else
         go->SetSpawnedByDefault(false);
     map->Add(go);
@@ -2355,8 +2313,8 @@ Creature* WorldObject::SummonTrigger(float x, float y, float z, float ang, uint3
     //summon->SetName(GetName());
     if (GetTypeId() == TYPEID_PLAYER || GetTypeId() == TYPEID_UNIT)
     {
-        summon->setFaction(((Unit*)this)->getFaction());
-        summon->SetLevel(((Unit*)this)->getLevel());
+        summon->setFaction(this->ToUnit()->getFaction());
+        summon->SetLevel(this->ToUnit()->getLevel());
     }
 
     if (GetAI)
@@ -2428,16 +2386,16 @@ namespace Strawberry
                 if (c == i_searcher || c == &i_object)
                     return;
 
-                float x, y, z;
+                float x,y,z;
 
                 if (!c->isAlive() || c->HasUnitState(UNIT_STAT_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_DISTRACTED) ||
-                    !c->GetMotionMaster()->GetDestination(x, y, z))
+                    !c->GetMotionMaster()->GetDestination(x,y,z))
                 {
                     x = c->GetPositionX();
                     y = c->GetPositionY();
                 }
 
-                add(c, x, y);
+                add(c,x,y);
             }
 
             template<class T>
@@ -2447,19 +2405,19 @@ namespace Strawberry
                 if (u == i_searcher || u == &i_object)
                     return;
 
-                float x, y;
+                float x,y;
 
                 x = u->GetPositionX();
                 y = u->GetPositionY();
 
-                add(u, x, y);
+                add(u,x,y);
             }
 
             // we must add used pos that can fill places around center
             void add(WorldObject* u, float x, float y) const
             {
                 // u is too nearest/far away to i_object
-                if (!i_object.IsInRange2d(x, y, i_selector.m_dist - i_selector.m_size, i_selector.m_dist + i_selector.m_size))
+                if (!i_object.IsInRange2d(x,y,i_selector.m_dist - i_selector.m_size,i_selector.m_dist + i_selector.m_size))
                     return;
 
                 float angle = i_object.GetAngle(u)-i_angle;
@@ -2471,8 +2429,8 @@ namespace Strawberry
                     angle += 2.0f * M_PI;
 
                 // dist include size of u
-                float dist2d = i_object.GetDistance2d(x, y);
-                i_selector.AddUsedPos(u->GetObjectSize(), angle, dist2d + i_object.GetObjectSize());
+                float dist2d = i_object.GetDistance2d(x,y);
+                i_selector.AddUsedPos(u->GetObjectSize(),angle,dist2d + i_object.GetObjectSize());
             }
         private:
             WorldObject const& i_object;
@@ -2497,127 +2455,10 @@ void WorldObject::GetNearPoint2D(float &x, float &y, float distance2d, float abs
 void WorldObject::GetNearPoint(WorldObject const* /*searcher*/, float &x, float &y, float &z, float searcher_size, float distance2d, float absAngle) const
 {
     GetNearPoint2D(x, y, distance2d+searcher_size, absAngle);
-    z = GetPositionZ();
-    UpdateGroundPositionZ(x, y, z);
 
-    /*
-    // if detection disabled, return first point
-    if (!sWorld->getIntConfig(CONFIG_DETECT_POS_COLLISION))
-    {
-        UpdateGroundPositionZ(x, y, z);                       // update to LOS height if available
-        return;
-    }
+    const float init_z = z = GetPositionZ();
 
-    // or remember first point
-    float first_x = x;
-    float first_y = y;
-    bool first_los_conflict = false;                        // first point LOS problems
-
-    // prepare selector for work
-    ObjectPosSelector selector(GetPositionX(), GetPositionY(), GetObjectSize(), distance2d+searcher_size);
-
-    // adding used positions around object
-    {
-        CellPair p(Strawberry::ComputeCellPair(GetPositionX(), GetPositionY()));
-        Cell cell(p);
-        cell.data.Part.reserved = ALL_DISTRICT;
-        cell.SetNoCreate();
-
-        Strawberry::NearUsedPosDo u_do(*this, searcher, absAngle, selector);
-        Strawberry::WorldObjectWorker<Strawberry::NearUsedPosDo> worker(this, u_do);
-
-        TypeContainerVisitor<Strawberry::WorldObjectWorker<Strawberry::NearUsedPosDo>, GridTypeMapContainer  > grid_obj_worker(worker);
-        TypeContainerVisitor<Strawberry::WorldObjectWorker<Strawberry::NearUsedPosDo>, WorldTypeMapContainer > world_obj_worker(worker);
-
-        CellLock<GridReadGuard> cell_lock(cell, p);
-        cell_lock->Visit(cell_lock, grid_obj_worker,  *GetMap(), *this, distance2d);
-        cell_lock->Visit(cell_lock, world_obj_worker, *GetMap(), *this, distance2d);
-    }
-
-    // maybe can just place in primary position
-    if (selector.CheckOriginal())
-    {
-        UpdateGroundPositionZ(x, y, z);                       // update to LOS height if available
-
-        if (IsWithinLOS(x, y, z))
-            return;
-
-        first_los_conflict = true;                          // first point have LOS problems
-    }
-
-    float angle;                                            // candidate of angle for free pos
-
-    // special case when one from list empty and then empty side preferred
-    if (selector.FirstAngle(angle))
-    {
-        GetNearPoint2D(x, y, distance2d, absAngle+angle);
-        z = GetPositionZ();
-        UpdateGroundPositionZ(x, y, z);                       // update to LOS height if available
-
-        if (IsWithinLOS(x, y, z))
-            return;
-    }
-
-    // set first used pos in lists
-    selector.InitializeAngle();
-
-    // select in positions after current nodes (selection one by one)
-    while (selector.NextAngle(angle))                        // angle for free pos
-    {
-        GetNearPoint2D(x, y, distance2d, absAngle+angle);
-        z = GetPositionZ();
-        UpdateGroundPositionZ(x, y, z);                       // update to LOS height if available
-
-        if (IsWithinLOS(x, y, z))
-            return;
-    }
-
-    // BAD NEWS: not free pos (or used or have LOS problems)
-    // Attempt find _used_ pos without LOS problem
-
-    if (!first_los_conflict)
-    {
-        x = first_x;
-        y = first_y;
-
-        UpdateGroundPositionZ(x, y, z);                       // update to LOS height if available
-        return;
-    }
-
-    // special case when one from list empty and then empty side preferred
-    if (selector.IsNonBalanced())
-    {
-        if (!selector.FirstAngle(angle))                     // _used_ pos
-        {
-            GetNearPoint2D(x, y, distance2d, absAngle+angle);
-            z = GetPositionZ();
-            UpdateGroundPositionZ(x, y, z);                   // update to LOS height if available
-
-            if (IsWithinLOS(x, y, z))
-                return;
-        }
-    }
-
-    // set first used pos in lists
-    selector.InitializeAngle();
-
-    // select in positions after current nodes (selection one by one)
-    while (selector.NextUsedAngle(angle))                    // angle for used pos but maybe without LOS problem
-    {
-        GetNearPoint2D(x, y, distance2d, absAngle+angle);
-        z = GetPositionZ();
-        UpdateGroundPositionZ(x, y, z);                       // update to LOS height if available
-
-        if (IsWithinLOS(x, y, z))
-            return;
-    }
-
-    // BAD BAD NEWS: all found pos (free and used) have LOS problem :(
-    x = first_x;
-    y = first_y;
-
-    UpdateGroundPositionZ(x, y, z);                           // update to LOS height if available
-    */
+    UpdateGroundPositionZ(x, y, z);static const float H_SCALE = 0.999f; // Searc
 }
 
 void WorldObject::MovePosition(Position &pos, float dist, float angle)
@@ -2642,7 +2483,7 @@ void WorldObject::MovePositionToFirstCollision(Position &pos, float dist, float 
     floor = GetMap()->GetHeight(destx, desty, pos.m_positionZ, true);
     destz = fabs(ground - pos.m_positionZ) <= fabs(floor - pos.m_positionZ) ? ground : floor;
 
-    bool col = VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(GetMapId(), pos.m_positionX, pos.m_positionY, pos.m_positionZ+0.5f, destx, desty, destz+0.5f, destx, desty, destz, -0.5f);
+    bool col = VMAP::VMapFactory::createOrGetVMapManager()->getObjectHitPos(GetMapId(),pos.m_positionX,pos.m_positionY,pos.m_positionZ+0.5f,destx,desty,destz+0.5f,destx,desty,destz,-0.5f);
 
     // collision occured
     if (col)
@@ -2690,7 +2531,7 @@ void WorldObject::SetPhaseMask(uint32 newPhaseMask, bool update)
 
 void WorldObject::PlayDistanceSound(uint32 sound_id, Player* target /*= NULL*/)
 {
-    WorldPacket data(SMSG_PLAY_OBJECT_SOUND, 4+8);
+    WorldPacket data(SMSG_PLAY_OBJECT_SOUND,4+8);
     data << uint32(sound_id);
     data << uint64(GetGUID());
     if (target)
@@ -2715,7 +2556,7 @@ void WorldObject::DestroyForNearbyPlayers()
         return;
 
     std::list<Player*> targets;
-    Strawberry::AnyPlayerInObjectRangeCheck check(this, GetVisibilityRange(), false);
+    Strawberry::AnyPlayerInObjectRangeCheck check(this, GetVisibilityRange());
     Strawberry::PlayerListSearcher<Strawberry::AnyPlayerInObjectRangeCheck> searcher(this, targets, check);
     VisitNearbyWorldObject(GetVisibilityRange(), searcher);
     for (std::list<Player*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
@@ -2728,7 +2569,7 @@ void WorldObject::DestroyForNearbyPlayers()
         if (!plr->HaveAtClient(this))
             continue;
 
-        if (isType(TYPEMASK_UNIT) && ((Unit*)this)->GetCharmerGUID() == plr->GetGUID()) // TODO: this is for puppet
+        if (isType(TYPEMASK_UNIT) && this->ToUnit()->GetCharmerGUID() == plr->GetGUID()) // TODO: this is for puppet
             continue;
 
         DestroyForPlayer(plr);

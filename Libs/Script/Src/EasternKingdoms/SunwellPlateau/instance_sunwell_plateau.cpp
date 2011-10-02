@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment: VERIFY SCRIPT
 SDCategory: Sunwell_Plateau
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "sunwell_plateau.h"
 
 #define MAX_ENCOUNTER 6
@@ -129,13 +128,13 @@ public:
             {
                 for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                 {
-                    Player* player = itr->getSource();
-                    if (player && !player->HasAura(45839, 0))
-                            return player;
+                    Player* plr = itr->getSource();
+                    if (plr && !plr->HasAura(45839,0))
+                            return plr;
                 }
             }
 
-            sLog->outDebug(LOG_FILTER_TSCR, "TSCR: Instance Sunwell Plateau: GetPlayerInMap, but PlayerList is empty!");
+            sLog->outDebug(LOG_FILTER_SSCR, "SCR: Instance Sunwell Plateau: GetPlayerInMap, but PlayerList is empty!");
             return NULL;
         }
 
@@ -168,13 +167,13 @@ public:
                 case 188524: KalecgosWall[0] = go->GetGUID(); break;
                 case 188075:
                     if (m_auiEncounter[2] == DONE)
-                        HandleGameObject(0, true, go);
+                        HandleGameObject(NULL, true, go);
                     FireBarrier = go->GetGUID();
                     break;
                 case 187990: MurusGate[0]   = go->GetGUID(); break;
                 case 188118:
                     if (m_auiEncounter[4] == DONE)
-                        HandleGameObject(0, true, go);
+                        HandleGameObject(NULL, true, go);
                     MurusGate[1]= go->GetGUID();
                     break;
             }
@@ -227,15 +226,15 @@ public:
                     {
                         if (data == NOT_STARTED || data == DONE)
                         {
-                            HandleGameObject(ForceField, true);
-                            HandleGameObject(KalecgosWall[0], true);
-                            HandleGameObject(KalecgosWall[1], true);
+                            HandleGameObject(ForceField,true);
+                            HandleGameObject(KalecgosWall[0],true);
+                            HandleGameObject(KalecgosWall[1],true);
                         }
                         else if (data == IN_PROGRESS)
                         {
-                            HandleGameObject(ForceField, false);
-                            HandleGameObject(KalecgosWall[0], false);
-                            HandleGameObject(KalecgosWall[1], false);
+                            HandleGameObject(ForceField,false);
+                            HandleGameObject(KalecgosWall[0],false);
+                            HandleGameObject(KalecgosWall[1],false);
                         }
                         m_auiEncounter[0] = data;
                     }
@@ -274,8 +273,8 @@ public:
         {
             OUT_SAVE_INST_DATA;
             std::ostringstream stream;
-            stream << m_auiEncounter[0] << ' '  << m_auiEncounter[1] << ' '  << m_auiEncounter[2] << ' '  << m_auiEncounter[3] << ' '
-                << m_auiEncounter[4] << ' '  << m_auiEncounter[5];
+            stream << m_auiEncounter[0] << " "  << m_auiEncounter[1] << " "  << m_auiEncounter[2] << " "  << m_auiEncounter[3] << " "
+                << m_auiEncounter[4] << " "  << m_auiEncounter[5];
             char* out = new char[stream.str().length() + 1];
             strcpy(out, stream.str().c_str());
             if (out)

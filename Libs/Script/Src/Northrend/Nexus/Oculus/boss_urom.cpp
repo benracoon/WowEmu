@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -23,7 +22,7 @@ SDComment: Is not working SPELL_ARCANE_SHIELD. SPELL_FROSTBOMB has some issues, 
 SDCategory: Instance Script
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "oculus.h"
 
 enum Spells
@@ -79,12 +78,12 @@ static Summons Group[]=
 
 static uint32 TeleportSpells[]=
 {
-    SPELL_SUMMON_MENAGERIE, SPELL_SUMMON_MENAGERIE_2, SPELL_SUMMON_MENAGERIE_3
+    SPELL_SUMMON_MENAGERIE,SPELL_SUMMON_MENAGERIE_2,SPELL_SUMMON_MENAGERIE_3
 };
 
 static int32 SayAggro[]=
 {
-    SAY_AGGRO_1, SAY_AGGRO_2, SAY_AGGRO_3, SAY_AGGRO_4
+    SAY_AGGRO_1,SAY_AGGRO_2,SAY_AGGRO_3,SAY_AGGRO_4
 };
 
 class boss_urom : public CreatureScript
@@ -92,14 +91,14 @@ class boss_urom : public CreatureScript
 public:
     boss_urom() : CreatureScript("boss_urom") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_uromAI (creature);
+        return new boss_uromAI (pCreature);
     }
 
     struct boss_uromAI : public BossAI
     {
-        boss_uromAI(Creature* creature) : BossAI(creature, DATA_UROM_EVENT) {}
+        boss_uromAI(Creature* creature) : BossAI(creature,DATA_UROM_EVENT) {}
 
         void Reset()
         {
@@ -121,14 +120,14 @@ public:
 
             me->GetMotionMaster()->MoveIdle();
 
-            teleportTimer = urand(30000, 35000);
+            teleportTimer = urand(30000,35000);
             arcaneExplosionTimer = 9000;
             castArcaneExplosionTimer = 2000;
-            frostBombTimer = urand(5000, 8000);
-            timeBombTimer = urand(20000, 25000);
+            frostBombTimer = urand(5000,8000);
+            timeBombTimer = urand(20000,25000);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*pWho*/)
         {
             _EnterCombat();
 
@@ -137,27 +136,27 @@ public:
             CastTeleport();
 
             if (instance->GetData(DATA_UROM_PLATAFORM) != 3)
-                instance->SetData(DATA_UROM_PLATAFORM, instance->GetData(DATA_UROM_PLATAFORM)+1);
+                instance->SetData(DATA_UROM_PLATAFORM,instance->GetData(DATA_UROM_PLATAFORM)+1);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* pWho)
         {
-            if (!who)
+            if (!pWho)
                 return;
 
             if (me->GetPositionZ() > 518.63f)
-                DoStartNoMovement(who);
+                DoStartNoMovement(pWho);
 
             if (me->GetPositionZ() < 518.63f)
             {
-                if (me->Attack(who, true))
+                if (me->Attack(pWho, true))
                 {
-                    DoScriptText(SayAggro[3], me);
+                    DoScriptText(SayAggro[3],me);
 
-                    me->SetInCombatWith(who);
-                    who->SetInCombatWith(me);
+                    me->SetInCombatWith(pWho);
+                    pWho->SetInCombatWith(me);
 
-                    me->GetMotionMaster()->MoveChase(who, 0, 0);
+                    me->GetMotionMaster()->MoveChase(pWho, 0,0);
                 }
             }
         }
@@ -170,7 +169,7 @@ public:
             while (group[0] == group[1] || group[0] == group[2] || group[1] == group[2])
             {
                 for (uint8 i = 0; i < 3; i++)
-                    group[i] = urand(0, 2);
+                    group[i] = urand(0,2);
             }
         }
 
@@ -207,7 +206,7 @@ public:
             for (uint8 i = 0; i < 4 ; i++)
             {
                 SetPosition(i);
-                me->SummonCreature(Group[group[instance->GetData(DATA_UROM_PLATAFORM)]].entry[i], x, y, me->GetPositionZ(), me->GetOrientation());
+                me->SummonCreature(Group[group[instance->GetData(DATA_UROM_PLATAFORM)]].entry[i],x,y,me->GetPositionZ(),me->GetOrientation());
             }
         }
 
@@ -216,7 +215,7 @@ public:
             if (!instance || instance->GetData(DATA_UROM_PLATAFORM) > 2)
                 return;
 
-            DoScriptText(SayAggro[instance->GetData(DATA_UROM_PLATAFORM)], me);
+            DoScriptText(SayAggro[instance->GetData(DATA_UROM_PLATAFORM)],me);
             DoCast(TeleportSpells[instance->GetData(DATA_UROM_PLATAFORM)]);
         }
 
@@ -232,10 +231,10 @@ public:
             if (teleportTimer <= uiDiff)
             {
                 me->InterruptNonMeleeSpells(false);
-                DoScriptText(SAY_TELEPORT, me);
+                DoScriptText(SAY_TELEPORT,me);
                 me->GetMotionMaster()->MoveIdle();
                 DoCast(SPELL_TELEPORT);
-                teleportTimer = urand(30000, 35000);
+                teleportTimer = urand(30000,35000);
 
             } else teleportTimer -= uiDiff;
 
@@ -257,8 +256,8 @@ public:
                     Position pPos;
                     me->getVictim()->GetPosition(&pPos);
 
-                    me->NearTeleportTo(pPos.GetPositionX(), pPos.GetPositionY(), pPos.GetPositionZ(), pPos.GetOrientation());
-                    me->GetMotionMaster()->MoveChase(me->getVictim(), 0, 0);
+                    me->NearTeleportTo(pPos.GetPositionX(),pPos.GetPositionY(),pPos.GetPositionZ(),pPos.GetOrientation());
+                    me->GetMotionMaster()->MoveChase(me->getVictim(),0,0);
                     me->SetUnitMovementFlags(MOVEMENTFLAG_WALKING);
 
                     canCast = false;
@@ -272,15 +271,15 @@ public:
                 if (frostBombTimer <= uiDiff)
                 {
                     DoCastVictim(SPELL_FROSTBOMB);
-                    frostBombTimer = urand(5000, 8000);
+                    frostBombTimer = urand(5000,8000);
                 } else frostBombTimer -= uiDiff;
 
                 if (timeBombTimer <= uiDiff)
                 {
                     if (Unit* pUnit = SelectTarget(SELECT_TARGET_RANDOM))
-                        DoCast(pUnit, SPELL_TIME_BOMB);
+                        DoCast(pUnit,SPELL_TIME_BOMB);
 
-                    timeBombTimer = urand(20000, 25000);
+                    timeBombTimer = urand(20000,25000);
                 } else timeBombTimer -= uiDiff;
             }
 
@@ -299,20 +298,20 @@ public:
             me->DeleteThreatList();
         }
 
-        void SpellHit(Unit* /*pCaster*/, const SpellInfo* pSpell)
+        void SpellHit(Unit* /*pCaster*/, const SpellEntry* pSpell)
         {
             switch(pSpell->Id)
             {
                 case SPELL_SUMMON_MENAGERIE:
-                    me->SetHomePosition(968.66f, 1042.53f, 527.32f, 0.077f);
+                    me->SetHomePosition(968.66f,1042.53f,527.32f,0.077f);
                     LeaveCombat();
                     break;
                 case SPELL_SUMMON_MENAGERIE_2:
-                    me->SetHomePosition(1164.02f, 1170.85f, 527.321f, 3.66f);
+                    me->SetHomePosition(1164.02f,1170.85f,527.321f,3.66f);
                     LeaveCombat();
                     break;
                 case SPELL_SUMMON_MENAGERIE_3:
-                    me->SetHomePosition(1118.31f, 1080.377f, 508.361f, 4.25f);
+                    me->SetHomePosition(1118.31f,1080.377f,508.361f,4.25f);
                     LeaveCombat();
                     break;
                 case SPELL_TELEPORT:
@@ -324,7 +323,7 @@ public:
             }
         }
         private:
-            float x, y;
+            float x,y;
 
             bool canCast;
             bool canGoBack;

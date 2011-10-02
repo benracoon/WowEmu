@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -16,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "gundrak.h"
 
 enum eSpells
@@ -32,6 +31,11 @@ enum eSpells
     SPELL_TRANSFORMATION                          = 55098, //Periodic, The caster transforms into a powerful mammoth, increasing Physical damage done by 25% and granting immunity to Stun effects.
 };
 
+enum eArchivements
+{
+    ACHIEV_LESS_RABI                              = 2040
+};
+
 enum eSays
 {
     SAY_AGGRO                                     = -1604010,
@@ -44,23 +48,21 @@ enum eSays
     EMOTE_TRANSFORM                               = -1604017
 };
 
-#define DATA_LESS_RABI                            1
-
 class boss_moorabi : public CreatureScript
 {
 public:
     boss_moorabi() : CreatureScript("boss_moorabi") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature *pCreature) const
     {
-        return new boss_moorabiAI(creature);
+        return new boss_moorabiAI(pCreature);
     }
 
     struct boss_moorabiAI : public ScriptedAI
     {
-        boss_moorabiAI(Creature* creature) : ScriptedAI(creature)
+        boss_moorabiAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
-            pInstance = creature->GetInstanceScript();
+            pInstance = pCreature->GetInstanceScript();
         }
 
         InstanceScript* pInstance;
@@ -84,7 +86,7 @@ public:
                 pInstance->SetData(DATA_MOORABI_EVENT, NOT_STARTED);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*pWho*/)
         {
             DoScriptText(SAY_AGGRO, me);
             DoCast(me, SPELL_MOJO_FRENZY, true);
@@ -144,55 +146,31 @@ public:
             DoMeleeAttackIfReady();
          }
 
-        uint32 GetData(uint32 type)
-        {
-            if (type == DATA_LESS_RABI)
-                return bPhase ? 0 : 1;
-
-            return 0;
-        }
-
-         void JustDied(Unit* /*killer*/)
+         void JustDied(Unit* /*pKiller*/)
          {
             DoScriptText(SAY_DEATH, me);
 
             if (pInstance)
+            {
                 pInstance->SetData(DATA_MOORABI_EVENT, DONE);
+
+                if (IsHeroic() && !bPhase)
+                    pInstance->DoCompleteAchievement(ACHIEV_LESS_RABI);
+            }
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* pVictim)
         {
-            if (victim == me)
+            if (pVictim == me)
                 return;
 
-            DoScriptText(RAND(SAY_SLAY_2, SAY_SLAY_3), me);
+            DoScriptText(RAND(SAY_SLAY_2,SAY_SLAY_3), me);
         }
     };
 
 };
 
-class achievement_less_rabi : public AchievementCriteriaScript
-{
-    public:
-        achievement_less_rabi() : AchievementCriteriaScript("achievement_less_rabi")
-        {
-        }
-
-        bool OnCheck(Player* /*player*/, Unit* target)
-        {
-            if (!target)
-                return false;
-
-            if (Creature* Moorabi = target->ToCreature())
-                if (Moorabi->AI()->GetData(DATA_LESS_RABI))
-                    return true;
-
-            return false;
-        }
-};
-
 void AddSC_boss_moorabi()
 {
     new boss_moorabi();
-    new achievement_less_rabi();
 }

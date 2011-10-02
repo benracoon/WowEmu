@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -80,7 +79,7 @@ enum Actions
 // handled the summonList and the notification events to/from the InstanceScript
 struct boss_horAI : ScriptedAI
 {
-    boss_horAI(Creature* creature) : ScriptedAI(creature), summons(creature)
+    boss_horAI(Creature *pCreature) : ScriptedAI(pCreature), summons(pCreature)
     {
         pInstance = me->GetInstanceScript();
     }
@@ -97,7 +96,7 @@ struct boss_horAI : ScriptedAI
         me->SetReactState(REACT_PASSIVE);
     }
 
-    void DamageTaken(Unit* /*pWho*/, uint32 &uiDamage)
+    void DamageTaken(Unit * /*pWho*/, uint32 &uiDamage)
     {
         if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
             uiDamage = 0;
@@ -115,7 +114,7 @@ struct boss_horAI : ScriptedAI
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
                 me->SetReactState(REACT_AGGRESSIVE);
 
-                if (Unit* pUnit = me->SelectNearestTarget())
+                if (Unit *pUnit = me->SelectNearestTarget())
                     AttackStart(pUnit);
 
                 DoZoneInCombat();
@@ -123,31 +122,31 @@ struct boss_horAI : ScriptedAI
         }
     }
 
-    void JustSummoned(Creature* summoned)
+    void JustSummoned(Creature *pSummoned)
     {
-        summons.Summon(summoned);
+        summons.Summon(pSummoned);
 
-        if (Unit* target = summoned->SelectNearestTarget())
+        if (Unit *pUnit = pSummoned->SelectNearestTarget())
         {
-            if (summoned->AI())
-                summoned->AI()->AttackStart(target);
+            if (pSummoned->AI())
+                pSummoned->AI()->AttackStart(pUnit);
             else
             {
-                summoned->GetMotionMaster()->MoveChase(target);
-                summoned->Attack(target, true);
+                pSummoned->GetMotionMaster()->MoveChase(pUnit);
+                pSummoned->Attack(pUnit, true);
             }
         }
 
-        if (summoned->AI())
-            summoned->AI()->DoZoneInCombat();
+        if (pSummoned->AI())
+            pSummoned->AI()->DoZoneInCombat();
     }
 
-    void SummonedCreatureDespawn(Creature* summoned)
+    void SummonedCreatureDespawn(Creature *pSummoned)
     {
-        summons.Despawn(summoned);
+        summons.Despawn(pSummoned);
         if (summons.empty())
         {
-            if (summoned->isAlive())
+            if (pSummoned->isAlive())
                 pInstance->SetData(DATA_WAVE_COUNT, NOT_STARTED);
             else
                 pInstance->SetData(DATA_WAVE_COUNT, SPECIAL);

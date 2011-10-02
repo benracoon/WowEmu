@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -30,7 +29,7 @@ go_mausoleum_door
 go_mausoleum_trigger
 EndContentData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 
 /*######
 ## npc_calvin_montague
@@ -49,25 +48,25 @@ class npc_calvin_montague : public CreatureScript
 public:
     npc_calvin_montague() : CreatureScript("npc_calvin_montague") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* pQuest)
+    bool OnQuestAccept(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
     {
         if (pQuest->GetQuestId() == QUEST_590)
         {
-            creature->setFaction(FACTION_HOSTILE);
-            creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE);
-            CAST_AI(npc_calvin_montague::npc_calvin_montagueAI, creature->AI())->AttackStart(player);
+            pCreature->setFaction(FACTION_HOSTILE);
+            pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE);
+            CAST_AI(npc_calvin_montague::npc_calvin_montagueAI, pCreature->AI())->AttackStart(pPlayer);
         }
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new npc_calvin_montagueAI (creature);
+        return new npc_calvin_montagueAI (pCreature);
     }
 
     struct npc_calvin_montagueAI : public ScriptedAI
     {
-        npc_calvin_montagueAI(Creature* creature) : ScriptedAI(creature) { }
+        npc_calvin_montagueAI(Creature* pCreature) : ScriptedAI(pCreature) { }
 
         uint32 m_uiPhase;
         uint32 m_uiPhaseTimer;
@@ -81,8 +80,8 @@ public:
 
             me->RestoreFaction();
 
-            if (!me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE))
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE);
+            if (!me->HasFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_OOC_NOT_ATTACKABLE))
+                me->SetFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_OOC_NOT_ATTACKABLE);
         }
 
         void EnterCombat(Unit* /*who*/) {}
@@ -102,7 +101,7 @@ public:
                 uiDamage = 0;
 
                 me->RestoreFaction();
-                me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE);
+                me->SetFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_OOC_NOT_ATTACKABLE);
                 me->CombatStop(true);
 
                 m_uiPhase = 1;
@@ -131,8 +130,8 @@ public:
                         ++m_uiPhase;
                         break;
                     case 2:
-                        if (Player* player = Unit::GetPlayer(*me, m_uiPlayerGUID))
-                            player->AreaExploredOrEventHappens(QUEST_590);
+                        if (Player *pPlayer = Unit::GetPlayer(*me, m_uiPlayerGUID))
+                            pPlayer->AreaExploredOrEventHappens(QUEST_590);
 
                         DoCast(me, SPELL_DRINK, true);
                         ++m_uiPhase;
@@ -172,15 +171,15 @@ class go_mausoleum_door : public GameObjectScript
 public:
     go_mausoleum_door() : GameObjectScript("go_mausoleum_door") { }
 
-    bool OnGossipHello(Player* player, GameObject* /*pGo*/)
+    bool OnGossipHello(Player* pPlayer, GameObject* /*pGo*/)
     {
-        if (player->GetQuestStatus(QUEST_ULAG) != QUEST_STATUS_INCOMPLETE)
+        if (pPlayer->GetQuestStatus(QUEST_ULAG) != QUEST_STATUS_INCOMPLETE)
             return false;
 
-        if (GameObject* pTrigger = player->FindNearestGameObject(GO_TRIGGER, 30.0f))
+        if (GameObject* pTrigger = pPlayer->FindNearestGameObject(GO_TRIGGER, 30.0f))
         {
             pTrigger->SetGoState(GO_STATE_READY);
-            player->SummonCreature(NPC_ULAG, 2390.26f, 336.47f, 40.01f, 2.26f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300000);
+            pPlayer->SummonCreature(NPC_ULAG, 2390.26f, 336.47f, 40.01f, 2.26f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300000);
             return false;
         }
 
@@ -194,15 +193,15 @@ class go_mausoleum_trigger : public GameObjectScript
 public:
     go_mausoleum_trigger() : GameObjectScript("go_mausoleum_trigger") { }
 
-    bool OnGossipHello(Player* player, GameObject* pGo)
+    bool OnGossipHello(Player* pPlayer, GameObject* pGo)
     {
-        if (player->GetQuestStatus(QUEST_ULAG) != QUEST_STATUS_INCOMPLETE)
+        if (pPlayer->GetQuestStatus(QUEST_ULAG) != QUEST_STATUS_INCOMPLETE)
             return false;
 
-        if (GameObject* pDoor = player->FindNearestGameObject(GO_DOOR, 30.0f))
+        if (GameObject* pDoor = pPlayer->FindNearestGameObject(GO_DOOR, 30.0f))
         {
             pGo->SetGoState(GO_STATE_ACTIVE);
-            pDoor->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_INTERACT_COND);
+            pDoor->RemoveFlag(GAMEOBJECT_FLAGS,GO_FLAG_INTERACT_COND);
             return true;
         }
 

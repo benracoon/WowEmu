@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -25,21 +27,23 @@
 #include "Define.h"
 #include "Path.h"
 #include "Util.h"
+#include "Vehicle.h"
 
 #include <map>
 #include <set>
 #include <vector>
+#include "SharedDefines.h"
 
 // Structures using to access raw DBC data and required packing to portability
 
-// GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push, N), also any gcc version not support it at some platform
+// GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push,N), also any gcc version not support it at some platform
 #if defined(__GNUC__)
 #pragma pack(1)
 #else
-#pragma pack(push, 1)
+#pragma pack(push,1)
 #endif
 
-typedef char const* DBCString;
+typedef char const* const* DBCString;                       // char* DBCStrings[MAX_LOCALE];
 
 struct AchievementEntry
 {
@@ -339,7 +343,7 @@ struct AchievementCriteriaEntry
             uint32  rollValue;                              // 3
             uint32  count;                                  // 4
         } roll_need_on_loot;
-        // ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREED_ON_LOOT      = 51
+       // ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREED_ON_LOOT      = 51
         struct
         {
             uint32  rollValue;                              // 3
@@ -802,30 +806,25 @@ struct CurrencyTypesEntry
 
 struct DestructibleModelDataEntry
 {
-    uint32  Id;                                             // 0
-    //uint32  DamagedUnk1;                                  // 1
-    //uint32  DamagedUnk2;                                  // 2
-    //uint32  DamagedUnk3;                                  // 3
-    //uint32  DamagedUnk4;                                  // 4
-    uint32  DamagedDisplayId;                               // 5
-    //uint32  DamagedUnk5;                                  // 6
-    //uint32  DestroyedUnk1;                                // 7
-    //uint32  DestroyedUnk2;                                // 8
-    //uint32  DestroyedUnk3;                                // 9
-    uint32  DestroyedDisplayId;                             // 10
-    //uint32  DestroyedUnk4;                                // 11
-    //uint32  RebuildingUnk1;                               // 12
-    //uint32  RebuildingUnk2;                               // 13
-    //uint32  RebuildingUnk3;                               // 14
-    uint32  RebuildingDisplayId;                            // 15
-    //uint32  RebuildingUnk4;                               // 16
-    //uint32  SmokeUnk1;                                    // 17
-    //uint32  SmokeUnk2;                                    // 18
-    //uint32  SmokeUnk3;                                    // 19
-    uint32  SmokeDisplayId;                                 // 20
-    //uint32  SmokeUnk4;                                    // 21
-    //uint32  Unk4;                                         // 22
-    //uint32  Unk5;                                         // 23
+    uint32  Id;
+    //uint32  DamagedUnk1;
+    //uint32  DamagedUnk2;
+    uint32  DamagedDisplayId;
+    //uint32  DamagedUnk3;
+    //uint32  DestroyedUnk1;
+    //uint32  DestroyedUnk2;
+    uint32  DestroyedDisplayId;
+    //uint32  DestroyedUnk3;
+    //uint32  RebuildingUnk1;
+    //uint32  RebuildingUnk2;
+    uint32  RebuildingDisplayId;
+    //uint32  RebuildingUnk3;
+    //uint32  SmokeUnk1;
+    //uint32  SmokeUnk2;
+    uint32  SmokeDisplayId;
+    //uint32  SmokeUnk3;
+    //uint32  Unk4;
+   //uint32  Unk5;
 };
 
 struct DungeonEncounterEntry
@@ -1327,7 +1326,7 @@ struct MapDifficultyEntry
     //uint32      Id;                                       // 0
     uint32      MapId;                                      // 1
     uint32      Difficulty;                                 // 2 (for arenas: arena slot)
-    DBCString   areaTriggerText;                            // 3 text showed when transfer to map failed (missing requirements)
+    //DBCString areaTriggerText;                            // 3 text showed when transfer to map failed (missing requirements)
     uint32      resetTime;                                  // 4, in secs, 0 if no fixed reset time
     uint32      maxPlayers;                                 // 5, some heroic versions have 0 when expected same amount as in normal version
     //DBCString difficultyString;                           // 6
@@ -1616,7 +1615,8 @@ struct SpellClassOptionsEntry
 {
     uint32    Id;                                           // 0 - m_ID
     //uint32  modalNextSpell;                               // 1 - m_modalNextSpell not used
-    flag96    SpellFamilyFlags;                             // 2 - 4, m_spellClassMask
+    uint64    SpellFamilyFlags;                             // 2 - 3, m_spellClassMask
+    uint32    SpellFamilyFlags2;                            // 4 - addition to m_spellClassMask
     uint32    SpellFamilyName;                              // 5 - m_spellClassSet
     //DBCString Description;                                // 6 - 4.0.0
 };
@@ -1651,7 +1651,7 @@ struct SpellEffectEntry
     uint32    EffectRadiusIndex;                            // 15 - m_effectRadiusIndex - spellradius.dbc
     uint32    EffectRadiusMaxIndex;                         // 16 - 4.0.0
     float     EffectRealPointsPerLevel;                     // 17 - m_effectRealPointsPerLevel
-    uint32    EffectSpellClassMask[MAX_SPELL_EFFECTS];      // 18 - m_effectSpellClassMask, effect 0
+    uint32    EffectSpellClassMaskA[3];                     // 18 - m_effectSpellClassMaskA, effect 0
     uint32    EffectTriggerSpell;                           // 19 - m_effectTriggerSpell
     uint32    EffectImplicitTargetA;                        // 20 - m_implicitTargetA
     uint32    EffectImplicitTargetB;                        // 21 - m_implicitTargetB
@@ -1759,9 +1759,10 @@ struct SpellTotemsEntry
 
 #define MAX_SPELL_VISUAL 2
 
+// Spell.dbc
 struct SpellEntry
 {
-    int32     Id;                                           // 0  - m_ID
+    uint32    Id;                                           // 0  - m_ID
     uint32    Attributes;                                   // 1  - m_attribute
     uint32    AttributesEx;                                 // 2  - m_attributesEx
     uint32    AttributesEx2;                                // 3  - m_attributesExB
@@ -1809,13 +1810,18 @@ struct SpellEntry
     uint32 SpellTotemsId;                                   // 46 - SpellTotems.dbc
     //uint32 ResearchProject;                               // 47 - ResearchProject.dbc
 
+    // helpers
+    int32 CalculateSimpleValue(SpellEffIndex eff) const;
+    uint32 const* GetEffectSpellClassMask(SpellEffIndex eff) const;
+
+    // struct access functions
     SpellAuraOptionsEntry const* GetSpellAuraOptions() const;
     SpellAuraRestrictionsEntry const* GetSpellAuraRestrictions() const;
     SpellCastingRequirementsEntry const* GetSpellCastingRequirements() const;
     SpellCategoriesEntry const* GetSpellCategories() const;
     SpellClassOptionsEntry const* GetSpellClassOptions() const;
     SpellCooldownsEntry const* GetSpellCooldowns() const;
-    SpellEffectEntry const* GetSpellEffect(uint8 eff) const;
+    SpellEffectEntry const* GetSpellEffect(SpellEffIndex eff) const;
     SpellEquippedItemsEntry const* GetSpellEquippedItems() const;
     SpellInterruptsEntry const* GetSpellInterrupts() const;
     SpellLevelsEntry const* GetSpellLevels() const;
@@ -1825,12 +1831,59 @@ struct SpellEntry
     SpellShapeshiftEntry const* GetSpellShapeshift() const;
     SpellTargetRestrictionsEntry const* GetSpellTargetRestrictions() const;
     SpellTotemsEntry const* GetSpellTotems() const;
+
+    // single fields
+    uint32 GetManaCost() const;
+    uint32 GetPreventionType() const;
+    uint32 GetCategory() const;
+    uint32 GetStartRecoveryTime() const;
+    uint32 GetMechanic() const;
+    uint32 GetRecoveryTime() const;
+    uint32 GetCategoryRecoveryTime() const;
+    uint32 GetStartRecoveryCategory() const;
+    uint32 GetSpellLevel() const;
+    int32  GetEquippedItemClass() const;
+    uint32 GetSpellFamilyName() const;
+    uint32 GetDmgClass() const;
+    uint32 GetDispel() const;
+    uint32 GetMaxAffectedTargets() const;
+    uint32 GetStackAmount() const;
+    uint32 GetManaCostPerlevel() const;
+    uint32 GetManaCostPercentage() const;
+    uint32 GetProcCharges() const;
+    uint32 GetProcChance() const;
+    uint32 GetMaxLevel() const;
+    uint32 GetTargetAuraState() const;
+    uint32 GetManaPerSecond() const;
+    uint32 GetRequiresSpellFocus() const;
+    uint32 GetSpellEffectIdByIndex(SpellEffIndex index) const;
+    uint32 GetAuraInterruptFlags() const;
+    uint32 GetEffectImplicitTargetAByIndex(SpellEffIndex index) const;
+    int32  GetAreaGroupId() const;
+    uint32 GetFacingCasterFlags() const;
+    uint32 GetBaseLevel() const;
+    uint32 GetInterruptFlags() const;
+    uint32 GetTargetCreatureType() const;
+    int32  GetEffectMiscValue(SpellEffIndex index) const;
+    int32  GetEffectMiscValueB(SpellEffIndex index) const;
+    uint32 GetStances() const;
+    uint32 GetStancesNot() const;
+    uint32 GetProcFlags() const;
+    uint32 GetChannelInterruptFlags() const;
+    uint32 GetManaCostPerLevel() const;
+    uint32 GetCasterAuraState() const;
+    uint32 GetTargets() const;
+    uint32 GetEffectApplyAuraNameByIndex(SpellEffIndex index) const;
+
+    private:
+    // prevent creating custom entries (copy data from original in fact)
+    SpellEntry(SpellEntry const&);                          // DON'T must have implementation
 };
 
 typedef std::set<uint32> SpellCategorySet;
-typedef std::map<uint32, SpellCategorySet > SpellCategoryStore;
+typedef std::map<uint32,SpellCategorySet > SpellCategoryStore;
 typedef std::set<uint32> PetFamilySpellsSet;
-typedef std::map<uint32, PetFamilySpellsSet > PetFamilySpellsStore;
+typedef std::map<uint32,PetFamilySpellsSet > PetFamilySpellsStore;
 
 struct SpellCastTimesEntry
 {
@@ -1854,9 +1907,9 @@ struct SpellFocusObjectEntry
 
 struct SpellRadiusEntry
 {
-    uint32 ID;                                        // 0
-    float  radiusMin;                                 // 1
-    float  radiusMax;                                 // 2
+    uint32    ID;                                           // 0
+    float     radiusHostile;                                // 1
+    float     radiusFriend;                                 // 2
 };
 
 struct SpellRangeEntry
@@ -2205,42 +2258,6 @@ struct WorldSafeLocsEntry
     //DBCString name;                                       // 5 name, unused
 };
 
-/*
-struct WorldStateSounds
-{
-    uint32    ID;                                           // 0        Worldstate
-    uint32    unk;                                          // 1
-    uint32    areaTable;                                    // 2
-    uint32    WMOAreaTable;                                 // 3
-    uint32    zoneIntroMusicTable;                          // 4
-    uint32    zoneIntroMusic;                               // 5
-    uint32    zoneMusic;                                    // 6
-    uint32    soundAmbience;                                // 7
-    uint32    soundProviderPreferences;                     // 8
-};
-*/
-
-/*
-struct WorldStateUI
-{
-    uint32    ID;                                           // 0
-    uint32    map_id;                                       // 1        Can be -1 to show up everywhere.
-    uint32    zone;                                         // 2        Can be zero for "everywhere".
-    uint32    phaseMask;                                    // 3        Phase this WorldState is avaliable in
-    uint32    icon;                                         // 4        The icon that is used in the interface.
-    char*     textureFilename;                              // 5
-    char*     text;                                         // 6-21     The worldstate text
-    char*     description;                                  // 22-38    Text shown when hovering mouse on icon
-    uint32    worldstateID;                                 // 39       This is the actual ID used
-    uint32    type;                                         // 40       0 = unknown, 1 = unknown, 2 = not shown in ui, 3 = wintergrasp
-    uint32    unk1;                                         // 41
-    uint32    unk2;                                         // 43
-    uint32    unk3;                                         // 44-58
-    uint32    unk4;                                         // 59-61    Used for some progress bars.
-    uint32    unk7;                                         // 62       Unused in 3.3.5a
-};
-*/
-
 // GCC have alternative #pragma pack() syntax and old gcc version not support pack(pop), also any gcc version not support it at some platform
 #if defined(__GNUC__)
 #pragma pack()
@@ -2251,12 +2268,11 @@ struct WorldStateUI
 // Structures not used for casting to loaded DBC data and not required then packing
 struct MapDifficulty
 {
-    MapDifficulty() : resetTime(0), maxPlayers(0), hasErrorMessage(false) {}
-    MapDifficulty(uint32 _resetTime, uint32 _maxPlayers, bool _hasErrorMessage) : resetTime(_resetTime), maxPlayers(_maxPlayers), hasErrorMessage(_hasErrorMessage) {}
+    MapDifficulty() : resetTime(0), maxPlayers(0) {}
+    MapDifficulty(uint32 _resetTime, uint32 _maxPlayers) : resetTime(_resetTime), maxPlayers(_maxPlayers) {}
 
     uint32 resetTime;
     uint32 maxPlayers;
-    bool hasErrorMessage;
 };
 
 struct TalentSpellPos
@@ -2268,7 +2284,7 @@ struct TalentSpellPos
     uint8  rank;
 };
 
-typedef std::map<uint32, TalentSpellPos> TalentSpellPosMap;
+typedef std::map<uint32,TalentSpellPos> TalentSpellPosMap;
 
 struct SpellEffect
 {
@@ -2285,14 +2301,14 @@ typedef std::map<uint32, SpellEffect> SpellEffectMap;
 
 struct TaxiPathBySourceAndDestination
 {
-    TaxiPathBySourceAndDestination() : ID(0), price(0) {}
-    TaxiPathBySourceAndDestination(uint32 _id, uint32 _price) : ID(_id), price(_price) {}
+    TaxiPathBySourceAndDestination() : ID(0),price(0) {}
+    TaxiPathBySourceAndDestination(uint32 _id,uint32 _price) : ID(_id),price(_price) {}
 
     uint32    ID;
     uint32    price;
 };
-typedef std::map<uint32, TaxiPathBySourceAndDestination> TaxiPathSetForSource;
-typedef std::map<uint32, TaxiPathSetForSource> TaxiPathSetBySource;
+typedef std::map<uint32,TaxiPathBySourceAndDestination> TaxiPathSetForSource;
+typedef std::map<uint32,TaxiPathSetForSource> TaxiPathSetBySource;
 
 struct TaxiPathNodePtr
 {
@@ -2302,10 +2318,9 @@ struct TaxiPathNodePtr
     operator TaxiPathNodeEntry const& () const { return *i_ptr; }
 };
 
-typedef Path<TaxiPathNodePtr, TaxiPathNodeEntry const> TaxiPathNodeList;
+typedef Path<TaxiPathNodePtr,TaxiPathNodeEntry const> TaxiPathNodeList;
 typedef std::vector<TaxiPathNodeList> TaxiPathNodesByPath;
 
 #define TaxiMaskSize 25
 typedef uint32 TaxiMask[TaxiMaskSize];
 #endif
-

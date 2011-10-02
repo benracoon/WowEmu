@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -23,7 +22,7 @@ SDComment: missing yells. not sure about timers.
 SDCategory: Trial of the Champion
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "ScriptedEscortAI.h"
 #include "trial_of_the_champion.h"
 
@@ -61,8 +60,8 @@ enum eSpells
 
 enum eModels
 {
-    MODEL_SKELETON = 29846,
-    MODEL_GHOST    = 21300
+     MODEL_SKELETON = 29846,
+     MODEL_GHOST    = 21300
 };
 
 enum ePhases
@@ -79,9 +78,9 @@ public:
 
     struct boss_black_knightAI : public ScriptedAI
     {
-        boss_black_knightAI(Creature* creature) : ScriptedAI(creature)
+        boss_black_knightAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
-            pInstance = creature->GetInstanceScript();
+            pInstance = pCreature->GetInstanceScript();
         }
 
         InstanceScript* pInstance;
@@ -119,16 +118,16 @@ public:
 
             uiPhase = PHASE_UNDEAD;
 
-            uiIcyTouchTimer = urand(5000, 9000);
-            uiPlagueStrikeTimer = urand(10000, 13000);
-            uiDeathRespiteTimer = urand(15000, 16000);
-            uiObliterateTimer = urand(17000, 19000);
-            uiDesecration = urand(15000, 16000);
+            uiIcyTouchTimer = urand(5000,9000);
+            uiPlagueStrikeTimer = urand(10000,13000);
+            uiDeathRespiteTimer = urand(15000,16000);
+            uiObliterateTimer = urand(17000,19000);
+            uiDesecration = urand(15000,16000);
             uiDeathArmyCheckTimer = 7000;
             uiResurrectTimer = 4000;
             uiGhoulExplodeTimer = 8000;
-            uiDeathBiteTimer = urand (2000, 4000);
-            uiMarkedDeathTimer = urand (5000, 7000);
+            uiDeathBiteTimer = urand (2000,4000);
+            uiMarkedDeathTimer = urand (5000,7000);
         }
 
         void RemoveSummons()
@@ -145,10 +144,10 @@ public:
             SummonList.clear();
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature* pSummon)
         {
-            SummonList.push_back(summon->GetGUID());
-            summon->AI()->AttackStart(me->getVictim());
+            SummonList.push_back(pSummon->GetGUID());
+            pSummon->AI()->AttackStart(me->getVictim());
         }
 
         void UpdateAI(const uint32 uiDiff)
@@ -162,7 +161,7 @@ public:
                 if (uiResurrectTimer <= uiDiff)
                 {
                     me->SetFullHealth();
-                    DoCast(me, SPELL_BLACK_KNIGHT_RES, true);
+                    DoCast(me,SPELL_BLACK_KNIGHT_RES,true);
                     uiPhase++;
                     uiResurrectTimer = 4000;
                     bEventInProgress = false;
@@ -178,17 +177,17 @@ public:
                     if (uiIcyTouchTimer <= uiDiff)
                     {
                         DoCastVictim(SPELL_ICY_TOUCH);
-                        uiIcyTouchTimer = urand(5000, 7000);
+                        uiIcyTouchTimer = urand(5000,7000);
                     } else uiIcyTouchTimer -= uiDiff;
                     if (uiPlagueStrikeTimer <= uiDiff)
                     {
                         DoCastVictim(SPELL_ICY_TOUCH);
-                        uiPlagueStrikeTimer = urand(12000, 15000);
+                        uiPlagueStrikeTimer = urand(12000,15000);
                     } else uiPlagueStrikeTimer -= uiDiff;
                     if (uiObliterateTimer <= uiDiff)
                     {
                         DoCastVictim(SPELL_OBLITERATE);
-                        uiObliterateTimer = urand(17000, 19000);
+                        uiObliterateTimer = urand(17000,19000);
                     } else uiObliterateTimer -= uiDiff;
                     switch(uiPhase)
                     {
@@ -196,12 +195,12 @@ public:
                         {
                             if (uiDeathRespiteTimer <= uiDiff)
                             {
-                                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                                if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                                 {
-                                    if (target && target->isAlive())
-                                        DoCast(target, SPELL_DEATH_RESPITE);
+                                    if (pTarget && pTarget->isAlive())
+                                        DoCast(pTarget,SPELL_DEATH_RESPITE);
                                 }
-                                uiDeathRespiteTimer = urand(15000, 16000);
+                                uiDeathRespiteTimer = urand(15000,16000);
                             } else uiDeathRespiteTimer -= uiDiff;
                             break;
                         }
@@ -224,12 +223,12 @@ public:
                             }
                             if (uiDesecration <= uiDiff)
                             {
-                                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                                if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                                 {
-                                    if (target && target->isAlive())
-                                        DoCast(target, SPELL_DESECRATION);
+                                    if (pTarget && pTarget->isAlive())
+                                        DoCast(pTarget,SPELL_DESECRATION);
                                 }
-                                uiDesecration = urand(15000, 16000);
+                                uiDesecration = urand(15000,16000);
                             } else uiDesecration -= uiDiff;
                             if (uiGhoulExplodeTimer <= uiDiff)
                             {
@@ -251,10 +250,10 @@ public:
                     } else uiDeathBiteTimer -= uiDiff;
                     if (uiMarkedDeathTimer <= uiDiff)
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                        if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                         {
-                            if (target && target->isAlive())
-                                DoCast(target, SPELL_MARKED_DEATH);
+                            if (pTarget && pTarget->isAlive())
+                                DoCast(pTarget,SPELL_MARKED_DEATH);
                         }
                         uiMarkedDeathTimer = urand (5000, 7000);
                     } else uiMarkedDeathTimer -= uiDiff;
@@ -287,16 +286,16 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*pKiller*/)
         {
             if (pInstance)
-                pInstance->SetData(BOSS_BLACK_KNIGHT, DONE);
+                pInstance->SetData(BOSS_BLACK_KNIGHT,DONE);
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature *pCreature) const
     {
-        return new boss_black_knightAI (creature);
+        return new boss_black_knightAI (pCreature);
     }
 };
 
@@ -307,7 +306,7 @@ public:
 
     struct npc_risen_ghoulAI : public ScriptedAI
     {
-        npc_risen_ghoulAI(Creature* creature) : ScriptedAI(creature) {}
+        npc_risen_ghoulAI(Creature* pCreature) : ScriptedAI(pCreature) {}
 
         uint32 uiAttackTimer;
 
@@ -323,10 +322,10 @@ public:
 
             if (uiAttackTimer <= uiDiff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true))
+                if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true))
                 {
-                    if (target && target->isAlive())
-                        DoCast(target, (SPELL_LEAP));
+                    if (pTarget && pTarget->isAlive())
+                    DoCast(pTarget, (SPELL_LEAP));
                 }
                 uiAttackTimer = 3500;
             } else uiAttackTimer -= uiDiff;
@@ -335,9 +334,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new npc_risen_ghoulAI(creature);
+        return new npc_risen_ghoulAI(pCreature);
     }
 };
 
@@ -348,9 +347,9 @@ public:
 
     struct npc_black_knight_skeletal_gryphonAI : public npc_escortAI
     {
-        npc_black_knight_skeletal_gryphonAI(Creature* creature) : npc_escortAI(creature)
+        npc_black_knight_skeletal_gryphonAI(Creature* pCreature) : npc_escortAI(pCreature)
         {
-            Start(false, true, 0, NULL);
+            Start(false,true,0,NULL);
         }
 
         void WaypointReached(uint32 /*i*/)
@@ -368,9 +367,9 @@ public:
 
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new npc_black_knight_skeletal_gryphonAI(creature);
+        return new npc_black_knight_skeletal_gryphonAI(pCreature);
     }
 };
 

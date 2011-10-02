@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -16,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "violet_hold.h"
 
 enum Spells
@@ -51,14 +50,14 @@ class boss_cyanigosa : public CreatureScript
 public:
     boss_cyanigosa() : CreatureScript("boss_cyanigosa") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_cyanigosaAI (creature);
+        return new boss_cyanigosaAI (pCreature);
     }
 
     struct boss_cyanigosaAI : public ScriptedAI
     {
-        boss_cyanigosaAI(Creature* c) : ScriptedAI(c)
+        boss_cyanigosaAI(Creature *c) : ScriptedAI(c)
         {
             pInstance = c->GetInstanceScript();
         }
@@ -112,8 +111,8 @@ public:
 
             if (uiBlizzardTimer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                    DoCast(target, SPELL_BLIZZARD);
+                if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                    DoCast(pTarget, SPELL_BLIZZARD);
                 uiBlizzardTimer = 15000;
             } else uiBlizzardTimer -= diff;
 
@@ -133,8 +132,8 @@ public:
             {
                 if (uiManaDestructionTimer <= diff)
                 {
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                        DoCast(target, SPELL_MANA_DESTRUCTION);
+                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                        DoCast(pTarget, SPELL_MANA_DESTRUCTION);
                     uiManaDestructionTimer = 30000;
                 } else uiManaDestructionTimer -= diff;
             }
@@ -150,38 +149,17 @@ public:
                 pInstance->SetData(DATA_CYANIGOSA_EVENT, DONE);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit * victim)
         {
             if (victim == me)
                 return;
-            DoScriptText(RAND(SAY_SLAY_1, SAY_SLAY_2, SAY_SLAY_3), me);
+            DoScriptText(RAND(SAY_SLAY_1,SAY_SLAY_2,SAY_SLAY_3), me);
         }
     };
 
 };
 
-class achievement_defenseless : public AchievementCriteriaScript
-{
-    public:
-        achievement_defenseless() : AchievementCriteriaScript("achievement_defenseless")
-        {
-        }
-
-        bool OnCheck(Player* /*player*/, Unit* target)
-        {
-            InstanceScript* instance = target->GetInstanceScript();
-            if (!instance)
-                return false;
-
-            if (!instance->GetData(DATA_DEFENSELESS))
-                return false;
-
-            return true;
-        }
-};
-
 void AddSC_boss_cyanigosa()
 {
     new boss_cyanigosa();
-    new achievement_defenseless();
 }

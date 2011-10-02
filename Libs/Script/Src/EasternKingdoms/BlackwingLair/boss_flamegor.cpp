@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment:
 SDCategory: Blackwing Lair
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 
 #define EMOTE_FRENZY            -1469031
 
@@ -37,14 +36,14 @@ class boss_flamegor : public CreatureScript
 public:
     boss_flamegor() : CreatureScript("boss_flamegor") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_flamegorAI (creature);
+        return new boss_flamegorAI (pCreature);
     }
 
     struct boss_flamegorAI : public ScriptedAI
     {
-        boss_flamegorAI(Creature* c) : ScriptedAI(c) {}
+        boss_flamegorAI(Creature *c) : ScriptedAI(c) {}
 
         uint32 ShadowFlame_Timer;
         uint32 WingBuffet_Timer;
@@ -57,7 +56,7 @@ public:
             Frenzy_Timer = 10000;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit * /*who*/)
         {
             DoZoneInCombat();
         }
@@ -79,7 +78,7 @@ public:
             {
                 DoCast(me->getVictim(), SPELL_WINGBUFFET);
                 if (DoGetThreat(me->getVictim()))
-                    DoModifyThreatPercent(me->getVictim(), -75);
+                    DoModifyThreatPercent(me->getVictim(),-75);
 
                 WingBuffet_Timer = 25000;
             } else WingBuffet_Timer -= diff;

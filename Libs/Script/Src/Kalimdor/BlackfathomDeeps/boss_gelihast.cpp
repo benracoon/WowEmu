@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -16,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "blackfathom_deeps.h"
 
 enum Spells
@@ -29,14 +28,14 @@ class boss_gelihast : public CreatureScript
 public:
     boss_gelihast() : CreatureScript("boss_gelihast") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_gelihastAI (creature);
+        return new boss_gelihastAI (pCreature);
     }
 
     struct boss_gelihastAI : public ScriptedAI
     {
-        boss_gelihastAI(Creature* c) : ScriptedAI(c)
+        boss_gelihastAI(Creature *c) : ScriptedAI(c)
         {
             pInstance = c->GetInstanceScript();
         }
@@ -47,7 +46,7 @@ public:
 
         void Reset()
         {
-            uiNetTimer = urand(2000, 4000);
+            uiNetTimer = urand(2000,4000);
             if (pInstance)
                 pInstance->SetData(TYPE_GELIHAST, NOT_STARTED);
         }
@@ -72,7 +71,7 @@ public:
             if (uiNetTimer < diff)
             {
                 DoCastVictim(SPELL_NET);
-                uiNetTimer = urand(4000, 7000);
+                uiNetTimer = urand(4000,7000);
             } else uiNetTimer -= diff;
 
             DoMeleeAttackIfReady();

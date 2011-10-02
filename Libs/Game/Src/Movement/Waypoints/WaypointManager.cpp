@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -21,13 +23,12 @@
 #include "GridDefines.h"
 #include "WaypointManager.h"
 #include "MapManager.h"
-#include "Log.h"
 
-WaypointMgr::WaypointMgr()
+WaypointStore::WaypointStore()
 {
 }
 
-WaypointMgr::~WaypointMgr()
+WaypointStore::~WaypointStore()
 {
     for (WaypointPathContainer::iterator itr = _waypointStore.begin(); itr != _waypointStore.end(); ++itr)
     {
@@ -40,7 +41,7 @@ WaypointMgr::~WaypointMgr()
     _waypointStore.clear();
 }
 
-void WaypointMgr::Load()
+void WaypointStore::Load()
 {
     uint32 oldMSTime = getMSTime();
 
@@ -88,7 +89,7 @@ void WaypointMgr::Load()
     sLog->outString();
 }
 
-void WaypointMgr::ReloadPath(uint32 id)
+void WaypointStore::UpdatePath(uint32 id)
 {
     WaypointPathContainer::iterator itr = _waypointStore.find(id);
     if (itr != _waypointStore.end())

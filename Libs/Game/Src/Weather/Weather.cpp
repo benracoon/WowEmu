@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -135,7 +137,7 @@ bool Weather::ReGenerate()
             if (m_grade > 0.6666667f)
             {
                                                             // Severe change, but how severe?
-                uint32 rnd = urand(0, 99);
+                uint32 rnd = urand(0,99);
                 if (rnd < 50)
                 {
                     m_grade -= 0.6666667f;
@@ -190,7 +192,7 @@ bool Weather::ReGenerate()
     return m_type != old_type || m_grade != old_grade;
 }
 
-void Weather::SendWeatherUpdateToPlayer(Player* player)
+void Weather::SendWeatherUpdateToPlayer(Player *player)
 {
     WorldPacket data(SMSG_WEATHER, (4+4+4));
 
@@ -198,7 +200,7 @@ void Weather::SendWeatherUpdateToPlayer(Player* player)
     player->GetSession()->SendPacket(&data);
 }
 
-void Weather::SendFineWeatherUpdateToPlayer(Player* player)
+void Weather::SendFineWeatherUpdateToPlayer(Player *player)
 {
     WorldPacket data(SMSG_WEATHER, (4+4+4));
 

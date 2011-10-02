@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -21,7 +23,6 @@
 #define STRAWBERRY_CONDITIONMGR_H
 
 #include "LootMgr.h"
-#include <ace/Singleton.h>
 
 class Player;
 class Unit;
@@ -54,7 +55,7 @@ enum ConditionType
     CONDITION_MAPID                 = 22,                   // map_id           0           +referenceID       true if in map_id
     CONDITION_AREAID                = 23,                   // area_id          0           +referenceID       true if in area_id
     CONDITION_ITEM_TARGET           = 24,                   // ItemRequiredTargetType,  TargetEntry,    0
-    CONDITION_SPELL                 = 25,                   // spell_id         bool        +referenceID       bool 1 for true 0 for false
+    CONDITION_SPELL                 = 25,                   // spell_id         0           +referenceID       true if knows spell
     CONDITION_NOITEM                = 26,                   // item_id          bank        +referenceID       true if player does not have any of the item (if 'bank' is set it searches in bank slots too)
     CONDITION_LEVEL                 = 27,                   // level            opt         +referenceID       true if player's level is equal to param1 (param2 can modify the statement)
     CONDITION_QUEST_COMPLETE        = 28,                   // quest_id         0           +referenceID       true if player has quest_id with all objectives complete, but not yet rewarded
@@ -65,38 +66,38 @@ enum ConditionType
 
 enum LevelConditionType
 {
-    LVL_COND_EQ,
-    LVL_COND_HIGH,
-    LVL_COND_LOW,
-    LVL_COND_HIGH_EQ,
-    LVL_COND_LOW_EQ,
-    LVL_COND_MAX
+    LVL_COND_EQ = 0,
+    LVL_COND_HIGH = 1,
+    LVL_COND_LOW = 2,
+    LVL_COND_HIGH_EQ = 3,
+    LVL_COND_LOW_EQ = 4,
+    LVL_COND_MAX = 5,
 };
 
 enum ConditionSourceType
 {
-    CONDITION_SOURCE_TYPE_NONE                           = 0, //DONE
-    CONDITION_SOURCE_TYPE_CREATURE_LOOT_TEMPLATE         = 1, //DONE
-    CONDITION_SOURCE_TYPE_DISENCHANT_LOOT_TEMPLATE       = 2, //DONE
-    CONDITION_SOURCE_TYPE_FISHING_LOOT_TEMPLATE          = 3, //DONE
-    CONDITION_SOURCE_TYPE_GAMEOBJECT_LOOT_TEMPLATE       = 4, //DONE
-    CONDITION_SOURCE_TYPE_ITEM_LOOT_TEMPLATE             = 5, //DONE
-    CONDITION_SOURCE_TYPE_MAIL_LOOT_TEMPLATE             = 6, //DONE
-    CONDITION_SOURCE_TYPE_MILLING_LOOT_TEMPLATE          = 7, //DONE
-    CONDITION_SOURCE_TYPE_PICKPOCKETING_LOOT_TEMPLATE    = 8, //DONE
-    CONDITION_SOURCE_TYPE_PROSPECTING_LOOT_TEMPLATE      = 9, //DONE
-    CONDITION_SOURCE_TYPE_REFERENCE_LOOT_TEMPLATE        = 10, //DONE
-    CONDITION_SOURCE_TYPE_SKINNING_LOOT_TEMPLATE         = 11, //DONE
-    CONDITION_SOURCE_TYPE_SPELL_LOOT_TEMPLATE            = 12, //DONE
-    CONDITION_SOURCE_TYPE_SPELL_SCRIPT_TARGET            = 13, //DONE
-    CONDITION_SOURCE_TYPE_GOSSIP_MENU                    = 14, //DONE
-    CONDITION_SOURCE_TYPE_GOSSIP_MENU_OPTION             = 15, //DONE
-    CONDITION_SOURCE_TYPE_CREATURE_TEMPLATE_VEHICLE      = 16, //DONE
-    CONDITION_SOURCE_TYPE_SPELL                          = 17, //DONE
-    CONDITION_SOURCE_TYPE_ITEM_REQUIRED_TARGET           = 18, //DONE
-    CONDITION_SOURCE_TYPE_QUEST_ACCEPT                   = 19, //DONE
-    CONDITION_SOURCE_TYPE_QUEST_SHOW_MARK                = 20, //DONE
-    CONDITION_SOURCE_TYPE_VEHICLE_SPELL                  = 21, //DONE
+    CONDITION_SOURCE_TYPE_NONE                           = 0,//DONE
+    CONDITION_SOURCE_TYPE_CREATURE_LOOT_TEMPLATE         = 1,//DONE
+    CONDITION_SOURCE_TYPE_DISENCHANT_LOOT_TEMPLATE       = 2,//DONE
+    CONDITION_SOURCE_TYPE_FISHING_LOOT_TEMPLATE          = 3,//DONE
+    CONDITION_SOURCE_TYPE_GAMEOBJECT_LOOT_TEMPLATE       = 4,//DONE
+    CONDITION_SOURCE_TYPE_ITEM_LOOT_TEMPLATE             = 5,//DONE
+    CONDITION_SOURCE_TYPE_MAIL_LOOT_TEMPLATE             = 6,//DONE
+    CONDITION_SOURCE_TYPE_MILLING_LOOT_TEMPLATE          = 7,//DONE
+    CONDITION_SOURCE_TYPE_PICKPOCKETING_LOOT_TEMPLATE    = 8,//DONE
+    CONDITION_SOURCE_TYPE_PROSPECTING_LOOT_TEMPLATE      = 9,//DONE
+    CONDITION_SOURCE_TYPE_REFERENCE_LOOT_TEMPLATE        = 10,//DONE
+    CONDITION_SOURCE_TYPE_SKINNING_LOOT_TEMPLATE         = 11,//DONE
+    CONDITION_SOURCE_TYPE_SPELL_LOOT_TEMPLATE            = 12,//DONE
+    CONDITION_SOURCE_TYPE_SPELL_SCRIPT_TARGET            = 13,//DONE
+    CONDITION_SOURCE_TYPE_GOSSIP_MENU                    = 14,//DONE
+    CONDITION_SOURCE_TYPE_GOSSIP_MENU_OPTION             = 15,//DONE
+    CONDITION_SOURCE_TYPE_CREATURE_TEMPLATE_VEHICLE      = 16,//DONE
+    CONDITION_SOURCE_TYPE_SPELL                          = 17,//DONE
+    CONDITION_SOURCE_TYPE_ITEM_REQUIRED_TARGET           = 18,//DONE
+    CONDITION_SOURCE_TYPE_QUEST_ACCEPT                   = 19,//DONE
+    CONDITION_SOURCE_TYPE_QUEST_SHOW_MARK                = 20,//DONE
+    CONDITION_SOURCE_TYPE_VEHICLE_SPELL                  = 21,//DONE
     CONDITION_SOURCE_TYPE_MAX                            = 22//MAX
 };
 
@@ -129,7 +130,7 @@ struct Condition
         mScriptId           = 0;
     }
 
-    bool Meets(Player* player, Unit* invoker = NULL);
+    bool Meets(Player * player, Unit* invoker = NULL);
     bool isLoaded() const { return mConditionType > CONDITION_NONE || mReferenceId; }
 };
 
@@ -143,26 +144,32 @@ typedef std::map<uint32, ConditionList > ConditionReferenceMap;//only used for r
 class ConditionMgr
 {
     friend class ACE_Singleton<ConditionMgr, ACE_Null_Mutex>;
-
-    private:
-        ConditionMgr();
-        ~ConditionMgr();
+    ConditionMgr();
+    ~ConditionMgr();
 
     public:
+
         void LoadConditions(bool isReload = false);
         bool isConditionTypeValid(Condition* cond);
         ConditionList GetConditionReferences(uint32 refId);
 
-        bool IsPlayerMeetToConditions(Player* player, ConditionList const& conditions, Unit* invoker = NULL);
+        bool IsPlayerMeetToConditions(Player* player, ConditionList conditions, Unit* invoker = NULL);
         ConditionList GetConditionsForNotGroupedEntry(ConditionSourceType sType, uint32 uEntry);
         ConditionList GetConditionsForVehicleSpell(uint32 creatureID, uint32 spellID);
 
+    protected:
+
+        ConditionMap                m_ConditionMap;
+        ConditionReferenceMap       m_ConditionReferenceMap;
+        VehicleSpellConditionMap    m_VehicleSpellConditions;
+
     private:
+
         bool isSourceTypeValid(Condition* cond);
         bool addToLootTemplate(Condition* cond, LootTemplate* loot);
         bool addToGossipMenus(Condition* cond);
         bool addToGossipMenuItems(Condition* cond);
-        bool IsPlayerMeetToConditionList(Player* player, ConditionList const& conditions, Unit* invoker = NULL);
+        bool IsPlayerMeetToConditionList(Player* player,const ConditionList& conditions, Unit* invoker = NULL);
 
         bool isGroupable(ConditionSourceType sourceType) const
         {
@@ -185,10 +192,6 @@ class ConditionMgr
 
         void Clean(); // free up resources
         std::list<Condition*> m_AllocatedMemory; // some garbage collection :)
-
-        ConditionMap                m_ConditionMap;
-        ConditionReferenceMap       m_ConditionReferenceMap;
-        VehicleSpellConditionMap    m_VehicleSpellConditions;
 };
 
 #define sConditionMgr ACE_Singleton<ConditionMgr, ACE_Null_Mutex>::instance()

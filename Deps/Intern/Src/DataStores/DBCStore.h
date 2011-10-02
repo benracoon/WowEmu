@@ -82,7 +82,7 @@ public:
     char const* GetFormat() const { return fmt; }
     uint32 GetFieldCount() const { return fieldCount; }
 
-    bool Load(char const* fn, SqlDbc * sql)
+    bool Load(char const* fn, LocaleConstant loc, SqlDbc * sql)
     {
         DBCFileLoader dbc;
         // Check if load was sucessful, only then continue
@@ -130,7 +130,7 @@ public:
         m_stringPoolList.push_back(dbc.AutoProduceStringsArrayHolders(fmt,(char*)m_dataTable));
 
         // load strings from dbc data
-        m_stringPoolList.push_back(dbc.AutoProduceStrings(fmt,(char*)m_dataTable));
+        m_stringPoolList.push_back(dbc.AutoProduceStrings(fmt,(char*)m_dataTable,loc));
 
         // Insert sql data into arrays
         if (result)
@@ -248,7 +248,7 @@ public:
             return false;
 
         // load strings from another locale dbc data
-        m_stringPoolList.push_back(dbc.AutoProduceStrings(fmt,(char*)m_dataTable));
+        m_stringPoolList.push_back(dbc.AutoProduceStrings(fmt,(char*)m_dataTable,loc));
 
         return true;
     }

@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -20,7 +19,7 @@
 #ifndef DEF_HYJAL_H
 #define DEF_HYJAL_H
 
-#define ERROR_INST_DATA     "TSCR: Instance data not set properly for Mount Hyjal. Encounters will be buggy."
+#define ERROR_INST_DATA     "SCR: Instance data not set properly for Mount Hyjal. Encounters will be buggy."
 
 enum eTypes
 {

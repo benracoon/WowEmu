@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -21,7 +23,7 @@
 #define QUERYRESULT_H
 
 #include <ace/Refcounted_Auto_Ptr.h>
-#include <ace/Thread_Mutex.h>
+#include <ace/Null_Mutex.h>
 
 #include "Field.h"
 #include "Log.h"
@@ -42,16 +44,17 @@ class ResultSet
         uint32 GetFieldCount() const { return m_fieldCount; }
 
         Field *Fetch() const { return m_currentRow; }
-        const Field & operator [] (uint32 index) const
-        {
-            ASSERT(index < m_fieldCount);
-            return m_currentRow[index];
-        }
 
         void Reset()
         {
             mysql_data_seek (m_result, 0);
             NextRow();
+        }
+
+        const Field & operator [] (uint32 index) const
+        {
+            ASSERT(index < m_fieldCount);
+            return m_currentRow[index];
         }
 
     protected:
@@ -65,7 +68,7 @@ class ResultSet
         MYSQL_FIELD *m_fields;
 };
 
-typedef ACE_Refcounted_Auto_Ptr<ResultSet, ACE_Thread_Mutex> QueryResult;
+typedef ACE_Refcounted_Auto_Ptr<ResultSet, ACE_Null_Mutex> QueryResult;
 
 class PreparedResultSet
 {
@@ -110,7 +113,7 @@ class PreparedResultSet
 
 };
 
-typedef ACE_Refcounted_Auto_Ptr<PreparedResultSet, ACE_Thread_Mutex> PreparedQueryResult;
+typedef ACE_Refcounted_Auto_Ptr<PreparedResultSet, ACE_Null_Mutex> PreparedQueryResult;
 
 #endif
 

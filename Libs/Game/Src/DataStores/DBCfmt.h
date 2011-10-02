@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -21,8 +23,6 @@
 #define STRAWBERRY_DBCSFRM_H
 
 const char Achievementfmt[]="niixsxiixixxii";
-const std::string CustomAchievementfmt="pppapappapaapp";
-const std::string CustomAchievementIndex = "ID";
 const char AchievementCriteriafmt[]="niiiiiiiisixiiixxxxxxxx";
 const char AreaTableEntryfmt[]="iiinixxxxxisixxxxxxxxxxxxx";
 const char AreaGroupEntryfmt[]="niiiiiii";
@@ -45,7 +45,7 @@ const char CreatureFamilyfmt[]="nfifiiiiixsx";
 const char CreatureSpellDatafmt[]="niiiixxxx";
 const char CreatureTypefmt[]="nxx";
 const char CurrencyTypesfmt[]="nxxxxxxiixx";
-const char DestructibleModelDatafmt[]="nxxxxixxxxixxxxixxxxixxx";
+const char DestructibleModelDatafmt[]="nxxixxxixxxixxxixxx";
 const char DungeonEncounterfmt[]="niixisxx";
 const char DurabilityCostsfmt[]="niiiiiiiiiiiiiiiiiiiiiiiiiiiii";
 const char DurabilityQualityfmt[]="nf";
@@ -84,7 +84,7 @@ const char LFGDungeonEntryfmt[]="nxiiiiiiixixxixixx";
 const char LockEntryfmt[]="niiiiiiiiiiiiiiiiiiiiiiiixxxxxxxx";
 const char MailTemplateEntryfmt[]="nxs";
 const char MapEntryfmt[]="nxixxxsixxixiffxiixx";
-const char MapDifficultyEntryfmt[]="diisiix";
+const char MapDifficultyEntryfmt[]="diixiix";
 const char MovieEntryfmt[]="nxxx";
 const char MountCapabilityfmt[]="niixxiii";
 const char MountTypefmt[]="niiiiiiiiiiiiiiiiixxxxxxx";
@@ -138,6 +138,7 @@ const char TalentTreePrimarySpellsfmt[]="niix";
 const char TaxiNodesEntryfmt[]="nifffsiixxx";
 const char TaxiPathEntryfmt[]="niii";
 const char TaxiPathNodeEntryfmt[]="diiifffiiii";
+//const char TeamContributionPointsfmt[]="df";              // Empty in 4.0.6
 const char TotemCategoryEntryfmt[]="nxii";
 const char VehicleEntryfmt[]="niffffiiiiiiiifffffffffffffffssssfifiixx";
 const char VehicleSeatEntryfmt[]="niiffffffffffiiiiiifffffffiiifffiiiiiiiffiiiiixxxxxxxxxxxxxxxxxxxx";

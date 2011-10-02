@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -53,7 +52,9 @@ public:
             { "spell",          SEC_MODERATOR,      false, &HandleModifySpellCommand,         "", NULL },
             { "tp",             SEC_MODERATOR,      false, &HandleModifyTalentCommand,        "", NULL },
             { "mount",          SEC_MODERATOR,      false, &HandleModifyMountCommand,         "", NULL },
+            { "honor",          SEC_MODERATOR,      false, &HandleModifyHonorCommand,         "", NULL },
             { "rep",            SEC_GAMEMASTER,     false, &HandleModifyRepCommand,           "", NULL },
+            { "arena",          SEC_MODERATOR,      false, &HandleModifyArenaCommand,         "", NULL },
             { "drunk",          SEC_MODERATOR,      false, &HandleModifyDrunkCommand,         "", NULL },
             { "standstate",     SEC_GAMEMASTER,     false, &HandleModifyStandStateCommand,    "", NULL },
             { "morph",          SEC_GAMEMASTER,     false, &HandleModifyMorphCommand,         "", NULL },
@@ -190,7 +191,7 @@ public:
         target->SetMaxPower(ENERGY, energym);
         target->SetPower(ENERGY, energy);
 
-        sLog->outDetail(handler->GetStrings(LANG_CURRENT_ENERGY), target->GetMaxPower(ENERGY));
+        sLog->outDetail(handler->GetString(LANG_CURRENT_ENERGY),target->GetMaxPower(ENERGY));
 
         return true;
     }
@@ -284,7 +285,7 @@ public:
         if (!*args)
             return false;
 
-        char* pfactionid = handler->extractKeyFromLink((char*)args, "Hfaction");
+        char* pfactionid = handler->extractKeyFromLink((char*)args,"Hfaction");
 
         Creature* target = handler->getSelectedCreature();
         if (!target)
@@ -302,7 +303,7 @@ public:
                 uint32 flag      = target->GetUInt32Value(UNIT_FIELD_FLAGS);
                 uint32 npcflag   = target->GetUInt32Value(UNIT_NPC_FLAGS);
                 uint32 dyflag    = target->GetUInt32Value(UNIT_DYNAMIC_FLAGS);
-                handler->PSendSysMessage(LANG_CURRENT_FACTION, target->GetGUIDLow(), factionid, flag, npcflag, dyflag);
+                handler->PSendSysMessage(LANG_CURRENT_FACTION,target->GetGUIDLow(),factionid,flag,npcflag,dyflag);
             }
             return true;
         }
@@ -346,12 +347,12 @@ public:
             return false;
         }
 
-        handler->PSendSysMessage(LANG_YOU_CHANGE_FACTION, target->GetGUIDLow(), factionid, flag, npcflag, dyflag);
+        handler->PSendSysMessage(LANG_YOU_CHANGE_FACTION, target->GetGUIDLow(),factionid,flag,npcflag,dyflag);
 
         target->setFaction(factionid);
-        target->SetUInt32Value(UNIT_FIELD_FLAGS, flag);
-        target->SetUInt32Value(UNIT_NPC_FLAGS, npcflag);
-        target->SetUInt32Value(UNIT_DYNAMIC_FLAGS, dyflag);
+        target->SetUInt32Value(UNIT_FIELD_FLAGS,flag);
+        target->SetUInt32Value(UNIT_NPC_FLAGS,npcflag);
+        target->SetUInt32Value(UNIT_DYNAMIC_FLAGS,dyflag);
 
         return true;
     }
@@ -439,7 +440,7 @@ public:
         }
         else if (target->ToCreature()->isPet())
         {
-            Unit* owner = target->GetOwner();
+            Unit *owner = target->GetOwner();
             if (owner && owner->GetTypeId() == TYPEID_PLAYER && ((Pet *)target)->IsPermanentPetFor(owner->ToPlayer()))
             {
                 // check online security
@@ -487,7 +488,7 @@ public:
 
         if (target->isInFlight())
         {
-            handler->PSendSysMessage(LANG_CHAR_IN_FLIGHT, targetNameLink.c_str());
+            handler->PSendSysMessage(LANG_CHAR_IN_FLIGHT,targetNameLink.c_str());
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -496,11 +497,11 @@ public:
         if (handler->needReportToTarget(target))
             (ChatHandler(target)).PSendSysMessage(LANG_YOURS_ASPEED_CHANGED, handler->GetNameLink().c_str(), ASpeed);
 
-        target->SetSpeed(MOVE_WALK,    ASpeed, true);
-        target->SetSpeed(MOVE_RUN,     ASpeed, true);
-        target->SetSpeed(MOVE_SWIM,    ASpeed, true);
-        //target->SetSpeed(MOVE_TURN,    ASpeed, true);
-        target->SetSpeed(MOVE_FLIGHT,     ASpeed, true);
+        //target->SetSpeed(MOVE_WALK,    ASpeed,true);
+        target->SetSpeed(MOVE_RUN,     ASpeed,true);
+        target->SetSpeed(MOVE_SWIM,    ASpeed,true);
+        //target->SetSpeed(MOVE_TURN,    ASpeed,true);
+        target->SetSpeed(MOVE_FLIGHT,     ASpeed,true);
         return true;
     }
 
@@ -535,7 +536,7 @@ public:
 
         if (target->isInFlight())
         {
-            handler->PSendSysMessage(LANG_CHAR_IN_FLIGHT, targetNameLink.c_str());
+            handler->PSendSysMessage(LANG_CHAR_IN_FLIGHT,targetNameLink.c_str());
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -544,7 +545,7 @@ public:
         if (handler->needReportToTarget(target))
             (ChatHandler(target)).PSendSysMessage(LANG_YOURS_SPEED_CHANGED, handler->GetNameLink().c_str(), Speed);
 
-        target->SetSpeed(MOVE_RUN, Speed, true);
+        target->SetSpeed(MOVE_RUN,Speed,true);
 
         return true;
     }
@@ -580,7 +581,7 @@ public:
 
         if (target->isInFlight())
         {
-            handler->PSendSysMessage(LANG_CHAR_IN_FLIGHT, targetNameLink.c_str());
+            handler->PSendSysMessage(LANG_CHAR_IN_FLIGHT,targetNameLink.c_str());
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -589,7 +590,7 @@ public:
         if (handler->needReportToTarget(target))
             (ChatHandler(target)).PSendSysMessage(LANG_YOURS_SWIM_SPEED_CHANGED, handler->GetNameLink().c_str(), Swim);
 
-        target->SetSpeed(MOVE_SWIM, Swim, true);
+        target->SetSpeed(MOVE_SWIM,Swim,true);
 
         return true;
     }
@@ -625,7 +626,7 @@ public:
 
         if (target->isInFlight())
         {
-            handler->PSendSysMessage(LANG_CHAR_IN_FLIGHT, targetNameLink.c_str());
+            handler->PSendSysMessage(LANG_CHAR_IN_FLIGHT,targetNameLink.c_str());
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -634,7 +635,7 @@ public:
         if (handler->needReportToTarget(target))
             (ChatHandler(target)).PSendSysMessage(LANG_YOURS_BACK_SPEED_CHANGED, handler->GetNameLink().c_str(), BSpeed);
 
-        target->SetSpeed(MOVE_RUN_BACK, BSpeed, true);
+        target->SetSpeed(MOVE_RUN_BACK,BSpeed,true);
 
         return true;
     }
@@ -670,12 +671,12 @@ public:
         if (handler->needReportToTarget(target))
             (ChatHandler(target)).PSendSysMessage(LANG_YOURS_FLY_SPEED_CHANGED, handler->GetNameLink().c_str(), FSpeed);
 
-        target->SetSpeed(MOVE_FLIGHT, FSpeed, true);
+        target->SetSpeed(MOVE_FLIGHT,FSpeed,true);
 
         return true;
     }
 
-    //Edit Player or Creature Scale
+    //Edit Player Scale
     static bool HandleModifyScaleCommand(ChatHandler* handler, const char* args)
     {
         if (!*args)
@@ -689,24 +690,21 @@ public:
             return false;
         }
 
-        Unit* target = handler->getSelectedUnit();
+        Player* target = handler->getSelectedPlayer();
         if (!target)
         {
-            handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        if (Player* player = target->ToPlayer())
-        {
-            // check online security
-            if (handler->HasLowerSecurity(player, 0))
-                return false;
+        // check online security
+        if (handler->HasLowerSecurity(target, 0))
+            return false;
 
-            handler->PSendSysMessage(LANG_YOU_CHANGE_SIZE, Scale, handler->GetNameLink(player).c_str());
-            if (handler->needReportToTarget(player))
-                (ChatHandler(player)).PSendSysMessage(LANG_YOURS_SIZE_CHANGED, handler->GetNameLink().c_str(), Scale);
-        }
+        handler->PSendSysMessage(LANG_YOU_CHANGE_SIZE, Scale, handler->GetNameLink(target).c_str());
+        if (handler->needReportToTarget(target))
+            (ChatHandler(target)).PSendSysMessage(LANG_YOURS_SIZE_CHANGED, handler->GetNameLink().c_str(), Scale);
 
         target->SetFloatValue(OBJECT_FIELD_SCALE_X, Scale);
 
@@ -992,15 +990,15 @@ public:
         if (handler->HasLowerSecurity(target, 0))
             return false;
 
-        int32 addmoney = atoi((char*)args);
+        int64 addmoney = atoi((char*)args);
 
-        uint32 moneyuser = target->GetMoney();
+        uint64 moneyuser = target->GetMoney();
 
         if (addmoney < 0)
         {
-            int32 newmoney = int32(moneyuser) + addmoney;
+            int64 newmoney = int64(moneyuser) + addmoney;
 
-            sLog->outDetail(handler->GetStrings(LANG_CURRENT_MONEY), moneyuser, addmoney, newmoney);
+            sLog->outDetail(handler->GetString(LANG_CURRENT_MONEY), moneyuser, addmoney, newmoney);
             if (newmoney <= 0)
             {
                 handler->PSendSysMessage(LANG_YOU_TAKE_ALL_MONEY, handler->GetNameLink(target).c_str());
@@ -1014,9 +1012,9 @@ public:
                 if (newmoney > MAX_MONEY_AMOUNT)
                     newmoney = MAX_MONEY_AMOUNT;
 
-                handler->PSendSysMessage(LANG_YOU_TAKE_MONEY, abs(addmoney), handler->GetNameLink(target).c_str());
+                handler->PSendSysMessage(LANG_YOU_TAKE_MONEY, addmoney, handler->GetNameLink(target).c_str());
                 if (handler->needReportToTarget(target))
-                    (ChatHandler(target)).PSendSysMessage(LANG_YOURS_MONEY_TAKEN, handler->GetNameLink().c_str(), abs(addmoney));
+                    (ChatHandler(target)).PSendSysMessage(LANG_YOURS_MONEY_TAKEN, handler->GetNameLink().c_str(), addmoney);
                 target->SetMoney(newmoney);
             }
         }
@@ -1032,7 +1030,7 @@ public:
                 target->ModifyMoney(addmoney);
         }
 
-        sLog->outDetail(handler->GetStrings(LANG_NEW_MONEY), moneyuser, addmoney, target->GetMoney());
+        sLog->outDetail(handler->GetString(LANG_NEW_MONEY), moneyuser, addmoney, target->GetMoney());
 
         return true;
     }
@@ -1092,6 +1090,32 @@ public:
         return true;
     }
 
+    static bool HandleModifyHonorCommand (ChatHandler* handler, const char* args)
+    {
+        if (!*args)
+            return false;
+
+        Player* target = handler->getSelectedPlayer();
+        if (!target)
+        {
+            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        // check online security
+        if (handler->HasLowerSecurity(target, 0))
+            return false;
+
+        int32 amount = (uint32)atoi(args);
+
+        target->ModifyHonorPoints(amount);
+
+        handler->PSendSysMessage(LANG_COMMAND_MODIFY_HONOR, handler->GetNameLink(target).c_str(), target->GetHonorPoints());
+
+        return true;
+    }
+
     static bool HandleModifyDrunkCommand(ChatHandler* handler, const char* args)
     {
         if (!*args)    return false;
@@ -1124,7 +1148,7 @@ public:
         if (handler->HasLowerSecurity(target, 0))
             return false;
 
-        char* factionTxt = handler->extractKeyFromLink((char*)args, "Hfaction");
+        char* factionTxt = handler->extractKeyFromLink((char*)args,"Hfaction");
         if (!factionTxt)
             return false;
 
@@ -1140,7 +1164,7 @@ public:
         {
             std::string rankStr = rankTxt;
             std::wstring wrankStr;
-            if (!Utf8toWStr(rankStr, wrankStr))
+            if (!Utf8toWStr(rankStr,wrankStr))
                 return false;
             wstrToLower(wrankStr);
 
@@ -1148,17 +1172,17 @@ public:
             amount = -42000;
             for (; r < MAX_REPUTATION_RANK; ++r)
             {
-                std::string rank = handler->GetStrings(ReputationRankStrIndex[r]);
+                std::string rank = handler->GetString(ReputationRankStrIndex[r]);
                 if (rank.empty())
                     continue;
 
                 std::wstring wrank;
-                if (!Utf8toWStr(rank, wrank))
+                if (!Utf8toWStr(rank,wrank))
                     continue;
 
                 wstrToLower(wrank);
 
-                if (wrank.substr(0, wrankStr.size()) == wrankStr)
+                if (wrank.substr(0,wrankStr.size()) == wrankStr)
                 {
                     char *deltaTxt = strtok(NULL, " ");
                     if (deltaTxt)
@@ -1200,7 +1224,7 @@ public:
             return false;
         }
 
-        target->GetReputationMgr().SetReputation(factionEntry, amount);
+        target->GetReputationMgr().SetReputation(factionEntry,amount);
         handler->PSendSysMessage(LANG_COMMAND_MODIFY_REP, factionEntry->name[handler->GetSessionDbcLocale()], factionId,
             handler->GetNameLink(target).c_str(), target->GetReputationMgr().GetReputation(factionEntry));
         return true;
@@ -1243,7 +1267,7 @@ public:
         else if (target->GetTypeId() == TYPEID_PLAYER && handler->HasLowerSecurity(target->ToPlayer(), 0))
             return false;
 
-        target->SetPhaseMask(phasemask, true);
+        target->SetPhaseMask(phasemask,true);
 
         return true;
     }
@@ -1256,6 +1280,28 @@ public:
 
         uint32 anim_id = atoi((char*)args);
         handler->GetSession()->GetPlayer()->SetUInt32Value(UNIT_NPC_EMOTESTATE , anim_id);
+
+        return true;
+    }
+
+    static bool HandleModifyArenaCommand(ChatHandler* handler, const char* args)
+    {
+        if (!*args)
+            return false;
+
+        Player* target = handler->getSelectedPlayer();
+        if (!target)
+        {
+            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        int32 amount = (uint32)atoi(args);
+
+        target->ModifyArenaPoints(amount);
+
+        handler->PSendSysMessage(LANG_COMMAND_MODIFY_ARENA, handler->GetNameLink(target).c_str(), target->GetArenaPoints());
 
         return true;
     }

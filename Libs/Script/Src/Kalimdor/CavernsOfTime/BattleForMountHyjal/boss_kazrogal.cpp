@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -16,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "hyjal.h"
 #include "hyjal_trash.h"
 
@@ -46,18 +45,25 @@ class boss_kazrogal : public CreatureScript
 public:
     boss_kazrogal() : CreatureScript("boss_kazrogal") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_kazrogalAI (creature);
+        return new boss_kazrogalAI (pCreature);
     }
 
     struct boss_kazrogalAI : public hyjal_trashAI
     {
-        boss_kazrogalAI(Creature* c) : hyjal_trashAI(c)
+        boss_kazrogalAI(Creature *c) : hyjal_trashAI(c)
         {
             pInstance = c->GetInstanceScript();
             pGo = false;
             pos = 0;
+            SpellEntry *TempSpell = GET_SPELL(SPELL_MARK);
+            SpellEffectEntry const* spellEffect = TempSpell->GetSpellEffect(EFFECT_0);
+            if (spellEffect && spellEffect->EffectImplicitTargetA != 1)
+            {
+                //spellEffect->EffectImplicitTargetA = 1;
+                //spellEffect->EffectImplicitTargetB = 0;
+            }
         }
 
         uint32 CleaveTimer;
@@ -79,29 +85,29 @@ public:
                 pInstance->SetData(DATA_KAZROGALEVENT, NOT_STARTED);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit * /*who*/)
         {
             if (pInstance && IsEvent)
                 pInstance->SetData(DATA_KAZROGALEVENT, IN_PROGRESS);
             DoPlaySoundToSet(me, SOUND_ONAGGRO);
-            me->MonsterYell(SAY_ONAGGRO, LANG_UNIVERSAL, 0);
+            me->MonsterYell(SAY_ONAGGRO, LANG_UNIVERSAL, NULL);
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit * /*victim*/)
         {
-            switch (urand(0, 2))
+            switch (urand(0,2))
             {
                 case 0:
                     DoPlaySoundToSet(me, SOUND_ONSLAY1);
-                    me->MonsterYell(SAY_ONSLAY1, LANG_UNIVERSAL, 0);
+                    me->MonsterYell(SAY_ONSLAY1, LANG_UNIVERSAL, NULL);
                     break;
                 case 1:
                     DoPlaySoundToSet(me, SOUND_ONSLAY2);
-                    me->MonsterYell(SAY_ONSLAY2, LANG_UNIVERSAL, 0);
+                    me->MonsterYell(SAY_ONSLAY2, LANG_UNIVERSAL, NULL);
                     break;
                 case 2:
                     DoPlaySoundToSet(me, SOUND_ONSLAY3);
-                    me->MonsterYell(SAY_ONSLAY3, LANG_UNIVERSAL, 0);
+                    me->MonsterYell(SAY_ONSLAY3, LANG_UNIVERSAL, NULL);
                     break;
             }
         }
@@ -111,13 +117,13 @@ public:
             pos = i;
             if (i == 7 && pInstance)
             {
-                Unit* target = Unit::GetUnit((*me), pInstance->GetData64(DATA_THRALL));
-                if (target && target->isAlive())
-                    me->AddThreat(target, 0.0f);
+                Unit *pTarget = Unit::GetUnit((*me), pInstance->GetData64(DATA_THRALL));
+                if (pTarget && pTarget->isAlive())
+                    me->AddThreat(pTarget,0.0f);
             }
         }
 
-        void JustDied(Unit* victim)
+        void JustDied(Unit *victim)
         {
             hyjal_trashAI::JustDied(victim);
             if (pInstance && IsEvent)
@@ -176,25 +182,25 @@ public:
                 std::list<HostileReference *> t_list = me->getThreatManager().getThreatList();
                 for (std::list<HostileReference *>::const_iterator itr = t_list.begin(); itr!= t_list.end(); ++itr)
                 {
-                    Unit* target = Unit::GetUnit(*me, (*itr)->getUnitGuid());
-                    if (target && target->GetTypeId() == TYPEID_PLAYER && target->getPowerType() == MANA)
+                    Unit *pTarget = Unit::GetUnit(*me, (*itr)->getUnitGuid());
+                    if (pTarget && pTarget->GetTypeId() == TYPEID_PLAYER && pTarget->getPowerType() == MANA)
                     {
-                        target->CastSpell(target, SPELL_MARK, true);//only cast on mana users
+                        pTarget->CastSpell(pTarget, SPELL_MARK,true);//only cast on mana users
                     }
                 }
                 MarkTimerBase -= 5000;
                 if (MarkTimerBase < 5500)
                     MarkTimerBase = 5500;
                 MarkTimer = MarkTimerBase;
-                switch (urand(0, 2))
+                switch (urand(0,2))
                 {
                     case 0:
                         DoPlaySoundToSet(me, SOUND_MARK1);
-                        me->MonsterYell(SAY_MARK1, LANG_UNIVERSAL, 0);
+                        me->MonsterYell(SAY_MARK1, LANG_UNIVERSAL, NULL);
                         break;
                     case 1:
                         DoPlaySoundToSet(me, SOUND_MARK2);
-                        me->MonsterYell(SAY_MARK2, LANG_UNIVERSAL, 0);
+                        me->MonsterYell(SAY_MARK2, LANG_UNIVERSAL, NULL);
                         break;
                 }
             } else MarkTimer -= diff;
@@ -204,6 +210,7 @@ public:
     };
 
 };
+
 
 void AddSC_boss_kazrogal()
 {

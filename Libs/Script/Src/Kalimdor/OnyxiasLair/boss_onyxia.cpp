@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -26,7 +25,7 @@ SDComment: <Known bugs>
 SDCategory: Onyxia's Lair
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "onyxias_lair.h"
 
 enum eYells
@@ -78,14 +77,14 @@ struct sOnyxMove
 
 static sOnyxMove aMoveData[]=
 {
-    {0, 1, SPELL_BREATH_WEST_TO_EAST,   -33.5561f, -182.682f, -56.9457f}, //west
-    {1, 0, SPELL_BREATH_EAST_TO_WEST,   -31.4963f, -250.123f, -55.1278f}, //east
-    {2, 4, SPELL_BREATH_NW_TO_SE,         6.8951f, -180.246f, -55.896f}, //north-west
-    {3, 5, SPELL_BREATH_NE_TO_SW,        10.2191f, -247.912f, -55.896f}, //north-east
-    {4, 2, SPELL_BREATH_SE_TO_NW,       -63.5156f, -240.096f, -55.477f}, //south-east
-    {5, 3, SPELL_BREATH_SW_TO_NE,       -58.2509f, -189.020f, -55.790f}, //south-west
-    {6, 7, SPELL_BREATH_SOUTH_TO_NORTH, -65.8444f, -213.809f, -55.2985f}, //south
-    {7, 6, SPELL_BREATH_NORTH_TO_SOUTH,  22.8763f, -217.152f, -55.0548f}, //north
+    {0, 1, SPELL_BREATH_WEST_TO_EAST,   -33.5561f, -182.682f, -56.9457f},//west
+    {1, 0, SPELL_BREATH_EAST_TO_WEST,   -31.4963f, -250.123f, -55.1278f},//east
+    {2, 4, SPELL_BREATH_NW_TO_SE,         6.8951f, -180.246f, -55.896f},//north-west
+    {3, 5, SPELL_BREATH_NE_TO_SW,        10.2191f, -247.912f, -55.896f},//north-east
+    {4, 2, SPELL_BREATH_SE_TO_NW,       -63.5156f, -240.096f, -55.477f},//south-east
+    {5, 3, SPELL_BREATH_SW_TO_NE,       -58.2509f, -189.020f, -55.790f},//south-west
+    {6, 7, SPELL_BREATH_SOUTH_TO_NORTH, -65.8444f, -213.809f, -55.2985f},//south
+    {7, 6, SPELL_BREATH_NORTH_TO_SOUTH,  22.8763f, -217.152f, -55.0548f},//north
 };
 
 const Position MiddleRoomLocation = {-23.6155f, -215.357f, -55.7344f, 0.0f};
@@ -106,16 +105,16 @@ class boss_onyxia : public CreatureScript
 public:
     boss_onyxia() : CreatureScript("boss_onyxia") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_onyxiaAI (creature);
+        return new boss_onyxiaAI (pCreature);
     }
 
     struct boss_onyxiaAI : public ScriptedAI
     {
-        boss_onyxiaAI(Creature* creature) : ScriptedAI(creature), Summons(me)
+        boss_onyxiaAI(Creature* pCreature) : ScriptedAI(pCreature), Summons(me)
         {
-            m_pInstance = creature->GetInstanceScript();
+            m_pInstance = pCreature->GetInstanceScript();
             Reset();
         }
 
@@ -178,7 +177,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*pWho*/)
         {
             DoScriptText(SAY_AGGRO, me);
             me->SetInCombatWithZone();
@@ -198,35 +197,35 @@ public:
             Summons.DespawnAll();
         }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature *pSummoned)
         {
-            summoned->SetInCombatWithZone();
-            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                summoned->AI()->AttackStart(target);
+            pSummoned->SetInCombatWithZone();
+            if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM,0))
+                pSummoned->AI()->AttackStart(pTarget);
 
-            switch (summoned->GetEntry())
+            switch (pSummoned->GetEntry())
             {
                 case NPC_WHELP:
                     ++m_uiSummonWhelpCount;
                     break;
                 case NPC_LAIRGUARD:
-                    summoned->setActive(true);
+                    pSummoned->setActive(true);
                     break;
             }
-            Summons.Summon(summoned);
+            Summons.Summon(pSummoned);
         }
 
-        void SummonedCreatureDespawn(Creature* summon)
+        void SummonedCreatureDespawn(Creature *summon)
         {
             Summons.Despawn(summon);
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*pVictim*/)
         {
             DoScriptText(SAY_KILL, me);
         }
 
-        void SpellHit(Unit* /*pCaster*/, const SpellInfo* pSpell)
+        void SpellHit(Unit * /*pCaster*/, const SpellEntry* pSpell)
         {
             if (pSpell->Id == SPELL_BREATH_EAST_TO_WEST ||
                 pSpell->Id == SPELL_BREATH_WEST_TO_EAST ||
@@ -263,7 +262,7 @@ public:
                         break;
                     case 10:
                         me->SetFlying(true);
-                        me->GetMotionMaster()->MovePoint(11, Phase2Location.GetPositionX(), Phase2Location.GetPositionY(), Phase2Location.GetPositionZ()+25);
+                        me->GetMotionMaster()->MovePoint(11, Phase2Location.GetPositionX(),Phase2Location.GetPositionY(),Phase2Location.GetPositionZ()+25);
                         me->SetSpeed(MOVE_FLIGHT, 1.0f);
                         DoScriptText(SAY_PHASE_2_TRANS, me);
                         if (m_pInstance)
@@ -286,7 +285,7 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* pSpell)
+        void SpellHitTarget(Unit* target, const SpellEntry* pSpell)
         {
             //Workaround - Couldn't find a way to group this spells (All Eruption)
             if (((pSpell->Id >= 17086 && pSpell->Id <= 17095) ||
@@ -417,7 +416,7 @@ public:
                     SetCombatMovement(true);
                     me->SetFlying(false);
                     m_bIsMoving = false;
-                    me->GetMotionMaster()->MovePoint(9, me->GetHomePosition());
+                    me->GetMotionMaster()->MovePoint(9,me->GetHomePosition());
                     return;
                 }
 
@@ -458,8 +457,8 @@ public:
                 {
                     if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != POINT_MOTION_TYPE)
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                            DoCast(target, SPELL_FIREBALL);
+                        if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                            DoCast(pTarget, SPELL_FIREBALL);
 
                         m_uiFireballTimer = 8000;
                     }
@@ -479,7 +478,7 @@ public:
                 {
                     me->SummonCreature(NPC_WHELP, aSpawnLocations[0].GetPositionX(), aSpawnLocations[0].GetPositionY(), aSpawnLocations[0].GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_DESPAWN);
                     me->SummonCreature(NPC_WHELP, aSpawnLocations[1].GetPositionX(), aSpawnLocations[1].GetPositionY(), aSpawnLocations[1].GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_DESPAWN);
-                    if (m_uiSummonWhelpCount >= RAID_MODE(20, 40))
+                    if (m_uiSummonWhelpCount >= RAID_MODE(20,40))
                     {
                         m_uiSummonWhelpCount = 0;
                         m_uiWhelpTimer = 90000;

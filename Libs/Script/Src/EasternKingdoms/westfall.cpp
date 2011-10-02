@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -29,7 +28,7 @@ npc_daphne_stilwell
 npc_defias_traitor
 EndContentData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "ScriptedEscortAI.h"
 
 /*######
@@ -55,27 +54,27 @@ class npc_daphne_stilwell : public CreatureScript
 public:
     npc_daphne_stilwell() : CreatureScript("npc_daphne_stilwell") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* pQuest)
+    bool OnQuestAccept(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
     {
         if (pQuest->GetQuestId() == QUEST_TOME_VALOR)
         {
-            DoScriptText(SAY_DS_START, creature);
+            DoScriptText(SAY_DS_START, pCreature);
 
-            if (npc_escortAI* pEscortAI = CAST_AI(npc_daphne_stilwell::npc_daphne_stilwellAI, creature->AI()))
-                pEscortAI->Start(true, true, player->GetGUID());
+            if (npc_escortAI* pEscortAI = CAST_AI(npc_daphne_stilwell::npc_daphne_stilwellAI, pCreature->AI()))
+                pEscortAI->Start(true, true, pPlayer->GetGUID());
         }
 
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new npc_daphne_stilwellAI(creature);
+        return new npc_daphne_stilwellAI(pCreature);
     }
 
     struct npc_daphne_stilwellAI : public npc_escortAI
     {
-        npc_daphne_stilwellAI(Creature* creature) : npc_escortAI(creature) {}
+        npc_daphne_stilwellAI(Creature* pCreature) : npc_escortAI(pCreature) {}
 
         uint32 uiWPHolder;
         uint32 uiShootTimer;
@@ -99,9 +98,9 @@ public:
 
         void WaypointReached(uint32 uiPoint)
         {
-            Player* player = GetPlayerForEscort();
+            Player* pPlayer = GetPlayerForEscort();
 
-            if (!player)
+            if (!pPlayer)
                 return;
 
             uiWPHolder = uiPoint;
@@ -145,29 +144,29 @@ public:
                     me->HandleEmoteCommand(EMOTE_STATE_USESTANDING_NOSHEATHE);
                     break;
                 case 17:
-                    player->GroupEventHappens(QUEST_TOME_VALOR, me);
+                    pPlayer->GroupEventHappens(QUEST_TOME_VALOR, me);
                     break;
             }
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* pWho)
         {
-            if (!who)
+            if (!pWho)
                 return;
 
-            if (me->Attack(who, false))
+            if (me->Attack(pWho, false))
             {
-                me->AddThreat(who, 0.0f);
-                me->SetInCombatWith(who);
-                who->SetInCombatWith(me);
+                me->AddThreat(pWho, 0.0f);
+                me->SetInCombatWith(pWho);
+                pWho->SetInCombatWith(me);
 
-                me->GetMotionMaster()->MoveChase(who, 30.0f);
+                me->GetMotionMaster()->MoveChase(pWho, 30.0f);
             }
         }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* pSummoned)
         {
-            summoned->AI()->AttackStart(me);
+            pSummoned->AI()->AttackStart(me);
         }
 
         void Update(const uint32 diff)
@@ -206,33 +205,33 @@ class npc_defias_traitor : public CreatureScript
 public:
     npc_defias_traitor() : CreatureScript("npc_defias_traitor") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* pPlayer, Creature* pCreature, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_DEFIAS_BROTHERHOOD)
         {
-            if (npc_escortAI* pEscortAI = CAST_AI(npc_defias_traitor::npc_defias_traitorAI, creature->AI()))
-                pEscortAI->Start(true, true, player->GetGUID());
+            if (npc_escortAI* pEscortAI = CAST_AI(npc_defias_traitor::npc_defias_traitorAI, pCreature->AI()))
+                pEscortAI->Start(true, true, pPlayer->GetGUID());
 
-            DoScriptText(SAY_START, creature, player);
+            DoScriptText(SAY_START, pCreature, pPlayer);
         }
 
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new npc_defias_traitorAI(creature);
+        return new npc_defias_traitorAI(pCreature);
     }
 
     struct npc_defias_traitorAI : public npc_escortAI
     {
-        npc_defias_traitorAI(Creature* c) : npc_escortAI(c) { Reset(); }
+        npc_defias_traitorAI(Creature *c) : npc_escortAI(c) { Reset(); }
 
         void WaypointReached(uint32 i)
         {
-            Player* player = GetPlayerForEscort();
+            Player* pPlayer = GetPlayerForEscort();
 
-            if (!player)
+            if (!pPlayer)
                 return;
 
             switch (i)
@@ -241,20 +240,20 @@ public:
                     SetRun(false);
                     break;
                 case 36:
-                    DoScriptText(SAY_PROGRESS, me, player);
+                    DoScriptText(SAY_PROGRESS, me, pPlayer);
                     break;
                 case 44:
-                    DoScriptText(SAY_END, me, player);
+                    DoScriptText(SAY_END, me, pPlayer);
                     {
-                        if (player)
-                            player->GroupEventHappens(QUEST_DEFIAS_BROTHERHOOD, me);
+                        if (pPlayer)
+                            pPlayer->GroupEventHappens(QUEST_DEFIAS_BROTHERHOOD,me);
                     }
                     break;
             }
         }
         void EnterCombat(Unit* who)
         {
-            DoScriptText(RAND(SAY_AGGRO_1, SAY_AGGRO_2), me, who);
+            DoScriptText(RAND(SAY_AGGRO_1,SAY_AGGRO_2), me, who);
         }
 
         void Reset() {}

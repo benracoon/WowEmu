@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -22,7 +21,7 @@ SD%Complete: 0
 SDComment:
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "sunwell_plateau.h"
 
 enum Yells
@@ -109,16 +108,27 @@ class boss_felmyst : public CreatureScript
 public:
     boss_felmyst() : CreatureScript("boss_felmyst") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_felmystAI(creature);
+        return new boss_felmystAI(pCreature);
     }
 
     struct boss_felmystAI : public ScriptedAI
     {
-        boss_felmystAI(Creature* c) : ScriptedAI(c)
+        boss_felmystAI(Creature *c) : ScriptedAI(c)
         {
             pInstance = c->GetInstanceScript();
+
+            // wait for core patch be accepted
+            /*SpellEntry *TempSpell = GET_SPELL(SPELL_ENCAPSULATE_EFFECT);
+            if (TempSpell->SpellIconID == 2294)
+                TempSpell->SpellIconID = 2295;
+            TempSpell = GET_SPELL(SPELL_VAPOR_TRIGGER);
+            if ((TempSpell->Attributes & SPELL_ATTR0_PASSIVE) == 0)
+                TempSpell->Attributes |= SPELL_ATTR0_PASSIVE;
+            TempSpell = GET_SPELL(SPELL_FOG_CHARM2);
+            if ((TempSpell->Attributes & SPELL_ATTR0_PASSIVE) == 0)
+                TempSpell->Attributes |= SPELL_ATTR0_PASSIVE;*/
         }
 
         InstanceScript *pInstance;
@@ -149,7 +159,7 @@ public:
                 pInstance->SetData(DATA_FELMYST_EVENT, NOT_STARTED);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit * /*who*/)
         {
             events.ScheduleEvent(EVENT_BERSERK, 600000);
 
@@ -163,13 +173,13 @@ public:
                 pInstance->SetData(DATA_FELMYST_EVENT, IN_PROGRESS);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit *who)
         {
             if (phase != PHASE_FLIGHT)
                 ScriptedAI::AttackStart(who);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit *who)
         {
             if (phase != PHASE_FLIGHT)
                 ScriptedAI::MoveInLineOfSight(who);
@@ -177,7 +187,7 @@ public:
 
         void KilledUnit(Unit* /*victim*/)
         {
-            DoScriptText(RAND(YELL_KILL1, YELL_KILL2), me);
+            DoScriptText(RAND(YELL_KILL1,YELL_KILL2), me);
         }
 
         void JustRespawned()
@@ -193,7 +203,7 @@ public:
                 pInstance->SetData(DATA_FELMYST_EVENT, DONE);
         }
 
-        void SpellHit(Unit* caster, const SpellInfo *spell)
+        void SpellHit(Unit *caster, const SpellEntry *spell)
         {
             // workaround for linked aura
             /*if (spell->Id == SPELL_VAPOR_FORCE)
@@ -216,7 +226,7 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summon)
+        void JustSummoned(Creature *summon)
         {
             if (summon->GetEntry() == MOB_DEAD)
             {
@@ -283,20 +293,20 @@ public:
                 break;
             case 2:
             {
-                Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 150, true);
-                if (!target)
-                    target = Unit::GetUnit(*me, pInstance ? pInstance->GetData64(DATA_PLAYER_GUID) : 0);
+                Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 150, true);
+                if (!pTarget)
+                    pTarget = Unit::GetUnit(*me, pInstance ? pInstance->GetData64(DATA_PLAYER_GUID) : 0);
 
-                if (!target)
+                if (!pTarget)
                 {
                     EnterEvadeMode();
                     return;
                 }
 
-                Creature* Vapor = me->SummonCreature(MOB_VAPOR, target->GetPositionX()-5+rand()%10, target->GetPositionY()-5+rand()%10, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 9000);
+                Creature* Vapor = me->SummonCreature(MOB_VAPOR, pTarget->GetPositionX()-5+rand()%10, pTarget->GetPositionY()-5+rand()%10, pTarget->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 9000);
                 if (Vapor)
                 {
-                    Vapor->AI()->AttackStart(target);
+                    Vapor->AI()->AttackStart(pTarget);
                     me->InterruptNonMeleeSpells(false);
                     DoCast(Vapor, SPELL_VAPOR_CHANNEL, false); // core bug
                     Vapor->CastSpell(Vapor, SPELL_VAPOR_TRIGGER, true);
@@ -310,22 +320,22 @@ public:
                 DespawnSummons(MOB_VAPOR_TRAIL);
                 //DoCast(me, SPELL_VAPOR_SELECT); need core support
 
-                Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 150, true);
-                if (!target)
-                    target = Unit::GetUnit(*me, pInstance ? pInstance->GetData64(DATA_PLAYER_GUID) : 0);
+                Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 150, true);
+                if (!pTarget)
+                    pTarget = Unit::GetUnit(*me, pInstance ? pInstance->GetData64(DATA_PLAYER_GUID) : 0);
 
-                if (!target)
+                if (!pTarget)
                 {
                     EnterEvadeMode();
                     return;
                 }
 
-                //pTarget->CastSpell(target, SPELL_VAPOR_SUMMON, true); need core support
-                Creature* pVapor = me->SummonCreature(MOB_VAPOR, target->GetPositionX()-5+rand()%10, target->GetPositionY()-5+rand()%10, target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 9000);
+                //pTarget->CastSpell(pTarget, SPELL_VAPOR_SUMMON, true); need core support
+                Creature* pVapor = me->SummonCreature(MOB_VAPOR, pTarget->GetPositionX()-5+rand()%10, pTarget->GetPositionY()-5+rand()%10, pTarget->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 9000);
                 if (pVapor)
                 {
                     if (pVapor->AI())
-                        pVapor->AI()->AttackStart(target);
+                        pVapor->AI()->AttackStart(pTarget);
                     me->InterruptNonMeleeSpells(false);
                     DoCast(pVapor, SPELL_VAPOR_CHANNEL, false); // core bug
                     pVapor->CastSpell(pVapor, SPELL_VAPOR_TRIGGER, true);
@@ -340,20 +350,20 @@ public:
                 break;
             case 5:
             {
-                Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 150, true);
-                if (!target)
-                    target = Unit::GetUnit(*me, pInstance ? pInstance->GetData64(DATA_PLAYER_GUID) : 0);
+                Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 150, true);
+                if (!pTarget)
+                    pTarget = Unit::GetUnit(*me, pInstance ? pInstance->GetData64(DATA_PLAYER_GUID) : 0);
 
-                if (!target)
+                if (!pTarget)
                 {
                     EnterEvadeMode();
                     return;
                 }
 
-                breathX = target->GetPositionX();
-                breathY = target->GetPositionY();
+                breathX = pTarget->GetPositionX();
+                breathY = pTarget->GetPositionY();
                 float x, y, z;
-                target->GetContactPoint(me, x, y, z, 70);
+                pTarget->GetContactPoint(me, x, y, z, 70);
                 me->GetMotionMaster()->MovePoint(0, x, y, z+10);
                 break;
             }
@@ -383,8 +393,8 @@ public:
                     uiFlightCount = 4;
                 break;
             case 9:
-                if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO))
-                    DoStartMovement(target);
+                if (Unit *pTarget = SelectTarget(SELECT_TARGET_TOPAGGRO))
+                    DoStartMovement(pTarget);
                 else
                 {
                     EnterEvadeMode();
@@ -426,20 +436,20 @@ public:
                         break;
                     case EVENT_CLEAVE:
                         DoCast(me->getVictim(), SPELL_CLEAVE, false);
-                        events.ScheduleEvent(EVENT_CLEAVE, urand(5000, 10000));
+                        events.ScheduleEvent(EVENT_CLEAVE, urand(5000,10000));
                         break;
                     case EVENT_CORROSION:
                         DoCast(me->getVictim(), SPELL_CORROSION, false);
-                        events.ScheduleEvent(EVENT_CORROSION, urand(20000, 30000));
+                        events.ScheduleEvent(EVENT_CORROSION, urand(20000,30000));
                         break;
                     case EVENT_GAS_NOVA:
                         DoCast(me, SPELL_GAS_NOVA, false);
-                        events.ScheduleEvent(EVENT_GAS_NOVA, urand(20000, 25000));
+                        events.ScheduleEvent(EVENT_GAS_NOVA, urand(20000,25000));
                         break;
                     case EVENT_ENCAPSULATE:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 150, true))
-                            DoCast(target, SPELL_ENCAPSULATE_CHANNEL, false);
-                        events.ScheduleEvent(EVENT_ENCAPSULATE, urand(25000, 30000));
+                        if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 150, true))
+                            DoCast(pTarget, SPELL_ENCAPSULATE_CHANNEL, false);
+                        events.ScheduleEvent(EVENT_ENCAPSULATE, urand(25000,30000));
                         break;
                     case EVENT_FLIGHT:
                         EnterPhase(PHASE_FLIGHT);
@@ -466,7 +476,7 @@ public:
                             float x, y, z;
                             me->GetPosition(x, y, z);
                             me->UpdateGroundPositionZ(x, y, z);
-                            if (Creature* Fog = me->SummonCreature(MOB_VAPOR_TRAIL, x, y, z, 0, TEMPSUMMON_TIMED_DESPAWN, 10000))
+                            if (Creature *Fog = me->SummonCreature(MOB_VAPOR_TRAIL, x, y, z, 0, TEMPSUMMON_TIMED_DESPAWN, 10000))
                             {
                                 Fog->RemoveAurasDueToSpell(SPELL_TRAIL_TRIGGER);
                                 Fog->CastSpell(Fog, SPELL_FOG_TRIGGER, true);
@@ -517,14 +527,14 @@ class mob_felmyst_vapor : public CreatureScript
 public:
     mob_felmyst_vapor() : CreatureScript("mob_felmyst_vapor") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new mob_felmyst_vaporAI(creature);
+        return new mob_felmyst_vaporAI(pCreature);
     }
 
     struct mob_felmyst_vaporAI : public ScriptedAI
     {
-        mob_felmyst_vaporAI(Creature* c) : ScriptedAI(c)
+        mob_felmyst_vaporAI(Creature *c) : ScriptedAI(c)
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             me->SetSpeed(MOVE_RUN, 0.8f);
@@ -538,8 +548,8 @@ public:
         void UpdateAI(const uint32 /*diff*/)
         {
             if (!me->getVictim())
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                    AttackStart(target);
+                if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                    AttackStart(pTarget);
         }
     };
 
@@ -550,18 +560,18 @@ class mob_felmyst_trail : public CreatureScript
 public:
     mob_felmyst_trail() : CreatureScript("mob_felmyst_trail") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new mob_felmyst_trailAI(creature);
+        return new mob_felmyst_trailAI(pCreature);
     }
 
     struct mob_felmyst_trailAI : public ScriptedAI
     {
-        mob_felmyst_trailAI(Creature* c) : ScriptedAI(c)
+        mob_felmyst_trailAI(Creature *c) : ScriptedAI(c)
         {
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             DoCast(me, SPELL_TRAIL_TRIGGER, true);
-            me->SetTarget(me->GetGUID());
+            me->SetUInt64Value(UNIT_FIELD_TARGET, me->GetGUID());
             me->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 0.01f); // core bug
         }
         void Reset() {}
@@ -572,6 +582,9 @@ public:
     };
 
 };
+
+
+
 
 void AddSC_boss_felmyst()
 {

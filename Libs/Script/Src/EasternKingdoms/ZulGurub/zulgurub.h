@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -20,19 +19,23 @@
 #ifndef DEF_ZULGURUB_H
 #define DEF_ZULGURUB_H
 
-enum DataTypes
+enum eTypes
 {
     MAX_ENCOUNTERS          = 8,
 
-    DATA_ARLOKK             = 1,
-    DATA_JEKLIK             = 2,
-    DATA_VENOXIS            = 3,
-    DATA_MARLI              = 4,
-    DATA_OHGAN              = 5,
-    DATA_THEKAL             = 6,
-    DATA_ZATH               = 7,
-    DATA_LORKHAN            = 8,
+    TYPE_ARLOKK             = 1,
+    TYPE_JEKLIK             = 2,
+    TYPE_VENOXIS            = 3,
+    TYPE_MARLI              = 4,
+    TYPE_OHGAN              = 5,
+    TYPE_THEKAL             = 6,
+    TYPE_ZATH               = 7,
+    TYPE_LORKHAN            = 8,
+
     DATA_JINDO              = 10,
+    DATA_LORKHAN            = 11,
+    DATA_THEKAL             = 12,
+    DATA_ZATH               = 13
 };
 
 #endif

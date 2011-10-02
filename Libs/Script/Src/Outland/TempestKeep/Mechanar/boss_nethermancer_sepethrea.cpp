@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment: Need adjustments to initial summons
 SDCategory: Tempest Keep, The Mechanar
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "mechanar.h"
 
 enum eSays
@@ -62,9 +61,9 @@ class boss_nethermancer_sepethrea : public CreatureScript
         }
         struct boss_nethermancer_sepethreaAI : public ScriptedAI
         {
-            boss_nethermancer_sepethreaAI(Creature* creature) : ScriptedAI(creature)
+            boss_nethermancer_sepethreaAI(Creature* pCreature) : ScriptedAI(pCreature)
             {
-                pInstance = creature->GetInstanceScript();
+                pInstance = pCreature->GetInstanceScript();
             }
 
             InstanceScript *pInstance;
@@ -99,7 +98,7 @@ class boss_nethermancer_sepethrea : public CreatureScript
 
             void KilledUnit(Unit* /*victim*/)
             {
-                DoScriptText(RAND(SAY_SLAY1, SAY_SLAY2), me);
+                DoScriptText(RAND(SAY_SLAY1,SAY_SLAY2), me);
             }
 
             void JustDied(Unit* /*Killer*/)
@@ -140,7 +139,7 @@ class boss_nethermancer_sepethrea : public CreatureScript
                     {
                         if (rand()%2)
                             return;
-                        DoScriptText(RAND(SAY_DRAGONS_BREATH_1, SAY_DRAGONS_BREATH_2), me);
+                        DoScriptText(RAND(SAY_DRAGONS_BREATH_1,SAY_DRAGONS_BREATH_2), me);
                     }
                     dragons_breath_Timer = 12000 + rand()%10000;
                 }
@@ -184,9 +183,9 @@ class mob_ragin_flames : public CreatureScript
 
             struct mob_ragin_flamesAI : public ScriptedAI
             {
-                mob_ragin_flamesAI(Creature* creature) : ScriptedAI(creature)
+                mob_ragin_flamesAI(Creature* pCreature) : ScriptedAI(pCreature)
                 {
-                    pInstance = creature->GetInstanceScript();
+                    pInstance = pCreature->GetInstanceScript();
                 }
 
                 InstanceScript *pInstance;
@@ -234,8 +233,8 @@ class mob_ragin_flames : public CreatureScript
 
                     if (!onlyonce)
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                            me->GetMotionMaster()->MoveChase(target);
+                        if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM,0))
+                            me->GetMotionMaster()->MoveChase(pTarget);
                         onlyonce = true;
                     }
 

@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -16,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "halls_of_reflection.h"
 
 enum Yells
@@ -51,14 +50,14 @@ class boss_falric : public CreatureScript
 public:
     boss_falric() : CreatureScript("boss_falric") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_falricAI(creature);
+        return new boss_falricAI(pCreature);
     }
 
     struct boss_falricAI : public boss_horAI
     {
-        boss_falricAI(Creature* creature) : boss_horAI(creature) {}
+        boss_falricAI(Creature *pCreature) : boss_horAI(pCreature) {}
 
         uint8 uiHopelessnessCount;
 
@@ -80,7 +79,7 @@ public:
 
             events.ScheduleEvent(EVENT_QUIVERING_STRIKE, 23000);
             events.ScheduleEvent(EVENT_IMPENDING_DESPAIR, 9000);
-            events.ScheduleEvent(EVENT_DEFILING_HORROR, urand(25000, 45000)); // TODO adjust timer.
+            events.ScheduleEvent(EVENT_DEFILING_HORROR, urand(25000,45000)); // TODO adjust timer.
         }
 
         void JustDied(Unit* /*killer*/)
@@ -91,9 +90,9 @@ public:
                 pInstance->SetData(DATA_FALRIC_EVENT, DONE);
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit * /*victim*/)
         {
-            DoScriptText(RAND(SAY_SLAY_1, SAY_SLAY_2), me);
+            DoScriptText(RAND(SAY_SLAY_1,SAY_SLAY_2), me);
         }
 
         void UpdateAI(const uint32 diff)
@@ -114,16 +113,16 @@ public:
                     events.ScheduleEvent(EVENT_QUIVERING_STRIKE, 10000);
                     break;
                 case EVENT_IMPENDING_DESPAIR:
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
+                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM))
                     {
                         DoScriptText(SAY_IMPENDING_DESPAIR, me);
-                        DoCast(target, SPELL_IMPENDING_DESPAIR);
+                        DoCast(pTarget, SPELL_IMPENDING_DESPAIR);
                     }
                     events.ScheduleEvent(EVENT_IMPENDING_DESPAIR, 13000);
                     break;
                 case EVENT_DEFILING_HORROR:
                     DoCast(SPELL_DEFILING_HORROR);
-                    events.ScheduleEvent(EVENT_DEFILING_HORROR, urand(25000, 45000)); // TODO adjust timer.
+                    events.ScheduleEvent(EVENT_DEFILING_HORROR, urand(25000,45000)); // TODO adjust timer.
                     break;
             }
 
@@ -132,7 +131,7 @@ public:
                 || (uiHopelessnessCount < 3 && HealthBelowPct(10)))
             {
                 uiHopelessnessCount++;
-                DoCast(DUNGEON_MODE(SPELL_HOPELESSNESS, H_SPELL_HOPELESSNESS));
+                DoCast(DUNGEON_MODE(SPELL_HOPELESSNESS,H_SPELL_HOPELESSNESS));
             }
 
             DoMeleeAttackIfReady();

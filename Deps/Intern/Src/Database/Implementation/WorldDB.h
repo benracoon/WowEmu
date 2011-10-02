@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -22,20 +21,19 @@
 #include "DatabaseWorkerPool.h"
 #include "MySQLConnection.h"
 
-class WorldDatabaseConnection : public MySQLConnection
+class WorldDBConnection : public MySQLConnection
 {
     public:
         //- Constructors for sync and async connections
-        WorldDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo) {}
-        WorldDatabaseConnection(ACE_Activation_Queue* q, MySQLConnectionInfo& connInfo) : MySQLConnection(q, connInfo) {}
+        WorldDBConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo) {}
 
-        //- Loads database type specific prepared statements
-        void DoPrepareStatements();
+        //- Loads databasetype specific prepared statements
+        bool Open();
 };
 
-typedef DatabaseWorkerPool<WorldDatabaseConnection> WorldDBWorkerPool;
+typedef DatabaseWorkerPool<WorldDBConnection> WorldDBWorkerPool;
 
-enum WorldDatabaseStatements
+enum WorldDBStatements
 {
     /*  Naming standard for defines:
         {DB}_{SET/DEL/ADD/REP}_{Summary of data changed}
@@ -49,7 +47,6 @@ enum WorldDatabaseStatements
     WORLD_LOAD_CRETEXT,
     WORLD_LOAD_SMART_SCRIPTS,
     WORLD_LOAD_SMARTAI_WP,
-
     MAX_WORLDDATABASE_STATEMENTS,
 };
 

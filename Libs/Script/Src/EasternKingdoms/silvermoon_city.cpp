@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -28,7 +27,7 @@ EndScriptData */
 npc_blood_knight_stillblade
 EndContentData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 
 /*#######
 # npc_blood_knight_stillblade
@@ -47,14 +46,14 @@ class npc_blood_knight_stillblade : public CreatureScript
 public:
     npc_blood_knight_stillblade() : CreatureScript("npc_blood_knight_stillblade") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new npc_blood_knight_stillbladeAI (creature);
+        return new npc_blood_knight_stillbladeAI (pCreature);
     }
 
     struct npc_blood_knight_stillbladeAI : public ScriptedAI
     {
-        npc_blood_knight_stillbladeAI(Creature* c) : ScriptedAI(c) {}
+        npc_blood_knight_stillbladeAI(Creature *c) : ScriptedAI(c) {}
 
         uint32 lifeTimer;
         bool spellHit;
@@ -63,15 +62,15 @@ public:
         {
             lifeTimer = 120000;
             me->SetStandState(UNIT_STAND_STATE_DEAD);
-            me->SetUInt32Value(UNIT_FIELD_BYTES_1, 7);   // lay down
+            me->SetUInt32Value(UNIT_FIELD_BYTES_1,7);   // lay down
             spellHit = false;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit * /*who*/)
         {
         }
 
-        void MoveInLineOfSight(Unit* /*who*/)
+        void MoveInLineOfSight(Unit * /*who*/)
         {
         }
 
@@ -86,7 +85,7 @@ public:
             }
         }
 
-        void SpellHit(Unit* Hitter, const SpellInfo *Spellkind)
+        void SpellHit(Unit *Hitter, const SpellEntry *Spellkind)
         {
             if ((Spellkind->Id == SPELL_SHIMMERING_VESSEL) && !spellHit &&
                 (Hitter->GetTypeId() == TYPEID_PLAYER) && (CAST_PLR(Hitter)->IsActiveQuest(QUEST_REDEEMING_THE_DEAD)))

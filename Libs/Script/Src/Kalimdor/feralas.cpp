@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment: Quest support: 3520, 2767, Special vendor Gregan Brewspewer
 SDCategory: Feralas
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "ScriptedEscortAI.h"
 
 /*######
@@ -38,28 +37,28 @@ class npc_gregan_brewspewer : public CreatureScript
 public:
     npc_gregan_brewspewer() : CreatureScript("npc_gregan_brewspewer") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction)
+    bool OnGossipSelect(Player* pPlayer, Creature* pCreature, uint32 /*uiSender*/, uint32 uiAction)
     {
-        player->PlayerTalkClass->ClearMenus();
+        pPlayer->PlayerTalkClass->ClearMenus();
         if (uiAction == GOSSIP_ACTION_INFO_DEF+1)
         {
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
-            player->SEND_GOSSIP_MENU(2434, creature->GetGUID());
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+            pPlayer->SEND_GOSSIP_MENU(2434, pCreature->GetGUID());
         }
         if (uiAction == GOSSIP_ACTION_TRADE)
-            player->GetSession()->SendListInventory(creature->GetGUID());
+            pPlayer->SEND_VENDORLIST(pCreature->GetGUID());
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* pPlayer, Creature* pCreature)
     {
-        if (creature->isQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
+        if (pCreature->isQuestGiver())
+            pPlayer->PrepareQuestMenu(pCreature->GetGUID());
 
-        if (creature->isVendor() && player->GetQuestStatus(3909) == QUEST_STATUS_INCOMPLETE)
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HELLO, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+        if (pCreature->isVendor() && pPlayer->GetQuestStatus(3909) == QUEST_STATUS_INCOMPLETE)
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HELLO, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
 
-        player->SEND_GOSSIP_MENU(2433, creature->GetGUID());
+        pPlayer->SEND_GOSSIP_MENU(2433, pCreature->GetGUID());
         return true;
     }
 
@@ -95,35 +94,35 @@ class npc_oox22fe : public CreatureScript
 public:
     npc_oox22fe() : CreatureScript("npc_oox22fe") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* pQuest)
+    bool OnQuestAccept(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
     {
         if (pQuest->GetQuestId() == QUEST_RESCUE_OOX22FE)
         {
-            DoScriptText(SAY_OOX_START, creature);
+            DoScriptText(SAY_OOX_START, pCreature);
             //change that the npc is not lying dead on the ground
-            creature->SetStandState(UNIT_STAND_STATE_STAND);
+            pCreature->SetStandState(UNIT_STAND_STATE_STAND);
 
-            if (player->GetTeam() == ALLIANCE)
-                creature->setFaction(FACTION_ESCORTEE_A);
+            if (pPlayer->GetTeam() == ALLIANCE)
+                pCreature->setFaction(FACTION_ESCORTEE_A);
 
-            if (player->GetTeam() == HORDE)
-                creature->setFaction(FACTION_ESCORTEE_H);
+            if (pPlayer->GetTeam() == HORDE)
+                pCreature->setFaction(FACTION_ESCORTEE_H);
 
-            if (npc_escortAI* pEscortAI = CAST_AI(npc_oox22fe::npc_oox22feAI, creature->AI()))
-                pEscortAI->Start(true, false, player->GetGUID());
+            if (npc_escortAI* pEscortAI = CAST_AI(npc_oox22fe::npc_oox22feAI, pCreature->AI()))
+                pEscortAI->Start(true, false, pPlayer->GetGUID());
 
         }
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new npc_oox22feAI(creature);
+        return new npc_oox22feAI(pCreature);
     }
 
     struct npc_oox22feAI : public npc_escortAI
     {
-        npc_oox22feAI(Creature* creature) : npc_escortAI(creature) { }
+        npc_oox22feAI(Creature* pCreature) : npc_escortAI(pCreature) { }
 
         void WaypointReached(uint32 i)
         {
@@ -154,9 +153,9 @@ public:
                 case 37:
                     DoScriptText(SAY_OOX_END, me);
                     // Award quest credit
-                    if (Player* player = GetPlayerForEscort())
+                    if (Player* pPlayer = GetPlayerForEscort())
                     {
-                            player->GroupEventHappens(QUEST_RESCUE_OOX22FE, me);
+                            pPlayer->GroupEventHappens(QUEST_RESCUE_OOX22FE, me);
                     }
                     break;
             }
@@ -171,8 +170,8 @@ public:
         void EnterCombat(Unit* /*who*/)
         {
             //For an small probability the npc says something when he get aggro
-            if (urand(0, 9) > 7)
-                DoScriptText(RAND(SAY_OOX_AGGRO1, SAY_OOX_AGGRO2), me);
+            if (urand(0,9) > 7)
+                DoScriptText(RAND(SAY_OOX_AGGRO1,SAY_OOX_AGGRO2), me);
         }
 
         void JustSummoned(Creature* summoned)
@@ -192,11 +191,11 @@ class npc_screecher_spirit : public CreatureScript
 public:
     npc_screecher_spirit() : CreatureScript("npc_screecher_spirit") { }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* pPlayer, Creature* pCreature)
     {
-        player->SEND_GOSSIP_MENU(2039, creature->GetGUID());
-        player->TalkedToCreature(creature->GetEntry(), creature->GetGUID());
-        creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        pPlayer->SEND_GOSSIP_MENU(2039, pCreature->GetGUID());
+        pPlayer->TalkedToCreature(pCreature->GetEntry(), pCreature->GetGUID());
+        pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 
         return true;
     }

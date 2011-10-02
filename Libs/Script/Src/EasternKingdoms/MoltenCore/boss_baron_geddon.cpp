@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -53,7 +52,7 @@ class boss_baron_geddon : public CreatureScript
 
         struct boss_baron_geddonAI : public BossAI
         {
-            boss_baron_geddonAI(Creature* creature) : BossAI(creature, BOSS_BARON_GEDDON)
+            boss_baron_geddonAI(Creature *pCreature) : BossAI(pCreature, BOSS_BARON_GEDDON)
             {
             }
 
@@ -111,9 +110,9 @@ class boss_baron_geddon : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* pCreature) const
         {
-            return new boss_baron_geddonAI (creature);
+            return new boss_baron_geddonAI (pCreature);
         }
 };
 

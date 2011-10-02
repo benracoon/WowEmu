@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -40,8 +42,8 @@ AccountOpResult AccountMgr::CreateAccount(std::string username, std::string pass
         return AOR_NAME_ALREDY_EXIST;                       // username does already exist
     }
 
-    RealmDB.PExecute("INSERT INTO account(username, sha_pass_hash, joindate) VALUES('%s', '%s', NOW())", username.c_str(), CalculateShaPassHash(username, password).c_str());
-    RealmDB.Execute("INSERT INTO realmcharacters (realmid, acctid, numchars) SELECT realmlist.id, account.id, 0 FROM realmlist, account LEFT JOIN realmcharacters ON acctid=account.id WHERE acctid IS NULL");
+    RealmDB.PExecute("INSERT INTO account(username,sha_pass_hash,joindate) VALUES('%s','%s',NOW())", username.c_str(), CalculateShaPassHash(username, password).c_str());
+    RealmDB.Execute("INSERT INTO realmcharacters (realmid, acctid, numchars) SELECT realmlist.id, account.id, 0 FROM realmlist,account LEFT JOIN realmcharacters ON acctid=account.id WHERE acctid IS NULL");
 
     return AOR_OK;                                          // everything's fine
 }
@@ -53,7 +55,7 @@ AccountOpResult AccountMgr::DeleteAccount(uint32 accid)
         return AOR_NAME_NOT_EXIST;                          // account doesn't exist
 
     // existed characters list
-    result = CharDB.PQuery("SELECT guid FROM characters WHERE account='%d'", accid);
+    result = CharDB.PQuery("SELECT guid FROM characters WHERE account='%d'",accid);
     if (result)
     {
         do
@@ -109,9 +111,9 @@ AccountOpResult AccountMgr::ChangeUsername(uint32 accid, std::string new_uname, 
     normalizeString(new_passwd);
 
     std::string safe_new_uname = new_uname;
-    RealmDB.EscapeString(safe_new_uname);
+    RealmDB.escape_string(safe_new_uname);
 
-    RealmDB.PExecute("UPDATE account SET v='0', s='0', username='%s', sha_pass_hash='%s' WHERE id='%d'", safe_new_uname.c_str(),
+    RealmDB.PExecute("UPDATE account SET v='0',s='0',username='%s',sha_pass_hash='%s' WHERE id='%d'", safe_new_uname.c_str(),
                 CalculateShaPassHash(new_uname, new_passwd).c_str(), accid);
 
     return AOR_OK;
@@ -139,7 +141,7 @@ AccountOpResult AccountMgr::ChangePassword(uint32 accid, std::string new_passwd)
 
 uint32 AccountMgr::GetId(std::string username)
 {
-    RealmDB.EscapeString(username);
+    RealmDB.escape_string(username);
     QueryResult result = RealmDB.PQuery("SELECT id FROM account WHERE username = '%s'", username.c_str());
     if (!result)
         return 0;
@@ -222,7 +224,7 @@ bool AccountMgr::normalizeString(std::string& utf8str)
     wchar_t wstr_buf[MAX_ACCOUNT_STR+1];
 
     size_t wstr_len = MAX_ACCOUNT_STR;
-    if (!Utf8toWStr(utf8str, wstr_buf, wstr_len))
+    if (!Utf8toWStr(utf8str,wstr_buf,wstr_len))
         return false;
 #ifdef _MSC_VER
 #pragma warning(disable: 4996)
@@ -232,7 +234,7 @@ bool AccountMgr::normalizeString(std::string& utf8str)
 #pragma warning(default: 4996)
 #endif
 
-    return WStrToUtf8(wstr_buf, wstr_len, utf8str);
+    return WStrToUtf8(wstr_buf,wstr_len,utf8str);
 }
 
 std::string AccountMgr::CalculateShaPassHash(std::string& name, std::string& password)

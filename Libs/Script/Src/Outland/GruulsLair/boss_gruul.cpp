@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment: Ground Slam need further development (knock back effect and shatter e
 SDCategory: Gruul's Lair
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "gruuls_lair.h"
 
 enum eEnums
@@ -60,14 +59,14 @@ class boss_gruul : public CreatureScript
 public:
     boss_gruul() : CreatureScript("boss_gruul") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_gruulAI (creature);
+        return new boss_gruulAI (pCreature);
     }
 
     struct boss_gruulAI : public ScriptedAI
     {
-        boss_gruulAI(Creature* c) : ScriptedAI(c)
+        boss_gruulAI(Creature *c) : ScriptedAI(c)
         {
             pInstance = c->GetInstanceScript();
         }
@@ -97,7 +96,7 @@ public:
                 pInstance->SetData(DATA_GRUULEVENT, NOT_STARTED);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit * /*who*/)
         {
             DoScriptText(SAY_AGGRO, me);
 
@@ -107,7 +106,7 @@ public:
 
         void KilledUnit(Unit* /*victim*/)
         {
-            DoScriptText(RAND(SAY_SLAY1, SAY_SLAY2, SAY_SLAY3), me);
+            DoScriptText(RAND(SAY_SLAY1,SAY_SLAY2,SAY_SLAY3), me);
         }
 
         void JustDied(Unit* /*Killer*/)
@@ -121,18 +120,18 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* pSpell)
+        void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell)
         {
             //This to emulate effect1 (77) of SPELL_GROUND_SLAM, knock back to any direction
             //It's initially wrong, since this will cause fall damage, which is by comments, not intended.
             if (pSpell->Id == SPELL_GROUND_SLAM)
             {
-                if (target->GetTypeId() == TYPEID_PLAYER)
+                if (pTarget->GetTypeId() == TYPEID_PLAYER)
                 {
-                    switch (urand(0, 1))
+                    switch (urand(0,1))
                     {
-                        case 0: target->CastSpell(target, SPELL_MAGNETIC_PULL, true, NULL, NULL, me->GetGUID()); break;
-                        case 1: target->CastSpell(target, SPELL_KNOCK_BACK, true, NULL, NULL, me->GetGUID()); break;
+                        case 0: pTarget->CastSpell(pTarget, SPELL_MAGNETIC_PULL, true, NULL, NULL, me->GetGUID()); break;
+                        case 1: pTarget->CastSpell(pTarget, SPELL_KNOCK_BACK, true, NULL, NULL, me->GetGUID()); break;
                     }
                 }
             }
@@ -141,10 +140,10 @@ public:
             if (pSpell->Id == SPELL_SHATTER)
             {
                 //this spell must have custom handling in the core, dealing damage based on distance
-                target->CastSpell(target, SPELL_SHATTER_EFFECT, true);
+                pTarget->CastSpell(pTarget, SPELL_SHATTER_EFFECT, true);
 
-                if (target->HasAura(SPELL_STONED))
-                    target->RemoveAurasDueToSpell(SPELL_STONED);
+                if (pTarget->HasAura(SPELL_STONED))
+                    pTarget->RemoveAurasDueToSpell(SPELL_STONED);
 
                 //clear this, if we are still performing
                 if (m_bPerformingGroundSlam)
@@ -198,10 +197,10 @@ public:
                 // Hurtful Strike
                 if (m_uiHurtfulStrike_Timer <= uiDiff)
                 {
-                    Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1);
+                    Unit *pTarget = SelectTarget(SELECT_TARGET_TOPAGGRO,1);
 
-                    if (target && me->IsWithinMeleeRange(me->getVictim()))
-                        DoCast(target, SPELL_HURTFUL_STRIKE);
+                    if (pTarget && me->IsWithinMeleeRange(me->getVictim()))
+                        DoCast(pTarget, SPELL_HURTFUL_STRIKE);
                     else
                         DoCast(me->getVictim(), SPELL_HURTFUL_STRIKE);
 
@@ -222,8 +221,8 @@ public:
                 // Cave In
                 if (m_uiCaveIn_Timer <= uiDiff)
                 {
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                        DoCast(target, SPELL_CAVE_IN);
+                    if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM,0))
+                        DoCast(pTarget, SPELL_CAVE_IN);
 
                     if (m_uiCaveIn_StaticTimer >= 4000)
                         m_uiCaveIn_StaticTimer -= 2000;

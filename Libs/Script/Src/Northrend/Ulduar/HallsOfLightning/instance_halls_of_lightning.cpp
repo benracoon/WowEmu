@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment: All ready.
 SDCategory: Halls of Lightning
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "halls_of_lightning.h"
 
 /* Halls of Lightning encounters:
@@ -211,8 +210,8 @@ public:
             OUT_SAVE_INST_DATA;
 
             std::ostringstream saveStream;
-            saveStream << "H L " << m_auiEncounter[0] << ' ' << m_auiEncounter[1] << ' '
-            << m_auiEncounter[2] << ' ' << m_auiEncounter[3];
+            saveStream << "H L " << m_auiEncounter[0] << " " << m_auiEncounter[1] << " "
+            << m_auiEncounter[2] << " " << m_auiEncounter[3];
 
             OUT_SAVE_INST_DATA_COMPLETE;
             return saveStream.str();

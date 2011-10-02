@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment:
 SDCategory: Razorfen Downs
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 
 #define SAY_AGGRO               -1129000
 #define SAY_SUMMON60            -1129001
@@ -42,14 +41,14 @@ class boss_amnennar_the_coldbringer : public CreatureScript
 public:
     boss_amnennar_the_coldbringer() : CreatureScript("boss_amnennar_the_coldbringer") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_amnennar_the_coldbringerAI (creature);
+        return new boss_amnennar_the_coldbringerAI (pCreature);
     }
 
     struct boss_amnennar_the_coldbringerAI : public ScriptedAI
     {
-        boss_amnennar_the_coldbringerAI(Creature* c) : ScriptedAI(c) {}
+        boss_amnennar_the_coldbringerAI(Creature *c) : ScriptedAI(c) {}
 
         uint32 AmnenarsWrath_Timer;
         uint32 FrostBolt_Timer;
@@ -68,7 +67,7 @@ public:
             Hp = false;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit * /*who*/)
         {
             DoScriptText(SAY_AGGRO, me);
         }

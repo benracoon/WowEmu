@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -16,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "violet_hold.h"
 
 enum Spells
@@ -63,16 +62,16 @@ class boss_xevozz : public CreatureScript
 public:
     boss_xevozz() : CreatureScript("boss_xevozz") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_xevozzAI (creature);
+        return new boss_xevozzAI (pCreature);
     }
 
     struct boss_xevozzAI : public ScriptedAI
     {
-        boss_xevozzAI(Creature* creature) : ScriptedAI(creature)
+        boss_xevozzAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
-            pInstance  = creature->GetInstanceScript();
+            pInstance  = pCreature->GetInstanceScript();
         }
 
         InstanceScript* pInstance;
@@ -100,7 +99,7 @@ public:
         void DespawnSphere()
         {
             std::list<Creature*> assistList;
-            GetCreatureListWithEntryInGrid(assistList, me, NPC_ETHEREAL_SPHERE , 150.0f);
+            GetCreatureListWithEntryInGrid(assistList,me, NPC_ETHEREAL_SPHERE ,150.0f);
 
             if (assistList.empty())
                 return;
@@ -112,36 +111,36 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* pSummoned)
         {
-            summoned->SetSpeed(MOVE_RUN, 0.5f);
-            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+            pSummoned->SetSpeed(MOVE_RUN, 0.5f);
+            if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0))
             {
-                summoned->AddThreat(target, 0.00f);
-                summoned->AI()->AttackStart(target);
+                pSummoned->AddThreat(pTarget, 0.00f);
+                pSummoned->AI()->AttackStart(pTarget);
             }
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* pWho)
         {
             if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
                 return;
 
-            if (me->Attack(who, true))
+            if (me->Attack(pWho, true))
             {
-                me->AddThreat(who, 0.0f);
-                me->SetInCombatWith(who);
-                who->SetInCombatWith(me);
-                DoStartMovement(who);
+                me->AddThreat(pWho, 0.0f);
+                me->SetInCombatWith(pWho);
+                pWho->SetInCombatWith(me);
+                DoStartMovement(pWho);
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*pWho*/)
         {
             DoScriptText(SAY_AGGRO, me);
             if (pInstance)
             {
-                if (GameObject* pDoor = pInstance->instance->GetGameObject(pInstance->GetData64(DATA_XEVOZZ_CELL)))
+                if (GameObject *pDoor = pInstance->instance->GetGameObject(pInstance->GetData64(DATA_XEVOZZ_CELL)))
                     if (pDoor->GetGoState() == GO_STATE_READY)
                     {
                         EnterEvadeMode();
@@ -154,7 +153,7 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) {}
+        void MoveInLineOfSight(Unit* /*pWho*/) {}
 
         void UpdateAI(const uint32 uiDiff)
         {
@@ -194,7 +193,7 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*pKiller*/)
         {
             DoScriptText(SAY_DEATH, me);
 
@@ -214,12 +213,12 @@ public:
                 }
             }
         }
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit* pVictim)
         {
-            if (victim == me)
+            if (pVictim == me)
                 return;
 
-            DoScriptText(RAND(SAY_SLAY_1, SAY_SLAY_2, SAY_SLAY_3), me);
+            DoScriptText(RAND(SAY_SLAY_1,SAY_SLAY_2,SAY_SLAY_3), me);
         }
     };
 
@@ -230,16 +229,16 @@ class mob_ethereal_sphere : public CreatureScript
 public:
     mob_ethereal_sphere() : CreatureScript("mob_ethereal_sphere") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new mob_ethereal_sphereAI (creature);
+        return new mob_ethereal_sphereAI (pCreature);
     }
 
     struct mob_ethereal_sphereAI : public ScriptedAI
     {
-        mob_ethereal_sphereAI(Creature* creature) : ScriptedAI(creature)
+        mob_ethereal_sphereAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
-            pInstance   = creature->GetInstanceScript();
+            pInstance   = pCreature->GetInstanceScript();
         }
 
         InstanceScript* pInstance;

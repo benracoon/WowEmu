@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment: some strange visual related to tree form(if aura lost before normal d
 SDCategory: Tempest Keep, The Botanica
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 
 enum eSays
 {
@@ -60,7 +59,7 @@ class boss_high_botanist_freywinn : public CreatureScript
 
         struct boss_high_botanist_freywinnAI : public ScriptedAI
         {
-            boss_high_botanist_freywinnAI(Creature* creature) : ScriptedAI(creature) {}
+            boss_high_botanist_freywinnAI(Creature* pCreature) : ScriptedAI(pCreature) {}
 
             std::list<uint64> Adds_List;
 
@@ -81,12 +80,12 @@ class boss_high_botanist_freywinn : public CreatureScript
                 MoveFree = true;
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit * /*who*/)
             {
                 DoScriptText(SAY_AGGRO, me);
             }
 
-            void JustSummoned(Creature* summoned)
+            void JustSummoned(Creature *summoned)
             {
                 if (summoned->GetEntry() == ENTRY_FRAYER)
                     Adds_List.push_back(summoned->GetGUID());
@@ -105,7 +104,7 @@ class boss_high_botanist_freywinn : public CreatureScript
 
             void KilledUnit(Unit* /*victim*/)
             {
-                DoScriptText(RAND(SAY_KILL_1, SAY_KILL_2), me);
+                DoScriptText(RAND(SAY_KILL_1,SAY_KILL_2), me);
             }
 
             void JustDied(Unit* /*Killer*/)
@@ -120,7 +119,7 @@ class boss_high_botanist_freywinn : public CreatureScript
 
                 if (TreeForm_Timer <= diff)
                 {
-                    DoScriptText(RAND(SAY_TREE_1, SAY_TREE_2), me);
+                    DoScriptText(RAND(SAY_TREE_1,SAY_TREE_2), me);
 
                     if (me->IsNonMeleeSpellCasted(false))
                         me->InterruptNonMeleeSpells(true);
@@ -147,7 +146,7 @@ class boss_high_botanist_freywinn : public CreatureScript
                         {
                             for (std::list<uint64>::iterator itr = Adds_List.begin(); itr != Adds_List.end(); ++itr)
                             {
-                                if (Unit* temp = Unit::GetUnit(*me, *itr))
+                                if (Unit *temp = Unit::GetUnit(*me,*itr))
                                 {
                                     if (!temp->isAlive())
                                     {
@@ -180,7 +179,7 @@ class boss_high_botanist_freywinn : public CreatureScript
                     return;
                 }
 
-                /*if (me->HasAura(SPELL_TREE_FORM, 0) || me->HasAura(SPELL_TRANQUILITY, 0))
+                /*if (me->HasAura(SPELL_TREE_FORM,0) || me->HasAura(SPELL_TRANQUILITY,0))
                     return;*/
 
                 //one random seedling every 5 secs, but not in tree form

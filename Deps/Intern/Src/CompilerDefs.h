@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -58,5 +60,6 @@
 #if COMPILER == COMPILER_MICROSOFT
 #  pragma warning( disable : 4267 )                         // conversion from 'size_t' to 'int', possible loss of data
 #  pragma warning( disable : 4786 )                         // identifier was truncated to '255' characters in the debug information
+#  pragma warning( disable : 4996 )
 #endif
 #endif

@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -64,10 +66,10 @@ class WorldObject;
 struct AchievementCriteriaData;
 struct AuctionEntry;
 struct Condition;
-struct ItemTemplate;
+struct ItemPrototype;
 struct OutdoorPvPData;
 
-#define VISIBLE_RANGE       166.0f                          //MAX visible range (size of grid)
+#define VISIBLE_RANGE       (166.0f)                        //MAX visible range (size of grid)
 
 // Generic scripting text function.
 void DoScriptText(int32 textEntry, WorldObject* pSource, Unit *pTarget = NULL);
@@ -100,7 +102,7 @@ void DoScriptText(int32 textEntry, WorldObject* pSource, Unit *pTarget = NULL);
             MyScriptType(const char* name, uint32 someId)
                 : ScriptObject(name), _someId(someId)
             {
-                ScriptRegistry<MyScriptType>::AddScript(this);
+                ScriptMgr::ScriptRegistry<MyScriptType>::AddScript(this);
             }
 
         public:
@@ -119,7 +121,7 @@ void DoScriptText(int32 textEntry, WorldObject* pSource, Unit *pTarget = NULL);
     Next, you need to add a specialization for ScriptRegistry. Put this in the bottom of
     ScriptMgr.cpp:
 
-    template class ScriptRegistry<MyScriptType>;
+    template class ScriptMgr::ScriptRegistry<MyScriptType>;
 
     Now, add a cleanup routine in ScriptMgr::~ScriptMgr:
 
@@ -239,7 +241,7 @@ class ServerScript : public ScriptObject
         virtual void OnUnknownPacketReceive(WorldSocket* /*socket*/, WorldPacket& /*packet*/) { }
 };
 
-class WorldScript : public ScriptObject
+class WorldScript : public ScriptObject, public UpdatableScript<void>
 {
     protected:
 
@@ -390,7 +392,7 @@ class ItemScript : public ScriptObject
         virtual bool OnUse(Player* /*player*/, Item* /*item*/, SpellCastTargets const& /*targets*/) { return false; }
 
         // Called when the item expires (is destroyed).
-        virtual bool OnExpire(Player* /*player*/, ItemTemplate const* /*proto*/) { return false; }
+        virtual bool OnExpire(Player* /*player*/, ItemPrototype const* /*proto*/) { return false; }
 };
 
 class CreatureScript : public ScriptObject, public UpdatableScript<Creature>
@@ -466,9 +468,9 @@ class GameObjectScript : public ScriptObject, public UpdatableScript<GameObject>
         virtual uint32 GetDialogStatus(Player* /*player*/, GameObject* /*go*/) { return 100; }
 
         // Called when the gameobject is destroyed (destructible buildings only).
-        virtual void OnDestroyed(GameObject* /*go*/, Player* /*player*/) { }
+        virtual void OnDestroyed(GameObject* /*go*/, Player* /*player*/, uint32 /*eventId*/) { }
         // Called when the gameobject is damaged (destructible buildings only).
-        virtual void OnDamaged(GameObject* /*go*/, Player* /*player*/) { }
+        virtual void OnDamaged(GameObject* /*go*/, Player* /*player*/,  uint32 /*eventId*/) { }
 };
 
 class AreaTriggerScript : public ScriptObject
@@ -672,7 +674,7 @@ class PlayerScript : public ScriptObject
         virtual void OnTalentsReset(Player* /*player*/, bool /*no_cost*/) { }
 
         // Called when a player's money is modified (before the modification is done)
-        virtual void OnMoneyChanged(Player* /*player*/, int32& /*amount*/) { }
+        virtual void OnMoneyChanged(Player* /*player*/, int64& /*amount*/) { }
 
         // Called when a player gains XP (before anything is given)
         virtual void OnGiveXP(Player* /*player*/, uint32& /*amount*/, Unit* /*victim*/) { }
@@ -701,7 +703,7 @@ class PlayerScript : public ScriptObject
         virtual void OnTextEmote(Player* /*player*/, uint32 /*text_emote*/, uint32 /*emoteNum*/, uint64 /*guid*/) { }
 
         // Called in Spell::cast
-        virtual void OnSpellCast(Player* /*player*/, Spell* /*spell*/, bool /*skipCheck*/) { }
+        virtual void OnSpellCast(Player* /*player*/, Spell * /*spell*/, bool /*skipCheck*/) { }
 
         // Called when a player logs in or out
         virtual void OnLogin(Player* /*player*/) { }
@@ -731,8 +733,8 @@ class GuildScript : public ScriptObject
         virtual void OnInfoChanged(Guild* /*guild*/, const std::string& /*newInfo*/) { }
         virtual void OnCreate(Guild* /*guild*/, Player* /*leader*/, const std::string& /*name*/) { }
         virtual void OnDisband(Guild* /*guild*/) { }
-        virtual void OnMemberWitdrawMoney(Guild* /*guild*/, Player* /*player*/, uint32& /*amount*/, bool /*isRepair*/) { }
-        virtual void OnMemberDepositMoney(Guild* /*guild*/, Player* /*player*/, uint32& /*amount*/) { }
+        virtual void OnMemberWitdrawMoney(Guild* /*guild*/, Player* /*player*/, uint64& /*amount*/, bool /*isRepair*/) { }
+        virtual void OnMemberDepositMoney(Guild* /*guild*/, Player* /*player*/, uint64& /*amount*/) { }
         virtual void OnItemMove(Guild* /*guild*/, Player* /*player*/, Item* /*pItem*/, bool /*isSrcBank*/, uint8 /*srcContainer*/, uint8 /*srcSlotId*/,
             bool /*isDestBank*/, uint8 /*destContainer*/, uint8 /*destSlotId*/) { }
         virtual void OnEvent(Guild* /*guild*/, uint8 /*eventType*/, uint32 /*playerGuid1*/, uint32 /*playerGuid2*/, uint8 /*newRank*/) { }
@@ -763,9 +765,13 @@ class ScriptMgr
     friend class ACE_Singleton<ScriptMgr, ACE_Null_Mutex>;
     friend class ScriptObject;
 
-    private:
-        ScriptMgr();
-        virtual ~ScriptMgr();
+    ScriptMgr();
+    virtual ~ScriptMgr();
+
+    uint32 _scriptCount;
+
+    //atomic op counter for active scripts amount
+    ACE_Atomic_Op<ACE_Thread_Mutex, long> _scheduledScripts;
 
     public: /* Initialization */
 
@@ -773,7 +779,7 @@ class ScriptMgr
         void LoadDatabase();
         void FillSpellSummary();
 
-        const char* ScriptsVersion() const { return "Integrated StrawberryScripts"; }
+        const char* ScriptsVersion() const { return "Integrated Trinity Scripts"; }
 
         void IncrementScriptCount() { ++_scriptCount; }
         uint32 GetScriptCount() const { return _scriptCount; }
@@ -837,7 +843,7 @@ class ScriptMgr
         bool OnDummyEffect(Unit* caster, uint32 spellId, SpellEffIndex effIndex, Item* target);
         bool OnQuestAccept(Player* player, Item* item, Quest const* quest);
         bool OnItemUse(Player* player, Item* item, SpellCastTargets const& targets);
-        bool OnItemExpire(Player* player, ItemTemplate const* proto);
+        bool OnItemExpire(Player* player, ItemPrototype const* proto);
 
     public: /* CreatureScript */
 
@@ -862,8 +868,8 @@ class ScriptMgr
         bool OnQuestAccept(Player* player, GameObject* go, Quest const* quest);
         bool OnQuestReward(Player* player, GameObject* go, Quest const* quest, uint32 opt);
         uint32 GetDialogStatus(Player* player, GameObject* go);
-        void OnGameObjectDestroyed(GameObject* go, Player* player);
-        void OnGameObjectDamaged(GameObject* go, Player* player);
+        void OnGameObjectDestroyed(GameObject* go, Player* player, uint32 eventId);
+        void OnGameObjectDamaged(GameObject* go, Player* player, uint32 eventId);
         void OnGameObjectUpdate(GameObject* go, uint32 diff);
 
     public: /* AreaTriggerScript */
@@ -925,15 +931,15 @@ class ScriptMgr
 
     public: /* PlayerScript */
 
-        void OnPVPKill(Player* killer, Player* killed);
-        void OnCreatureKill(Player* killer, Creature* killed);
-        void OnPlayerKilledByCreature(Creature* killer, Player* killed);
-        void OnPlayerLevelChanged(Player* player, uint8 oldLevel);
-        void OnPlayerFreeTalentPointsChanged(Player* player, uint32 newPoints);
-        void OnPlayerTalentsReset(Player* player, bool no_cost);
-        void OnPlayerMoneyChanged(Player* player, int32& amount);
-        void OnGivePlayerXP(Player* player, uint32& amount, Unit* victim);
-        void OnPlayerReputationChange(Player* player, uint32 factionID, int32& standing, bool incremental);
+        void OnPVPKill(Player *killer, Player *killed);
+        void OnCreatureKill(Player *killer, Creature *killed);
+        void OnPlayerKilledByCreature(Creature *killer, Player *killed);
+        void OnPlayerLevelChanged(Player *player, uint8 newLevel);
+        void OnPlayerFreeTalentPointsChanged(Player *player, uint32 newPoints);
+        void OnPlayerTalentsReset(Player *player, bool no_cost);
+        void OnPlayerMoneyChanged(Player *player, int64& amount);
+        void OnGivePlayerXP(Player *player, uint32& amount, Unit *victim);
+        void OnPlayerReputationChange(Player *player, uint32 factionID, int32& standing, bool incremental);
         void OnPlayerDuelRequest(Player* target, Player* challenger);
         void OnPlayerDuelStart(Player* player1, Player* player2);
         void OnPlayerDuelEnd(Player* winner, Player* loser, DuelCompleteType type);
@@ -944,7 +950,7 @@ class ScriptMgr
         void OnPlayerChat(Player* player, uint32 type, uint32 lang, std::string& msg, Channel* channel);
         void OnPlayerEmote(Player* player, uint32 emote);
         void OnPlayerTextEmote(Player* player, uint32 text_emote, uint32 emoteNum, uint64 guid);
-        void OnPlayerSpellCast(Player* player, Spell* spell, bool skipCheck);
+        void OnPlayerSpellCast(Player* player, Spell *spell, bool skipCheck);
         void OnPlayerLogin(Player* player);
         void OnPlayerLogout(Player* player);
         void OnPlayerCreate(Player* player);
@@ -952,14 +958,14 @@ class ScriptMgr
         void OnPlayerBindToInstance(Player* player, Difficulty difficulty, uint32 mapid, bool permanent);
 
     public: /* GuildScript */
-        void OnGuildAddMember(Guild* guild, Player* player, uint8& plRank);
-        void OnGuildRemoveMember(Guild* guild, Player* player, bool isDisbanding, bool isKicked);
-        void OnGuildMOTDChanged(Guild* guild, const std::string& newMotd);
-        void OnGuildInfoChanged(Guild* guild, const std::string& newInfo);
-        void OnGuildCreate(Guild* guild, Player* leader, const std::string& name);
-        void OnGuildDisband(Guild* guild);
-        void OnGuildMemberWitdrawMoney(Guild* guild, Player* player, uint32 &amount, bool isRepair);
-        void OnGuildMemberDepositMoney(Guild* guild, Player* player, uint32 &amount);
+        void OnGuildAddMember(Guild *guild, Player *player, uint8& plRank);
+        void OnGuildRemoveMember(Guild *guild, Player *player, bool isDisbanding, bool isKicked);
+        void OnGuildMOTDChanged(Guild *guild, const std::string& newMotd);
+        void OnGuildInfoChanged(Guild *guild, const std::string& newInfo);
+        void OnGuildCreate(Guild *guild, Player* leader, const std::string& name);
+        void OnGuildDisband(Guild *guild);
+        void OnGuildMemberWitdrawMoney(Guild* guild, Player* player, uint64 &amount, bool isRepair);
+        void OnGuildMemberDepositMoney(Guild* guild, Player* player, uint64 &amount);
         void OnGuildItemMove(Guild* guild, Player* player, Item* pItem, bool isSrcBank, uint8 srcContainer, uint8 srcSlotId,
             bool isDestBank, uint8 destContainer, uint8 destSlotId);
         void OnGuildEvent(Guild* guild, uint8 eventType, uint32 playerGuid1, uint32 playerGuid2, uint8 newRank);
@@ -978,11 +984,102 @@ class ScriptMgr
         uint32 DecreaseScheduledScriptCount(size_t count) { return uint32(_scheduledScripts -= count); }
         bool IsScriptScheduled() const { return _scheduledScripts > 0; }
 
-    private:
-        uint32 _scriptCount;
+    public: /* ScriptRegistry */
 
-        //atomic op counter for active scripts amount
-        ACE_Atomic_Op<ACE_Thread_Mutex, long> _scheduledScripts;
+        // This is the global static registry of scripts.
+        template<class TScript>
+        class ScriptRegistry
+        {
+            // Counter used for code-only scripts.
+            static uint32 _scriptIdCounter;
+
+            public:
+
+                typedef std::map<uint32, TScript*> ScriptMap;
+                typedef typename ScriptMap::iterator ScriptMapIterator;
+
+                // The actual list of scripts. This will be accessed concurrently, so it must not be modified
+                // after server startup.
+                static ScriptMap ScriptPointerList;
+
+                static void AddScript(TScript* const script)
+                {
+                    ASSERT(script);
+
+                    // See if the script is using the same memory as another script. If this happens, it means that
+                    // someone forgot to allocate new memory for a script.
+                    for (ScriptMapIterator it = ScriptPointerList.begin(); it != ScriptPointerList.end(); ++it)
+                    {
+                        if (it->second == script)
+                        {
+                            sLog->outError("Script '%s' has same memory pointer as '%s'.",
+                                script->GetName().c_str(), it->second->GetName().c_str());
+
+                            return;
+                        }
+                    }
+
+                    if (script->IsDatabaseBound())
+                    {
+                        // Get an ID for the script. An ID only exists if it's a script that is assigned in the database
+                        // through a script name (or similar).
+                        uint32 id = GetScriptId(script->GetName().c_str());
+                        if (id)
+                        {
+                            // Try to find an existing script.
+                            bool existing = false;
+                            for (ScriptMapIterator it = ScriptPointerList.begin(); it != ScriptPointerList.end(); ++it)
+                            {
+                                // If the script names match...
+                                if (it->second->GetName() == script->GetName())
+                                {
+                                    // ... It exists.
+                                    existing = true;
+                                    break;
+                                }
+                            }
+
+                            // If the script isn't assigned -> assign it!
+                            if (!existing)
+                            {
+                                ScriptPointerList[id] = script;
+                                sScriptMgr->IncrementScriptCount();
+                            }
+                            else
+                            {
+                                // If the script is already assigned -> delete it!
+                                sLog->outError("Script '%s' already assigned with the same script name, so the script can't work.",
+                                    script->GetName().c_str());
+
+                                ASSERT(false); // Error that should be fixed ASAP.
+                            }
+                        }
+                        else
+                        {
+                            // The script uses a script name from database, but isn't assigned to anything.
+                            if (script->GetName().find("example") == std::string::npos && script->GetName().find("Smart") == std::string::npos)
+                                sLog->outErrorDb("Script named '%s' does not have a script name assigned in database.",
+                                    script->GetName().c_str());
+                        }
+                    }
+                    else
+                    {
+                        // We're dealing with a code-only script; just add it.
+                        ScriptPointerList[_scriptIdCounter++] = script;
+                        sScriptMgr->IncrementScriptCount();
+                    }
+                }
+
+                // Gets a script by its ID (assigned by ObjectMgr).
+                static TScript* GetScriptById(uint32 id)
+                {
+                    ScriptMapIterator it = ScriptPointerList.find(id);
+                    if (it != ScriptPointerList.end())
+                        return it->second;
+
+                    return NULL;
+                }
+        };
 };
 
 #endif

@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -34,17 +36,17 @@ class GridInfo
 {
 public:
     GridInfo()
-        : i_timer(0), vis_Update(0, irand(0, DEFAULT_VISIBILITY_NOTIFY_PERIOD)),
+        : i_timer(0), vis_Update(0, irand(0,DEFAULT_VISIBILITY_NOTIFY_PERIOD)),
           i_unloadActiveLockCount(0), i_unloadExplicitLock(false), i_unloadReferenceLock(false) {}
     GridInfo(time_t expiry, bool unload = true )
-        : i_timer(expiry), vis_Update(0, irand(0, DEFAULT_VISIBILITY_NOTIFY_PERIOD)),
+        : i_timer(expiry), vis_Update(0, irand(0,DEFAULT_VISIBILITY_NOTIFY_PERIOD)),
           i_unloadActiveLockCount(0), i_unloadExplicitLock(!unload), i_unloadReferenceLock(false) {}
     const TimeTracker& getTimeTracker() const { return i_timer; }
     bool getUnloadLock() const { return i_unloadActiveLockCount || i_unloadExplicitLock || i_unloadReferenceLock; }
-    void setUnloadExplicitLock(bool on) { i_unloadExplicitLock = on; }
-    void setUnloadReferenceLock(bool on) { i_unloadReferenceLock = on; }
+    void setUnloadExplicitLock( bool on ) { i_unloadExplicitLock = on; }
+    void setUnloadReferenceLock( bool on ) { i_unloadReferenceLock = on; }
     void incUnloadActiveLock() { ++i_unloadActiveLockCount; }
-    void decUnloadActiveLock() { if (i_unloadActiveLockCount) --i_unloadActiveLockCount; }
+    void decUnloadActiveLock() { if(i_unloadActiveLockCount) --i_unloadActiveLockCount; }
 
     void setTimer(const TimeTracker& pTimer) { i_timer = pTimer; }
     void ResetTimeTracker(time_t interval) { i_timer.Reset(interval); }
@@ -100,7 +102,7 @@ class NGrid
             return i_cells[x][y];
         }
 
-        uint32 GetGridId(void) const { return i_gridId; }
+        const uint32& GetGridId(void) const { return i_gridId; }
         void SetGridId(const uint32 id) const { i_gridId = id; }
         grid_state_t GetGridState(void) const { return i_cellstate; }
         void SetGridState(grid_state_t s) { i_cellstate = s; }
@@ -117,8 +119,8 @@ class NGrid
         GridInfo* getGridInfoRef() { return &i_GridInfo; }
         const TimeTracker& getTimeTracker() const { return i_GridInfo.getTimeTracker(); }
         bool getUnloadLock() const { return i_GridInfo.getUnloadLock(); }
-        void setUnloadExplicitLock(bool on) { i_GridInfo.setUnloadExplicitLock(on); }
-        void setUnloadReferenceLock(bool on) { i_GridInfo.setUnloadReferenceLock(on); }
+        void setUnloadExplicitLock( bool on ) { i_GridInfo.setUnloadExplicitLock(on); }
+        void setUnloadReferenceLock( bool on ) { i_GridInfo.setUnloadReferenceLock(on); }
         void incUnloadActiveLock() { i_GridInfo.incUnloadActiveLock(); }
         void decUnloadActiveLock() { i_GridInfo.decUnloadActiveLock(); }
         void ResetTimeTracker(time_t interval) { i_GridInfo.ResetTimeTracker(interval); }
@@ -141,7 +143,7 @@ class NGrid
                     getGridType(x, y).Visit(visitor);
         }
 
-        template<class T, class TT> void Visit(const uint32 x, const uint32 y, TypeContainerVisitor<T, TypeMapContainer<TT> > &visitor)
+        template<class T, class TT> void Visit(const uint32 &x, const uint32 &y, TypeContainerVisitor<T, TypeMapContainer<TT> > &visitor)
         {
             getGridType(x, y).Visit(visitor);
         }
@@ -167,7 +169,7 @@ class NGrid
 
     private:
 
-        GridType& getGridType(const uint32 x, const uint32 y)
+        GridType& getGridType(const uint32& x, const uint32& y)
         {
             ASSERT(x < N);
             ASSERT(y < N);

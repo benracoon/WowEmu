@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -20,15 +22,14 @@
 #include "Common.h"
 #include "Corpse.h"
 #include "Player.h"
+#include "OpcodeHandler.h"
 #include "UpdateMask.h"
 #include "ObjectAccessor.h"
 #include "DatabaseEnv.h"
-#include "Opcodes.h"
 #include "GossipDef.h"
 #include "World.h"
 
-Corpse::Corpse(CorpseType type) : WorldObject()
-, m_type(type)
+Corpse::Corpse(CorpseType type) : WorldObject(), m_type(type)
 {
     m_objectType |= TYPEMASK_CORPSE;
     m_objectTypeId = TYPEID_CORPSE;
@@ -155,7 +156,6 @@ void Corpse::DeleteFromDB(SQLTransaction& trans)
     }
     else
     {
-        // all corpses (not bones)
         stmt = CharDB.GetPreparedStatement(CHAR_DEL_PLAYER_CORPSES);
         stmt->setUInt32(0, GUID_LOPART(GetOwnerGUID()));
     }
@@ -165,9 +165,9 @@ void Corpse::DeleteFromDB(SQLTransaction& trans)
 bool Corpse::LoadFromDB(uint32 guid, Field *fields)
 {
     uint32 ownerGuid = fields[17].GetUInt32();
-    //        0     1     2     3            4      5          6          7       8       9        10     11        12    13          14          15         16          17
-    // SELECT posX, posY, posZ, orientation, mapId, displayId, itemCache, bytes1, bytes2, guildId, flags, dynFlags, time, corpseType, instanceId, phaseMask, corpseGuid, guid FROM corpse WHERE corpseType <> 0
-    m_type = CorpseType(fields[13].GetUInt8());
+    //        0     1     2     3            4      5          6          7       8       10     11        12    13          14          15         16          17
+    // SELECT posX, posY, posZ, orientation, mapId, displayId, itemCache, bytes1, bytes2, flags, dynFlags, time, corpseType, instanceId, phaseMask, corpseGuid, guid FROM corpse WHERE corpseType <> 0
+    m_type = CorpseType(fields[13].GetUInt32());
     if (m_type >= MAX_CORPSE_TYPE)
     {
         sLog->outError("Corpse (guid: %u, owner: %u) have wrong corpse type (%u), not loading.", guid, ownerGuid, m_type);
@@ -189,16 +189,16 @@ bool Corpse::LoadFromDB(uint32 guid, Field *fields)
     SetUInt32Value(CORPSE_FIELD_BYTES_1, fields[7].GetUInt32());
     SetUInt32Value(CORPSE_FIELD_BYTES_2, fields[8].GetUInt32());
     SetUInt32Value(CORPSE_FIELD_FLAGS, fields[9].GetUInt8());
-    SetUInt32Value(CORPSE_FIELD_DYNAMIC_FLAGS, fields[10].GetUInt8());
+    SetUInt32Value(CORPSE_FIELD_DYNAMIC_FLAGS, fields[10].GetUInt32());
     SetUInt64Value(CORPSE_FIELD_OWNER, MAKE_NEW_GUID(ownerGuid, 0, HIGHGUID_PLAYER));
 
     m_time = time_t(fields[11].GetUInt32());
 
-    uint32 instanceId  = fields[13].GetUInt32();
+    uint32 instanceid  = fields[13].GetUInt32();
     uint32 phaseMask   = fields[14].GetUInt16();
 
     // place
-    SetLocationInstanceId(instanceId);
+    SetLocationInstanceId(instanceid);
     SetLocationMapId(mapId);
     SetPhaseMask(phaseMask, false);
     Relocate(posX, posY, posZ, o);

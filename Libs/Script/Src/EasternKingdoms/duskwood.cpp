@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment: Quest Support:8735
 SDCategory: Duskwood
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 
 /*######
 # at_twilight_grove
@@ -35,20 +34,20 @@ class at_twilight_grove : public AreaTriggerScript
 public:
     at_twilight_grove() : AreaTriggerScript("at_twilight_grove") { }
 
-    bool OnTrigger(Player* player, const AreaTriggerEntry * /*at*/)
+    bool OnTrigger(Player* pPlayer, const AreaTriggerEntry * /*at*/)
     {
-        if (player->HasQuestForItem(21149))
+        if (pPlayer->HasQuestForItem(21149))
         {
-            if (Unit* TCorrupter = player->SummonCreature(15625, -10328.16f, -489.57f, 49.95f, 0, TEMPSUMMON_MANUAL_DESPAWN, 60000))
+            if (Unit* TCorrupter = pPlayer->SummonCreature(15625,-10328.16f,-489.57f,49.95f,0,TEMPSUMMON_MANUAL_DESPAWN,60000))
             {
                 TCorrupter->setFaction(14);
                 TCorrupter->SetMaxHealth(832750);
             }
-            if (Unit* CorrupterSpeaker = player->SummonCreature(1, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ()-1, 0, TEMPSUMMON_TIMED_DESPAWN, 15000))
+            if (Unit* CorrupterSpeaker = pPlayer->SummonCreature(1,pPlayer->GetPositionX(),pPlayer->GetPositionY(),pPlayer->GetPositionZ()-1,0,TEMPSUMMON_TIMED_DESPAWN,15000))
             {
                 CorrupterSpeaker->SetName("Twilight Corrupter");
                 CorrupterSpeaker->SetVisible(true);
-                CorrupterSpeaker->MonsterYell("Come, $N. See what the Nightmare brings...", 0, player->GetGUID());
+                CorrupterSpeaker->MonsterYell("Come, $N. See what the Nightmare brings...",0,pPlayer->GetGUID());
             }
         }
         return false;
@@ -69,14 +68,14 @@ class boss_twilight_corrupter : public CreatureScript
 public:
     boss_twilight_corrupter() : CreatureScript("boss_twilight_corrupter") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_twilight_corrupterAI (creature);
+        return new boss_twilight_corrupterAI (pCreature);
     }
 
     struct boss_twilight_corrupterAI : public ScriptedAI
     {
-        boss_twilight_corrupterAI(Creature* c) : ScriptedAI(c) {}
+        boss_twilight_corrupterAI(Creature *c) : ScriptedAI(c) {}
 
         uint32 SoulCorruption_Timer;
         uint32 CreatureOfNightmare_Timer;
@@ -90,7 +89,7 @@ public:
         }
         void EnterCombat(Unit* /*who*/)
         {
-            me->MonsterYell("The Nightmare cannot be stopped!", 0, me->GetGUID());
+            me->MonsterYell("The Nightmare cannot be stopped!",0,me->GetGUID());
         }
 
         void KilledUnit(Unit* victim)
@@ -98,7 +97,7 @@ public:
             if (victim->GetTypeId() == TYPEID_PLAYER)
             {
                 ++KillCount;
-                me->MonsterTextEmote("Twilight Corrupter squeezes the last bit of life out of $N and swallows their soul.", victim->GetGUID(), true);
+                me->MonsterTextEmote("Twilight Corrupter squeezes the last bit of life out of $N and swallows their soul.", victim->GetGUID(),true);
 
                 if (KillCount == 3)
                 {
@@ -117,7 +116,6 @@ public:
                 DoCast(me->getVictim(), SPELL_SOUL_CORRUPTION);
                 SoulCorruption_Timer = rand()%4000+15000; //gotta confirm Timers
             } else SoulCorruption_Timer-=diff;
-
             if (CreatureOfNightmare_Timer <= diff)
             {
                 DoCast(me->getVictim(), SPELL_CREATURE_OF_NIGHTMARE);

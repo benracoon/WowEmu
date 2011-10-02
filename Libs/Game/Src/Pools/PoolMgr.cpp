@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
@@ -141,7 +140,7 @@ void PoolGroup<T>::AddEntry(PoolObject& poolitem, uint32 maxentries)
 template <class T>
 bool PoolGroup<T>::CheckPool() const
 {
-    if (EqualChanced.empty())
+    if (!EqualChanced.size())
     {
         float chance = 0;
         for (uint32 i = 0; i < ExplicitlyChanced.size(); ++i)
@@ -194,7 +193,7 @@ void PoolGroup<T>::DespawnObject(ActivePoolData& spawns, uint32 guid)
             if (!guid || EqualChanced[i].guid == guid)
             {
                 Despawn1Object(EqualChanced[i].guid);
-                spawns.RemoveObject<T>(EqualChanced[i].guid, poolId);
+                spawns.RemoveObject<T>(EqualChanced[i].guid,poolId);
             }
         }
     }
@@ -207,7 +206,7 @@ void PoolGroup<T>::DespawnObject(ActivePoolData& spawns, uint32 guid)
             if (!guid || ExplicitlyChanced[i].guid == guid)
             {
                 Despawn1Object(ExplicitlyChanced[i].guid);
-                spawns.RemoveObject<T>(ExplicitlyChanced[i].guid, poolId);
+                spawns.RemoveObject<T>(ExplicitlyChanced[i].guid,poolId);
             }
         }
     }
@@ -365,7 +364,7 @@ void PoolGroup<Creature>::Spawn1Object(PoolObject* obj)
         if (!map->Instanceable() && map->IsLoaded(data->posX, data->posY))
         {
             Creature* pCreature = new Creature;
-            //sLog->outDebug(LOG_FILTER_POOLSYS, "Spawning creature %u", guid);
+            //sLog->outDebug(LOG_FILTER_POOLSYS, "Spawning creature %u",guid);
             if (!pCreature->LoadFromDB(obj->guid, map))
             {
                 delete pCreature;
@@ -497,7 +496,7 @@ void PoolGroup<Quest>::SpawnObject(ActivePoolData& spawns, uint32 limit, uint32 
         Spawn1Object(&tempObj);
         newQuests.erase(itr);
         --limit;
-    } while (limit && !newQuests.empty());
+    } while (limit && newQuests.size());
 
     // if we are here it means the pool is initialized at startup and did not have previous saved state
     if (!triggerFrom)
@@ -567,7 +566,7 @@ void PoolMgr::LoadFromDB()
     {
         uint32 oldMSTime = getMSTime();
 
-        QueryResult result = WorldDB.Query("SELECT entry, max_limit FROM pool_template");
+        QueryResult result = WorldDB.Query("SELECT entry,max_limit FROM pool_template");
         if (!result)
         {
             mPoolTemplate.clear();
@@ -627,7 +626,7 @@ void PoolMgr::LoadFromDB()
                 }
                 if (pool_id > max_pool_id)
                 {
-                    sLog->outErrorDb("`pool_creature` pool id (%u) is out of range compared to max pool id in `pool_template`, skipped.", pool_id);
+                    sLog->outErrorDb("`pool_creature` pool id (%u) is out of range compared to max pool id in `pool_template`, skipped.",pool_id);
                     continue;
                 }
                 if (chance < 0 || chance > 100)
@@ -684,7 +683,7 @@ void PoolMgr::LoadFromDB()
                     continue;
                 }
 
-                GameObjectTemplate const* goinfo = sObjectMgr->GetGameObjectTemplate(data->id);
+                GameObjectInfo const* goinfo = ObjectMgr::GetGameObjectInfo(data->id);
                 if (goinfo->type != GAMEOBJECT_TYPE_CHEST &&
                     goinfo->type != GAMEOBJECT_TYPE_GOOBER &&
                     goinfo->type != GAMEOBJECT_TYPE_FISHINGHOLE)
@@ -695,7 +694,7 @@ void PoolMgr::LoadFromDB()
 
                 if (pool_id > max_pool_id)
                 {
-                    sLog->outErrorDb("`pool_gameobject` pool id (%u) is out of range compared to max pool id in `pool_template`, skipped.", pool_id);
+                    sLog->outErrorDb("`pool_gameobject` pool id (%u) is out of range compared to max pool id in `pool_template`, skipped.",pool_id);
                     continue;
                 }
 
@@ -721,6 +720,7 @@ void PoolMgr::LoadFromDB()
             sLog->outString();
         }
     }
+
 
     // Pool of pools
 
@@ -749,17 +749,17 @@ void PoolMgr::LoadFromDB()
 
                 if (mother_pool_id > max_pool_id)
                 {
-                    sLog->outErrorDb("`pool_pool` mother_pool id (%u) is out of range compared to max pool id in `pool_template`, skipped.", mother_pool_id);
+                    sLog->outErrorDb("`pool_pool` mother_pool id (%u) is out of range compared to max pool id in `pool_template`, skipped.",mother_pool_id);
                     continue;
                 }
                 if (child_pool_id > max_pool_id)
                 {
-                    sLog->outErrorDb("`pool_pool` included pool_id (%u) is out of range compared to max pool id in `pool_template`, skipped.", child_pool_id);
+                    sLog->outErrorDb("`pool_pool` included pool_id (%u) is out of range compared to max pool id in `pool_template`, skipped.",child_pool_id);
                     continue;
                 }
                 if (mother_pool_id == child_pool_id)
                 {
-                    sLog->outErrorDb("`pool_pool` pool_id (%u) includes itself, dead-lock detected, skipped.", child_pool_id);
+                    sLog->outErrorDb("`pool_pool` pool_id (%u) includes itself, dead-lock detected, skipped.",child_pool_id);
                     continue;
                 }
                 if (chance < 0 || chance > 100)
@@ -780,7 +780,7 @@ void PoolMgr::LoadFromDB()
             while (result->NextRow());
 
             // Now check for circular reference
-            for (uint32 i=0; i < max_pool_id; ++i)
+            for (uint32 i=0; i<mPoolPoolGroups.size(); ++i)
             {
                 std::set<uint32> checkedPools;
                 for (SearchMap::iterator poolItr = mPoolSearchMap.find(i); poolItr != mPoolSearchMap.end(); poolItr = mPoolSearchMap.find(poolItr->second))
@@ -791,7 +791,7 @@ void PoolMgr::LoadFromDB()
                         std::ostringstream ss;
                         ss<< "The pool(s) ";
                         for (std::set<uint32>::const_iterator itr=checkedPools.begin(); itr != checkedPools.end(); ++itr)
-                            ss << *itr << ' ';
+                            ss << *itr << " ";
                         ss << "create(s) a circular reference, which can cause the server to freeze.\nRemoving the last link between mother pool "
                             << poolItr->first << " and child pool " << poolItr->second;
                         sLog->outErrorDb("%s", ss.str().c_str());
@@ -850,7 +850,7 @@ void PoolMgr::LoadFromDB()
 
                 if (pool_id > max_pool_id)
                 {
-                    sLog->outErrorDb("`pool_quest` pool id (%u) is out of range compared to max pool id in `pool_template`, skipped.", pool_id);
+                    sLog->outErrorDb("`pool_quest` pool id (%u) is out of range compared to max pool id in `pool_template`, skipped.",pool_id);
                     continue;
                 }
 

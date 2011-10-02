@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment: Quest support: 9836, 10297. Currently in progress.
 SDCategory: Caverns of Time, The Dark Portal
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "dark_portal.h"
 
 #define MAX_ENCOUNTER              2
@@ -112,25 +111,26 @@ public:
 
         void InitWorldState(bool Enable = true)
         {
-            DoUpdateWorldState(WORLD_STATE_BM, Enable ? 1 : 0);
+            DoUpdateWorldState(WORLD_STATE_BM,Enable ? 1 : 0);
             DoUpdateWorldState(WORLD_STATE_BM_SHIELD, 100);
             DoUpdateWorldState(WORLD_STATE_BM_RIFT, 0);
         }
 
-        bool IsEncounterInProgress()
+        bool IsEncounterInProgress() const
         {
-            if (GetData(TYPE_MEDIVH) == IN_PROGRESS)
+            //if (GetData(TYPE_MEDIVH) == IN_PROGRESS)
+            if (m_auiEncounter[0] == IN_PROGRESS)   // compile fix, GetData is not const
                 return true;
 
             return false;
         }
 
-        void OnPlayerEnter(Player* player)
+        void OnPlayerEnter(Player* pPlayer)
         {
             if (GetData(TYPE_MEDIVH) == IN_PROGRESS)
                 return;
 
-            player->SendUpdateWorldState(WORLD_STATE_BM, 0);
+            pPlayer->SendUpdateWorldState(WORLD_STATE_BM,0);
         }
 
         void OnCreatureCreate(Creature* creature)
@@ -193,7 +193,7 @@ public:
                 {
                     if (data == IN_PROGRESS)
                     {
-                        sLog->outDebug(LOG_FILTER_TSCR, "TSCR: Instance Dark Portal: Starting event.");
+                        sLog->outDebug(LOG_FILTER_SSCR, "SCR: Instance Dark Portal: Starting event.");
                         InitWorldState();
                         m_auiEncounter[1] = IN_PROGRESS;
                         NextPortal_Timer = 15000;
@@ -202,20 +202,20 @@ public:
                     if (data == DONE)
                     {
                         //this may be completed further out in the post-event
-                        sLog->outDebug(LOG_FILTER_TSCR, "TSCR: Instance Dark Portal: Event completed.");
+                        sLog->outDebug(LOG_FILTER_SSCR, "SCR: Instance Dark Portal: Event completed.");
                         Map::PlayerList const& players = instance->GetPlayers();
 
                         if (!players.isEmpty())
                         {
                             for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                             {
-                                if (Player* player = itr->getSource())
+                                if (Player* pPlayer = itr->getSource())
                                 {
-                                    if (player->GetQuestStatus(QUEST_OPENING_PORTAL) == QUEST_STATUS_INCOMPLETE)
-                                        player->AreaExploredOrEventHappens(QUEST_OPENING_PORTAL);
+                                    if (pPlayer->GetQuestStatus(QUEST_OPENING_PORTAL) == QUEST_STATUS_INCOMPLETE)
+                                        pPlayer->AreaExploredOrEventHappens(QUEST_OPENING_PORTAL);
 
-                                    if (player->GetQuestStatus(QUEST_MASTER_TOUCH) == QUEST_STATUS_INCOMPLETE)
-                                        player->AreaExploredOrEventHappens(QUEST_MASTER_TOUCH);
+                                    if (pPlayer->GetQuestStatus(QUEST_MASTER_TOUCH) == QUEST_STATUS_INCOMPLETE)
+                                        pPlayer->AreaExploredOrEventHappens(QUEST_MASTER_TOUCH);
                                 }
                             }
                         }
@@ -267,7 +267,7 @@ public:
             if (entry == RIFT_BOSS)
                 entry = RandRiftBoss();
 
-            sLog->outDebug(LOG_FILTER_TSCR, "TSCR: Instance Dark Portal: Summoning rift boss entry %u.", entry);
+            sLog->outDebug(LOG_FILTER_SSCR, "SCR: Instance Dark Portal: Summoning rift boss entry %u.",entry);
 
             Position pos;
             me->GetRandomNearPosition(pos, 10.0f);
@@ -278,7 +278,7 @@ public:
             if (Creature* summon = me->SummonCreature(entry, pos, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000))
                 return summon;
 
-            sLog->outDebug(LOG_FILTER_TSCR, "TSCR: Instance Dark Portal: What just happened there? No boss, no loot, no fun...");
+            sLog->outDebug(LOG_FILTER_SSCR, "SCR: Instance Dark Portal: What just happened there? No boss, no loot, no fun...");
             return NULL;
         }
 
@@ -286,18 +286,18 @@ public:
         {
             if (Creature* pMedivh = instance->GetCreature(MedivhGUID))
             {
-                uint8 tmp = urand(0, 2);
+                uint8 tmp = urand(0,2);
 
                 if (tmp >= CurrentRiftId)
                     ++tmp;
 
-                sLog->outDebug(LOG_FILTER_TSCR, "TSCR: Instance Dark Portal: Creating Time Rift at locationId %i (old locationId was %u).", tmp, CurrentRiftId);
+                sLog->outDebug(LOG_FILTER_SSCR, "SCR: Instance Dark Portal: Creating Time Rift at locationId %i (old locationId was %u).",tmp,CurrentRiftId);
 
                 CurrentRiftId = tmp;
 
                 Creature* pTemp = pMedivh->SummonCreature(C_TIME_RIFT,
-                    PortalLocation[tmp][0], PortalLocation[tmp][1], PortalLocation[tmp][2], PortalLocation[tmp][3],
-                    TEMPSUMMON_CORPSE_DESPAWN, 0);
+                    PortalLocation[tmp][0],PortalLocation[tmp][1],PortalLocation[tmp][2],PortalLocation[tmp][3],
+                    TEMPSUMMON_CORPSE_DESPAWN,0);
                 if (pTemp)
                 {
                     pTemp->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -306,11 +306,11 @@ public:
                     if (Creature* pBoss = SummonedPortalBoss(pTemp))
                     {
                         if (pBoss->GetEntry() == C_AEONUS)
-                            pBoss->AddThreat(pMedivh, 0.0f);
+                            pBoss->AddThreat(pMedivh,0.0f);
                         else
                         {
-                            pBoss->AddThreat(pTemp, 0.0f);
-                            pTemp->CastSpell(pBoss, SPELL_RIFT_CHANNEL, false);
+                            pBoss->AddThreat(pTemp,0.0f);
+                            pTemp->CastSpell(pBoss,SPELL_RIFT_CHANNEL,false);
                         }
                     }
                 }

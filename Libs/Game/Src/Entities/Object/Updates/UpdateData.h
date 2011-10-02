@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -23,7 +25,7 @@
 #include "ByteBuffer.h"
 class WorldPacket;
 
-enum OBJECT_UPDATE_TYPE
+enum ObjectUpdateType
 {
     UPDATETYPE_VALUES               = 0,
     UPDATETYPE_CREATE_OBJECT        = 1,
@@ -31,12 +33,14 @@ enum OBJECT_UPDATE_TYPE
     UPDATETYPE_OUT_OF_RANGE_OBJECTS = 3,
 };
 
-enum OBJECT_UPDATE_FLAGS
+enum ObjectUpdateFlags
 {
     UPDATEFLAG_NONE         = 0x0000,
     UPDATEFLAG_SELF         = 0x0001,
     UPDATEFLAG_TRANSPORT    = 0x0002,
     UPDATEFLAG_HAS_TARGET   = 0x0004,
+    //UPDATEFLAG_LOWGUID      = 0x0008,
+    //UPDATEFLAG_HIGHGUID     = 0x0010,
     UPDATEFLAG_LIVING       = 0x0020,
     UPDATEFLAG_HAS_POSITION = 0x0040,
     UPDATEFLAG_VEHICLE      = 0x0080,
@@ -53,9 +57,9 @@ class UpdateData
         UpdateData();
 
         void AddOutOfRangeGUID(std::set<uint64>& guids);
-        void AddOutOfRangeGUID(const uint64 guid);
+        void AddOutOfRangeGUID(const uint64 &guid);
         void AddUpdateBlock(const ByteBuffer &block);
-        bool BuildPacket(WorldPacket* packet);
+        bool BuildPacket(WorldPacket *packet);
         bool HasData() { return m_blockCount > 0 || !m_outOfRangeGUIDs.empty(); }
         void Clear();
 

@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -16,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "violet_hold.h"
 
 enum Spells
@@ -51,6 +50,11 @@ enum Yells
     SAY_BUBBLE                                  = -1608026
 };
 
+enum Achievements
+{
+    ACHIEVEMENT_DEHYDRATION                     = 2041,
+};
+
 enum Actions
 {
     ACTION_WATER_ELEMENT_HIT                    = 1,
@@ -68,28 +72,26 @@ static Position SpawnLoc[MAX_SPAWN_LOC]=
     {1935.50f, 796.224f, 52.492f, 4.224f},
 };
 
-#define DATA_DEHYDRATION                        1
-
 class boss_ichoron : public CreatureScript
 {
 public:
     boss_ichoron() : CreatureScript("boss_ichoron") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_ichoronAI (creature);
+        return new boss_ichoronAI (pCreature);
     }
 
     struct boss_ichoronAI : public ScriptedAI
     {
-        boss_ichoronAI(Creature* creature) : ScriptedAI(creature), m_waterElements(creature)
+        boss_ichoronAI(Creature* pCreature) : ScriptedAI(pCreature), m_waterElements(pCreature)
         {
-            pInstance  = creature->GetInstanceScript();
+            pInstance  = pCreature->GetInstanceScript();
         }
 
         bool bIsExploded;
         bool bIsFrenzy;
-        bool dehydration;
+        bool bAchievement;
 
         uint32 uiBubbleCheckerTimer;
         uint32 uiWaterBoltVolleyTimer;
@@ -102,7 +104,7 @@ public:
         {
             bIsExploded = false;
             bIsFrenzy = false;
-            dehydration = true;
+            bAchievement = true;
             uiBubbleCheckerTimer = 1000;
             uiWaterBoltVolleyTimer = urand(10000, 15000);
 
@@ -118,7 +120,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*pWho*/)
         {
             DoScriptText(SAY_AGGRO, me);
 
@@ -126,7 +128,7 @@ public:
 
             if (pInstance)
             {
-                if (GameObject* pDoor = pInstance->instance->GetGameObject(pInstance->GetData64(DATA_ICHORON_CELL)))
+                if (GameObject *pDoor = pInstance->instance->GetGameObject(pInstance->GetData64(DATA_ICHORON_CELL)))
                     if (pDoor->GetGoState() == GO_STATE_READY)
                     {
                         EnterEvadeMode();
@@ -139,17 +141,17 @@ public:
             }
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* pWho)
         {
             if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
                 return;
 
-            if (me->Attack(who, true))
+            if (me->Attack(pWho, true))
             {
-                me->AddThreat(who, 0.0f);
-                me->SetInCombatWith(who);
-                who->SetInCombatWith(me);
-                DoStartMovement(who);
+                me->AddThreat(pWho, 0.0f);
+                me->SetInCombatWith(pWho);
+                pWho->SetInCombatWith(me);
+                DoStartMovement(pWho);
             }
         }
 
@@ -166,7 +168,7 @@ public:
                     if (bIsExploded)
                         DoExplodeCompleted();
 
-                    dehydration = false;
+                    bAchievement = false;
                     break;
                 case ACTION_WATER_ELEMENT_KILLED:
                     uint32 damage = me->CountPctFromMaxHealth(3);
@@ -197,18 +199,11 @@ public:
             me->GetMotionMaster()->MoveChase(me->getVictim());
         }
 
-        uint32 GetData(uint32 type)
-        {
-            if (type == DATA_DEHYDRATION)
-                return dehydration ? 1 : 0;
-
-            return 0;
-        }
-
-        void MoveInLineOfSight(Unit* /*who*/) {}
+        void MoveInLineOfSight(Unit* /*pWho*/) {}
 
         void UpdateAI(const uint32 uiDiff)
         {
+            //Return since we have no target
             if (!UpdateVictim())
                 return;
 
@@ -289,6 +284,9 @@ public:
 
             if (pInstance)
             {
+                if (IsHeroic() && bAchievement)
+                    pInstance->DoCompleteAchievement(ACHIEVEMENT_DEHYDRATION);
+
                 if (pInstance->GetData(DATA_WAVE_COUNT) == 6)
                 {
                     pInstance->SetData(DATA_1ST_BOSS_EVENT, DONE);
@@ -302,31 +300,31 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* pSummoned)
         {
-            if (summoned)
+            if (pSummoned)
             {
-                summoned->SetSpeed(MOVE_RUN, 0.3f);
-                summoned->GetMotionMaster()->MoveFollow(me, 0, 0);
-                m_waterElements.push_back(summoned->GetGUID());
-                pInstance->SetData64(DATA_ADD_TRASH_MOB, summoned->GetGUID());
+                pSummoned->SetSpeed(MOVE_RUN, 0.3f);
+                pSummoned->GetMotionMaster()->MoveFollow(me, 0, 0);
+                m_waterElements.push_back(pSummoned->GetGUID());
+                pInstance->SetData64(DATA_ADD_TRASH_MOB,pSummoned->GetGUID());
             }
         }
 
-        void SummonedCreatureDespawn(Creature* summoned)
+        void SummonedCreatureDespawn(Creature *pSummoned)
         {
-            if (summoned)
+            if (pSummoned)
             {
-                m_waterElements.remove(summoned->GetGUID());
-                pInstance->SetData64(DATA_DEL_TRASH_MOB, summoned->GetGUID());
+                m_waterElements.remove(pSummoned->GetGUID());
+                pInstance->SetData64(DATA_DEL_TRASH_MOB,pSummoned->GetGUID());
             }
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit * victim)
         {
             if (victim == me)
                 return;
-            DoScriptText(RAND(SAY_SLAY_1, SAY_SLAY_2, SAY_SLAY_3), me);
+            DoScriptText(RAND(SAY_SLAY_1,SAY_SLAY_2,SAY_SLAY_3), me);
         }
     };
 
@@ -337,16 +335,16 @@ class mob_ichor_globule : public CreatureScript
 public:
     mob_ichor_globule() : CreatureScript("mob_ichor_globule") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new mob_ichor_globuleAI (creature);
+        return new mob_ichor_globuleAI (pCreature);
     }
 
     struct mob_ichor_globuleAI : public ScriptedAI
     {
-        mob_ichor_globuleAI(Creature* creature) : ScriptedAI(creature)
+        mob_ichor_globuleAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
-            pInstance = creature->GetInstanceScript();
+            pInstance = pCreature->GetInstanceScript();
         }
 
         InstanceScript* pInstance;
@@ -356,10 +354,10 @@ public:
         void Reset()
         {
             uiRangeCheck_Timer = 1000;
-            DoCast(me, SPELL_WATER_GLOBULE);
+            DoCast(me,SPELL_WATER_GLOBULE);
         }
 
-        void AttackStart(Unit* /*who*/)
+        void AttackStart(Unit* /*pWho*/)
         {
             return;
         }
@@ -385,7 +383,7 @@ public:
             else uiRangeCheck_Timer -= uiDiff;
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*pKiller*/)
         {
             DoCast(me, SPELL_SPLASH);
             if (Creature* pIchoron = Unit::GetCreature(*me, pInstance->GetData64(DATA_ICHORON)))
@@ -396,29 +394,8 @@ public:
 
 };
 
-class achievement_dehydration : public AchievementCriteriaScript
-{
-    public:
-        achievement_dehydration() : AchievementCriteriaScript("achievement_dehydration")
-        {
-        }
-
-        bool OnCheck(Player* /*player*/, Unit* target)
-        {
-            if (!target)
-                return false;
-
-            if (Creature* Ichoron = target->ToCreature())
-                if (Ichoron->AI()->GetData(DATA_DEHYDRATION))
-                    return true;
-
-            return false;
-        }
-};
-
 void AddSC_boss_ichoron()
 {
     new boss_ichoron();
     new mob_ichor_globule();
-    new achievement_dehydration();
 }

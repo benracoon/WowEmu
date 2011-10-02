@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -28,7 +27,7 @@ EndScriptData */
 at_malfurion_Stormrage_trigger
 EndContentData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "sunken_temple.h"
 
 /*#####
@@ -40,10 +39,10 @@ class at_malfurion_stormrage : public AreaTriggerScript
 public:
     at_malfurion_stormrage() : AreaTriggerScript("at_malfurion_stormrage") { }
 
-    bool OnTrigger(Player* player, const AreaTriggerEntry * /*at*/)
+    bool OnTrigger(Player* pPlayer, const AreaTriggerEntry * /*at*/)
     {
-        if (player->GetInstanceScript() && !player->FindNearestCreature(15362, 15))
-            player->SummonCreature(15362, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), -1.52f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 100000);
+        if (pPlayer->GetInstanceScript() && !pPlayer->FindNearestCreature(15362, 15))
+            pPlayer->SummonCreature(15362, pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), -1.52f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 100000);
         return false;
     }
 
@@ -57,10 +56,10 @@ class go_atalai_statue : public GameObjectScript
 public:
     go_atalai_statue() : GameObjectScript("go_atalai_statue") { }
 
-    bool OnGossipHello(Player* player, GameObject* pGo)
+    bool OnGossipHello(Player* pPlayer, GameObject* pGo)
     {
-        if (InstanceScript* pInstance = player->GetInstanceScript())
-            pInstance->SetData(EVENT_STATE, pGo->GetEntry());
+        if (InstanceScript* pInstance = pPlayer->GetInstanceScript())
+            pInstance->SetData(EVENT_STATE,pGo->GetEntry());
         return false;
     }
 

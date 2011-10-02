@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment: Missing spawns pre-event, missing speech to be coordinated with rest 
 SDCategory: Caverns of Time, Old Hillsbrad Foothills
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "old_hillsbrad.h"
 
 #define SAY_ENTER1                  -1560013
@@ -48,14 +47,14 @@ class boss_epoch_hunter : public CreatureScript
 public:
     boss_epoch_hunter() : CreatureScript("boss_epoch_hunter") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_epoch_hunterAI (creature);
+        return new boss_epoch_hunterAI (pCreature);
     }
 
     struct boss_epoch_hunterAI : public ScriptedAI
     {
-        boss_epoch_hunterAI(Creature* c) : ScriptedAI(c)
+        boss_epoch_hunterAI(Creature *c) : ScriptedAI(c)
         {
             pInstance = c->GetInstanceScript();
         }
@@ -75,17 +74,17 @@ public:
             Mda_Timer = 40000;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit * /*who*/)
         {
-            DoScriptText(RAND(SAY_AGGRO1, SAY_AGGRO2), me);
+            DoScriptText(RAND(SAY_AGGRO1,SAY_AGGRO2), me);
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit * /*victim*/)
         {
-            DoScriptText(RAND(SAY_SLAY1, SAY_SLAY2), me);
+            DoScriptText(RAND(SAY_SLAY1,SAY_SLAY2), me);
         }
 
-        void JustDied(Unit* /*victim*/)
+        void JustDied(Unit * /*victim*/)
         {
             DoScriptText(SAY_DEATH, me);
 
@@ -107,7 +106,7 @@ public:
 
                 DoCast(me->getVictim(), SPELL_SAND_BREATH);
 
-                DoScriptText(RAND(SAY_BREATH1, SAY_BREATH2), me);
+                DoScriptText(RAND(SAY_BREATH1,SAY_BREATH2), me);
 
                 SandBreath_Timer = 10000 + rand()%10000;
             } else SandBreath_Timer -= diff;
@@ -120,8 +119,8 @@ public:
 
             if (WingBuffet_Timer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                    DoCast(target, SPELL_WING_BUFFET);
+                if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM,0))
+                    DoCast(pTarget, SPELL_WING_BUFFET);
                 WingBuffet_Timer = 25000+rand()%10000;
             } else WingBuffet_Timer -= diff;
 

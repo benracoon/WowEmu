@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment:
 SDCategory: Scarlet Monastery
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 
 #define SPELL_CALLOFTHEGRAVE            17831
 #define SPELL_TERRIFY                   7399
@@ -35,14 +34,14 @@ class boss_azshir_the_sleepless : public CreatureScript
 public:
     boss_azshir_the_sleepless() : CreatureScript("boss_azshir_the_sleepless") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_azshir_the_sleeplessAI (creature);
+        return new boss_azshir_the_sleeplessAI (pCreature);
     }
 
     struct boss_azshir_the_sleeplessAI : public ScriptedAI
     {
-        boss_azshir_the_sleeplessAI(Creature* c) : ScriptedAI(c) {}
+        boss_azshir_the_sleeplessAI(Creature *c) : ScriptedAI(c) {}
 
         uint32 SoulSiphon_Timer;
         uint32 CallOftheGrave_Timer;
@@ -55,7 +54,7 @@ public:
             Terrify_Timer = 20000;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit * /*who*/)
         {
         }
 

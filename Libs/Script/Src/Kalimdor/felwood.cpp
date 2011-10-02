@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -28,7 +27,7 @@ EndScriptData */
 npcs_riverbreeze_and_silversky
 EndContentData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 
 /*######
 ## npcs_riverbreeze_and_silversky
@@ -41,46 +40,46 @@ class npcs_riverbreeze_and_silversky : public CreatureScript
 public:
     npcs_riverbreeze_and_silversky() : CreatureScript("npcs_riverbreeze_and_silversky") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction)
+    bool OnGossipSelect(Player* pPlayer, Creature* pCreature, uint32 /*uiSender*/, uint32 uiAction)
     {
-        player->PlayerTalkClass->ClearMenus();
+        pPlayer->PlayerTalkClass->ClearMenus();
         if (uiAction == GOSSIP_ACTION_INFO_DEF+1)
         {
-            player->CLOSE_GOSSIP_MENU();
-            creature->CastSpell(player, 15120, false);
+            pPlayer->CLOSE_GOSSIP_MENU();
+            pCreature->CastSpell(pPlayer, 15120, false);
         }
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* pPlayer, Creature* pCreature)
     {
-        uint32 eCreature = creature->GetEntry();
+        uint32 eCreature = pCreature->GetEntry();
 
-        if (creature->isQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
+        if (pCreature->isQuestGiver())
+            pPlayer->PrepareQuestMenu(pCreature->GetGUID());
 
         if (eCreature == 9528)
         {
-            if (player->GetQuestRewardStatus(4101))
+            if (pPlayer->GetQuestRewardStatus(4101))
             {
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_BEACON, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
-                player->SEND_GOSSIP_MENU(2848, creature->GetGUID());
-            } else if (player->GetTeam() == HORDE)
-            player->SEND_GOSSIP_MENU(2845, creature->GetGUID());
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_BEACON, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+                pPlayer->SEND_GOSSIP_MENU(2848, pCreature->GetGUID());
+            } else if (pPlayer->GetTeam() == HORDE)
+            pPlayer->SEND_GOSSIP_MENU(2845, pCreature->GetGUID());
             else
-                player->SEND_GOSSIP_MENU(2844, creature->GetGUID());
+                pPlayer->SEND_GOSSIP_MENU(2844, pCreature->GetGUID());
         }
 
         if (eCreature == 9529)
         {
-            if (player->GetQuestRewardStatus(4102))
+            if (pPlayer->GetQuestRewardStatus(4102))
             {
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_BEACON, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
-                player->SEND_GOSSIP_MENU(2849, creature->GetGUID());
-            } else if (player->GetTeam() == ALLIANCE)
-            player->SEND_GOSSIP_MENU(2843, creature->GetGUID());
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_BEACON, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+                pPlayer->SEND_GOSSIP_MENU(2849, pCreature->GetGUID());
+            } else if (pPlayer->GetTeam() == ALLIANCE)
+            pPlayer->SEND_GOSSIP_MENU(2843, pCreature->GetGUID());
             else
-                player->SEND_GOSSIP_MENU(2842, creature->GetGUID());
+                pPlayer->SEND_GOSSIP_MENU(2842, pCreature->GetGUID());
         }
 
         return true;

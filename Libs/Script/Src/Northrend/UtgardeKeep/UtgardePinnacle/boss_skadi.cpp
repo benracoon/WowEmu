@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -26,7 +25,7 @@ SDComment: <Known Bugs>
 SDCategory: Utgarde Pinnacle
 Script Data End */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "utgarde_pinnacle.h"
 
 //Yell
@@ -162,14 +161,14 @@ class boss_skadi : public CreatureScript
 public:
     boss_skadi() : CreatureScript("boss_skadi") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_skadiAI (creature);
+        return new boss_skadiAI (pCreature);
     }
 
     struct boss_skadiAI : public ScriptedAI
     {
-        boss_skadiAI(Creature* c) : ScriptedAI(c), Summons(me)
+        boss_skadiAI(Creature *c) : ScriptedAI(c), Summons(me)
         {
             m_pInstance = c->GetInstanceScript();
         }
@@ -247,37 +246,37 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* pSummoned)
         {
-            switch (summoned->GetEntry())
+            switch (pSummoned->GetEntry())
             {
                 case CREATURE_GRAUF:
-                    m_uiGraufGUID = summoned->GetGUID();
+                    m_uiGraufGUID = pSummoned->GetGUID();
                     break;
                 case CREATURE_YMIRJAR_WARRIOR:
                 case CREATURE_YMIRJAR_WITCH_DOCTOR:
                 case CREATURE_YMIRJAR_HARPOONER:
-                    summoned->setActive(true);
-                    summoned->SetInCombatWithZone();
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                        summoned->AI()->AttackStart(target);
+                    pSummoned->setActive(true);
+                    pSummoned->SetInCombatWithZone();
+                    if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                        pSummoned->AI()->AttackStart(pTarget);
                     break;
                 case CREATURE_TRIGGER:
-                    summoned->CastSpell((Unit*)NULL, SPELL_FREEZING_CLOUD, true);
-                    summoned->DespawnOrUnsummon(10*IN_MILLISECONDS);
+                    pSummoned->CastSpell((Unit*)NULL, SPELL_FREEZING_CLOUD, true);
+                    pSummoned->DespawnOrUnsummon(10*IN_MILLISECONDS);
                     break;
             }
-            Summons.Summon(summoned);
+            Summons.Summon(pSummoned);
         }
 
-        void SummonedCreatureDespawn(Creature* summoned)
+        void SummonedCreatureDespawn(Creature* pSummoned)
         {
-            if (summoned->GetEntry() == CREATURE_GRAUF)
+            if (pSummoned->GetEntry() == CREATURE_GRAUF)
                 m_uiGraufGUID = 0;
-            Summons.Despawn(summoned);
+            Summons.Despawn(pSummoned);
         }
 
-        void SpellHit(Unit* /*caster*/, const SpellInfo *spell)
+        void SpellHit(Unit * /*caster*/, const SpellEntry *spell)
         {
             if (spell->Id == SPELL_HARPOON_DAMAGE)
             {
@@ -357,7 +356,7 @@ public:
                                 break;
                             case 3:
                                 me->GetMotionMaster()->MovePoint(0, Location[69].GetPositionX(), Location[69].GetPositionY(), Location[69].GetPositionZ());
-                                DoScriptText(RAND(SAY_DRAKE_BREATH_1, SAY_DRAKE_BREATH_2), me);
+                                DoScriptText(RAND(SAY_DRAKE_BREATH_1,SAY_DRAKE_BREATH_2), me);
                                 DoScriptText(EMOTE_BREATH, me);
                                 m_uiMovementTimer = 2500;
                                 break;
@@ -392,8 +391,8 @@ public:
 
                     if (m_uiPoisonedSpearTimer <= diff)
                     {
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM))
-                            DoCast(target, SPELL_POISONED_SPEAR);
+                        if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM))
+                            DoCast(pTarget, SPELL_POISONED_SPEAR);
                         m_uiPoisonedSpearTimer = 10000;
                     } else m_uiPoisonedSpearTimer -= diff;
 
@@ -416,16 +415,16 @@ public:
                 m_pInstance->SetData(DATA_SKADI_THE_RUTHLESS_EVENT, DONE);
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit * /*victim*/)
         {
-            DoScriptText(RAND(SAY_KILL_1, SAY_KILL_2), me);
+            DoScriptText(RAND(SAY_KILL_1,SAY_KILL_2), me);
         }
 
         void SpawnMobs()
         {
-            for (uint8 i = 0; i < DUNGEON_MODE(5, 6); ++i)
+            for (uint8 i = 0; i < DUNGEON_MODE(5,6); ++i)
             {
-                switch (urand(0, 2))
+                switch (urand(0,2))
                 {
                     case 0: me->SummonCreature(CREATURE_YMIRJAR_WARRIOR, SpawnLoc.GetPositionX()+rand()%5, SpawnLoc.GetPositionY()+rand()%5, SpawnLoc.GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000); break;
                     case 1: me->SummonCreature(CREATURE_YMIRJAR_WITCH_DOCTOR, SpawnLoc.GetPositionX()+rand()%5, SpawnLoc.GetPositionY()+rand()%5, SpawnLoc.GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000); break;
@@ -437,7 +436,7 @@ public:
         void SpawnTrigger()
         {
             uint8 iStart = 0, iEnd = 0;
-            switch (urand(0, 1))
+            switch (urand(0,1))
             {
                 case 0:
                     iStart = 8;
@@ -462,14 +461,14 @@ class go_harpoon_launcher : public GameObjectScript
 public:
     go_harpoon_launcher() : GameObjectScript("go_harpoon_launcher") { }
 
-    bool OnGossipHello(Player* player, GameObject* pGO)
+    bool OnGossipHello(Player *pPlayer, GameObject *pGO)
     {
         InstanceScript* m_pInstance = pGO->GetInstanceScript();
         if (!m_pInstance) return false;
 
-        if (Creature* pSkadi = Unit::GetCreature((*pGO), m_pInstance->GetData64(DATA_SKADI_THE_RUTHLESS)))
+        if (Creature* pSkadi = Unit::GetCreature((*pGO),m_pInstance->GetData64(DATA_SKADI_THE_RUTHLESS)))
         {
-            player->CastSpell(pSkadi, SPELL_RAPID_FIRE, true);
+            pPlayer->CastSpell(pSkadi,SPELL_RAPID_FIRE, true);
         }
         return false;
     }

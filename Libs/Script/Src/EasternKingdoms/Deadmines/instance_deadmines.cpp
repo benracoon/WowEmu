@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2008 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment:
 SDCategory: Deadmines
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "deadmines.h"
 
 enum Sounds
@@ -129,9 +128,9 @@ class instance_deadmines : public InstanceMapScript
             {
                 if (GameObject* pIronCladDoor = instance->GetGameObject(IronCladDoorGUID))
                 {
-                    Creature* DefiasPirate1 = pIronCladDoor->SummonCreature(657, pIronCladDoor->GetPositionX() - 2, pIronCladDoor->GetPositionY()-7, pIronCladDoor->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
-                    Creature* DefiasPirate2 = pIronCladDoor->SummonCreature(657, pIronCladDoor->GetPositionX() + 3, pIronCladDoor->GetPositionY()-6, pIronCladDoor->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
-                    Creature* DefiasCompanion = pIronCladDoor->SummonCreature(3450, pIronCladDoor->GetPositionX() + 2, pIronCladDoor->GetPositionY()-6, pIronCladDoor->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                    Creature* DefiasPirate1 = pIronCladDoor->SummonCreature(657,pIronCladDoor->GetPositionX() - 2,pIronCladDoor->GetPositionY()-7,pIronCladDoor->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                    Creature* DefiasPirate2 = pIronCladDoor->SummonCreature(657,pIronCladDoor->GetPositionX() + 3,pIronCladDoor->GetPositionY()-6,pIronCladDoor->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
+                    Creature* DefiasCompanion = pIronCladDoor->SummonCreature(3450,pIronCladDoor->GetPositionX() + 2,pIronCladDoor->GetPositionY()-6,pIronCladDoor->GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 3000);
 
                     DefiasPirate1GUID = DefiasPirate1->GetGUID();
                     DefiasPirate2GUID = DefiasPirate2->GetGUID();
@@ -158,7 +157,7 @@ class instance_deadmines : public InstanceMapScript
             void MoveCreatureInside(Creature* creature)
             {
                 creature->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
-                creature->GetMotionMaster()->MovePoint(0, -102.7f, -655.9f, creature->GetPositionZ());
+                creature->GetMotionMaster()->MovePoint(0, -102.7f,-655.9f, creature->GetPositionZ());
             }
 
             void ShootCannon()
@@ -240,7 +239,7 @@ class instance_deadmines : public InstanceMapScript
                 WorldPacket data(4);
                 data.SetOpcode(SMSG_PLAY_SOUND);
                 data << uint32(sound);
-                unit->SendMessageToSet(&data, false);
+                unit->SendMessageToSet(&data,false);
             }
 
             void DoPlaySoundCreature(Unit* unit, uint32 sound)
@@ -248,7 +247,7 @@ class instance_deadmines : public InstanceMapScript
                 WorldPacket data(4);
                 data.SetOpcode(SMSG_PLAY_SOUND);
                 data << uint32(sound);
-                unit->SendMessageToSet(&data, false);
+                unit->SendMessageToSet(&data,false);
             }
         };
 

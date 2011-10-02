@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -160,7 +162,7 @@ enum ItemFieldFlags
     ITEM_FLAG_UNK1          = 0x00000002, // ?
     ITEM_FLAG_UNLOCKED      = 0x00000004, // Item had lock but can be opened now
     ITEM_FLAG_WRAPPED       = 0x00000008, // Item is wrapped and contains another item
-    ITEM_FLAG_UNK2          = 0x00000010, // ?
+    ITEM_FLAG_DEPRECATED    = 0x00000010, // ?
     ITEM_FLAG_UNK3          = 0x00000020, // ?
     ITEM_FLAG_UNK4          = 0x00000040, // ?
     ITEM_FLAG_UNK5          = 0x00000080, // ?
@@ -198,7 +200,7 @@ enum ItemFlagsExtra
     ITEM_FLAGS_EXTRA_ALLIANCE_ONLY           = 0x00000002,
     ITEM_FLAGS_EXTRA_EXT_COST_REQUIRES_GOLD  = 0x00000004, // when item uses extended cost, gold is also required
     ITEM_FLAGS_EXTRA_NEED_ROLL_DISABLED      = 0x00000100,
-    ITEM_FLAGS_EXTRA_CASTER_WEAPON           = 0x00000200  // uses caster specific dbc file for DPS calculations
+    ITEM_FLAGS_EXTRA_CASTER_WEAPON           = 0x00000200, // uses caster specific dbc file for DPS calculations
 };
 
 enum BAG_FAMILY_MASK
@@ -553,11 +555,11 @@ inline uint8 ItemSubClassToDurabilityMultiplierId(uint32 ItemClass, uint32 ItemS
     return 0;
 }
 
-// GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push, N), also any gcc version not support it at some platform
+// GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push,N), also any gcc version not support it at some platform
 #if defined(__GNUC__)
 #pragma pack(1)
 #else
-#pragma pack(push, 1)
+#pragma pack(push,1)
 #endif
 
 struct _ItemStat
@@ -570,7 +572,7 @@ struct _ItemStat
 
 struct _Spell
 {
-    int32 SpellId;                                         // id from Spell.dbc
+    int32  SpellId;                                         // id from Spell.dbc
     uint32 SpellTrigger;
     int32  SpellCharges;
     float  SpellPPMRate;
@@ -589,13 +591,13 @@ struct _Socket
 #define MAX_ITEM_PROTO_SPELLS  5
 #define MAX_ITEM_PROTO_STATS  10
 
-struct ItemTemplate
+struct ItemPrototype
 {
     uint32 ItemId;
     uint32 Class;                                           // id from ItemClass.dbc
     uint32 SubClass;                                        // id from ItemSubClass.dbc
     int32  Unk0;
-    std::string Name1;
+    char*  Name1;
     uint32 DisplayInfoID;                                   // id from ItemDisplayInfo.dbc
     uint32 Quality;
     uint32 Flags;
@@ -626,7 +628,7 @@ struct ItemTemplate
     float  RangedModRange;
     _Spell Spells[MAX_ITEM_PROTO_SPELLS];
     uint32 Bonding;
-    std::string Description;
+    char*  Description;
     uint32 PageText;
     uint32 LanguageID;
     uint32 PageMaterial;
@@ -663,17 +665,17 @@ struct ItemTemplate
     {
         switch(InventoryType)
         {
-        case INVTYPE_RELIC:
-        case INVTYPE_SHIELD:
-        case INVTYPE_HOLDABLE:
-            return true;
+            case INVTYPE_RELIC:
+            case INVTYPE_SHIELD:
+            case INVTYPE_HOLDABLE:
+                return true;
         }
 
         switch(Class)
         {
-        case ITEM_CLASS_WEAPON:
-        case ITEM_CLASS_PROJECTILE:
-            return true;
+            case ITEM_CLASS_WEAPON:
+            case ITEM_CLASS_PROJECTILE:
+                return true;
         }
 
         return false;
@@ -689,7 +691,7 @@ struct ItemTemplate
     int32 getFeralBonus(int32 extraDPS = 0) const
     {
         // 0x02A5F3 - is mask for Melee weapon from ItemSubClassMask.dbc
-        if (Class == ITEM_CLASS_WEAPON && (1 << SubClass)&0x02A5F3)
+        if (Class == ITEM_CLASS_WEAPON && (1<<SubClass)&0x02A5F3)
         {
             int32 bonus = int32((extraDPS + getDPS())*14.0f) - 767;
             if (bonus < 0)
@@ -704,20 +706,20 @@ struct ItemTemplate
         float itemLevel = (float)ItemLevel;
         switch (Quality)
         {
-        case ITEM_QUALITY_POOR:
-        case ITEM_QUALITY_NORMAL:
-        case ITEM_QUALITY_UNCOMMON:
-        case ITEM_QUALITY_ARTIFACT:
-        case ITEM_QUALITY_HEIRLOOM:
-            itemLevel -= 13; // leaving this as a separate statement since we do not know the real behavior in this case
-            break;
-        case ITEM_QUALITY_RARE:
-            itemLevel -= 13;
-            break;
-        case ITEM_QUALITY_EPIC:
-        case ITEM_QUALITY_LEGENDARY:
-        default:
-            break;
+            case ITEM_QUALITY_POOR:
+            case ITEM_QUALITY_NORMAL:
+            case ITEM_QUALITY_UNCOMMON:
+            case ITEM_QUALITY_ARTIFACT:
+            case ITEM_QUALITY_HEIRLOOM:
+                itemLevel -= 13; // leaving this as a separate statement since we do not know the real behavior in this case
+                break;
+            case ITEM_QUALITY_RARE:
+                itemLevel -= 13;
+                break;
+            case ITEM_QUALITY_EPIC:
+            case ITEM_QUALITY_LEGENDARY:
+            default:
+                break;
         }
         return itemLevel;
     }
@@ -731,9 +733,6 @@ struct ItemTemplate
     bool IsArmorVellum() const { return Class == ITEM_CLASS_TRADE_GOODS && SubClass == ITEM_SUBCLASS_ARMOR_ENCHANTMENT; }
     bool IsConjuredConsumable() const { return Class == ITEM_CLASS_CONSUMABLE && (Flags & ITEM_PROTO_FLAG_CONJURED); }
 };
-
-// Benchmarked: Faster than std::map (insert/find)
-typedef UNORDERED_MAP<uint32, ItemTemplate> ItemTemplateContainer;
 
 struct ItemLocale
 {

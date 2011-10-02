@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment: Wrong cleave and red aura is missing.
 SDCategory: Zul'Gurub
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "zulgurub.h"
 
 enum eYells
@@ -60,9 +59,9 @@ class boss_arlokk : public CreatureScript
 
         struct boss_arlokkAI : public ScriptedAI
         {
-            boss_arlokkAI(Creature* creature) : ScriptedAI(creature)
+            boss_arlokkAI(Creature* pCreature) : ScriptedAI(pCreature)
             {
-                m_pInstance = creature->GetInstanceScript();
+                m_pInstance = pCreature->GetInstanceScript();
             }
 
             InstanceScript* m_pInstance;
@@ -104,7 +103,7 @@ class boss_arlokk : public CreatureScript
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit* /*pWho*/)
             {
                 DoScriptText(SAY_AGGRO, me);
             }
@@ -112,13 +111,13 @@ class boss_arlokk : public CreatureScript
             void JustReachedHome()
             {
                 if (m_pInstance)
-                    m_pInstance->SetData(DATA_ARLOKK, NOT_STARTED);
+                    m_pInstance->SetData(TYPE_ARLOKK, NOT_STARTED);
 
                 //we should be summoned, so despawn
                 me->DespawnOrUnsummon();
             }
 
-            void JustDied(Unit* /*killer*/)
+            void JustDied(Unit* /*pKiller*/)
             {
                 DoScriptText(SAY_DEATH, me);
 
@@ -126,22 +125,22 @@ class boss_arlokk : public CreatureScript
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 
                 if (m_pInstance)
-                    m_pInstance->SetData(DATA_ARLOKK, DONE);
+                    m_pInstance->SetData(TYPE_ARLOKK, DONE);
             }
 
             void DoSummonPhanters()
             {
-                if (Unit* pMarkedTarget = Unit::GetUnit(*me, MarkedTargetGUID))
+                if (Unit *pMarkedTarget = Unit::GetUnit(*me, MarkedTargetGUID))
                     DoScriptText(SAY_FEAST_PANTHER, me, pMarkedTarget);
 
                 me->SummonCreature(NPC_ZULIAN_PROWLER, -11532.7998f, -1649.6734f, 41.4800f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
                 me->SummonCreature(NPC_ZULIAN_PROWLER, -11532.9970f, -1606.4840f, 41.2979f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
             }
 
-            void JustSummoned(Creature* summoned)
+            void JustSummoned(Creature* pSummoned)
             {
-                if (Unit* pMarkedTarget = Unit::GetUnit(*me, MarkedTargetGUID))
-                    summoned->AI()->AttackStart(pMarkedTarget);
+                if (Unit *pMarkedTarget = Unit::GetUnit(*me, MarkedTargetGUID))
+                    pSummoned->AI()->AttackStart(pMarkedTarget);
 
                 ++m_uiSummonCount;
             }
@@ -163,7 +162,7 @@ class boss_arlokk : public CreatureScript
 
                     if (m_uiMark_Timer <= uiDiff)
                     {
-                        Unit* pMarkedTarget = SelectTarget(SELECT_TARGET_RANDOM, 0);
+                        Unit *pMarkedTarget = SelectTarget(SELECT_TARGET_RANDOM,0);
 
                         if (pMarkedTarget)
                         {
@@ -171,7 +170,7 @@ class boss_arlokk : public CreatureScript
                             MarkedTargetGUID = pMarkedTarget->GetGUID();
                         }
                         else
-                            sLog->outError("TSCR: boss_arlokk could not accuire pMarkedTarget.");
+                            sLog->outError("SCR: boss_arlokk could not accuire pMarkedTarget.");
 
                         m_uiMark_Timer = 15000;
                     }
@@ -194,7 +193,7 @@ class boss_arlokk : public CreatureScript
                     {
                         DoCast(me->getVictim(), SPELL_GOUGE);
 
-                        DoModifyThreatPercent(me->getVictim(), -80);
+                        DoModifyThreatPercent(me->getVictim(),-80);
 
                         m_uiGouge_Timer = 17000+rand()%10000;
                     }
@@ -238,13 +237,13 @@ class boss_arlokk : public CreatureScript
                         me->SetDisplayId(MODEL_ID_PANTHER);
                         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 
-                        const CreatureTemplate *cinfo = me->GetCreatureInfo();
+                        const CreatureInfo *cinfo = me->GetCreatureInfo();
                         me->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, (cinfo->mindmg +((cinfo->mindmg/100) * 35)));
                         me->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, (cinfo->maxdmg +((cinfo->maxdmg/100) * 35)));
                         me->UpdateDamagePhysical(BASE_ATTACK);
 
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                            AttackStart(target);
+                        if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM,0))
+                            AttackStart(pTarget);
 
                         m_bIsPhaseTwo = true;
                         m_bIsVanished = false;
@@ -270,14 +269,14 @@ class go_gong_of_bethekk : public GameObjectScript
         {
         }
 
-        bool OnGossipHello(Player* /*player*/, GameObject* pGo)
+        bool OnGossipHello(Player* /*pPlayer*/, GameObject* pGo)
         {
             if (InstanceScript* m_pInstance = pGo->GetInstanceScript())
             {
-                if (m_pInstance->GetData(DATA_ARLOKK) == DONE || m_pInstance->GetData(DATA_ARLOKK) == IN_PROGRESS)
+                if (m_pInstance->GetData(TYPE_ARLOKK) == DONE || m_pInstance->GetData(TYPE_ARLOKK) == IN_PROGRESS)
                     return true;
 
-                m_pInstance->SetData(DATA_ARLOKK, IN_PROGRESS);
+                m_pInstance->SetData(TYPE_ARLOKK, IN_PROGRESS);
                 return true;
             }
 

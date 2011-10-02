@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -71,7 +73,7 @@ void Bag::RemoveFromWorld()
 
 bool Bag::Create(uint32 guidlow, uint32 itemid, Player const* owner)
 {
-    ItemTemplate const* itemProto = sObjectMgr->GetItemTemplate(itemid);
+    ItemPrototype const * itemProto = ObjectMgr::GetItemPrototype(itemid);
 
     if (!itemProto || itemProto->ContainerSlots > MAX_BAG_SIZE)
         return false;
@@ -111,7 +113,7 @@ bool Bag::LoadFromDB(uint32 guid, uint64 owner_guid, Field* fields, uint32 entry
     if (!Item::LoadFromDB(guid, owner_guid, fields, entry))
         return false;
 
-    ItemTemplate const* itemProto = GetTemplate(); // checked in Item::LoadFromDB
+    ItemPrototype const* itemProto = GetProto(); // checked in Item::LoadFromDB
     SetUInt32Value(CONTAINER_FIELD_NUM_SLOTS, itemProto->ContainerSlots);
     // cleanup bag content related item value fields (its will be filled correctly from `character_inventory`)
     for (uint8 i = 0; i < MAX_BAG_SIZE; ++i)
@@ -172,6 +174,7 @@ void Bag::StoreItem(uint8 slot, Item *pItem, bool /*update*/)
 void Bag::BuildCreateUpdateBlockForPlayer(UpdateData *data, Player *target) const
 {
     data->m_map = target->GetMapId();
+
     Item::BuildCreateUpdateBlockForPlayer(data, target);
 
     for (uint32 i = 0; i < GetBagSize(); ++i)
@@ -200,12 +203,12 @@ uint32 Bag::GetItemCount(uint32 item, Item* eItem) const
             count += pItem->GetCount();
     }
 
-    if (eItem && eItem->GetTemplate()->GemProperties)
+    if (eItem && eItem->GetProto()->GemProperties)
     {
         for (uint32 i=0; i < GetBagSize(); ++i)
         {
             pItem = m_bagslot[i];
-            if (pItem && pItem != eItem && pItem->GetTemplate()->Socket[0].Color)
+            if (pItem && pItem != eItem && pItem->GetProto()->Socket[0].Color)
                 count += pItem->GetGemCountWithID(item);
         }
     }
@@ -219,7 +222,7 @@ uint32 Bag::GetItemCountWithLimitCategory(uint32 limitCategory, Item* skipItem) 
     for (uint32 i = 0; i < GetBagSize(); ++i)
         if (Item *pItem = m_bagslot[i])
             if (pItem != skipItem)
-                if (ItemTemplate const *pProto = pItem->GetTemplate())
+                if (ItemPrototype const *pProto = pItem->GetProto())
                     if (pProto->ItemLimitCategory == limitCategory)
                         count += m_bagslot[i]->GetCount();
 

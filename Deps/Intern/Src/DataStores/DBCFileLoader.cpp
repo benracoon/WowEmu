@@ -320,7 +320,7 @@ char* DBCFileLoader::AutoProduceStringsArrayHolders(const char* format, char* da
     return stringHoldersPool;
 }
 
-char* DBCFileLoader::AutoProduceStrings(const char* format, char* dataTable)
+char* DBCFileLoader::AutoProduceStrings(const char* format, char* dataTable, LocaleConstant loc)
 {
     if (strlen(format)!=fieldCount)
         return NULL;
@@ -348,8 +348,8 @@ char* DBCFileLoader::AutoProduceStrings(const char* format, char* dataTable)
                 break;
             case FT_STRING:
             {
-                char** holder = ((char**)(&dataTable[offset]));
-                char** slot = *&holder;
+                char** holder = *((char***)(&dataTable[offset]));
+                char** slot = &holder[loc];
 
                 // fill only not filled entries
                 if (*slot == nullStr)

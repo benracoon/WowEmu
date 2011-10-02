@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment: Massive Geyser with knockback not working. Spell buggy.
 SDCategory: Zul'Gurub
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 
 #define SPELL_FROSTBREATH            16099
 #define SPELL_MASSIVEGEYSER          22421                  //Not working. Cause its a summon...
@@ -41,7 +40,7 @@ class boss_gahzranka : public CreatureScript
 
         struct boss_gahzrankaAI : public ScriptedAI
         {
-            boss_gahzrankaAI(Creature* c) : ScriptedAI(c) {}
+            boss_gahzrankaAI(Creature *c) : ScriptedAI(c) {}
             uint32 Frostbreath_Timer;
             uint32 MassiveGeyser_Timer;
             uint32 Slam_Timer;
@@ -53,7 +52,7 @@ class boss_gahzranka : public CreatureScript
                 Slam_Timer = 17000;
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit * /*who*/)
             {
             }
 

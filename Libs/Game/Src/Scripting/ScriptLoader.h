@@ -6,6 +6,7 @@
 #define SC_SCRIPTLOADER_H
 
 void AddScripts();
+void AddExampleScripts();
 void AddSpellScripts();
 void AddCommandScripts();
 void AddWorldScripts();

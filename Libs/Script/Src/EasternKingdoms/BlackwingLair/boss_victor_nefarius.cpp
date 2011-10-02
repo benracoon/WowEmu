@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment: Missing some text, Vael beginning event, and spawns Nef in wrong plac
 SDCategory: Blackwing Lair
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 
 #define SAY_GAMESBEGIN_1        -1469004
 #define SAY_GAMESBEGIN_2        -1469005
@@ -75,46 +74,46 @@ class boss_victor_nefarius : public CreatureScript
 public:
     boss_victor_nefarius() : CreatureScript("boss_victor_nefarius") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction)
+    bool OnGossipSelect(Player* pPlayer, Creature* pCreature, uint32 /*uiSender*/, uint32 uiAction)
     {
-        player->PlayerTalkClass->ClearMenus();
+        pPlayer->PlayerTalkClass->ClearMenus();
         switch (uiAction)
         {
             case GOSSIP_ACTION_INFO_DEF+1:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
-                player->SEND_GOSSIP_MENU(7198, creature->GetGUID());
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+2);
+                pPlayer->SEND_GOSSIP_MENU(7198, pCreature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
-                player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+3);
-                player->SEND_GOSSIP_MENU(7199, creature->GetGUID());
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+3);
+                pPlayer->SEND_GOSSIP_MENU(7199, pCreature->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+3:
-                player->CLOSE_GOSSIP_MENU();
-                DoScriptText(SAY_GAMESBEGIN_1, creature);
-                CAST_AI(boss_victor_nefarius::boss_victor_nefariusAI, creature->AI())->BeginEvent(player);
+                pPlayer->CLOSE_GOSSIP_MENU();
+                DoScriptText(SAY_GAMESBEGIN_1, pCreature);
+                CAST_AI(boss_victor_nefarius::boss_victor_nefariusAI, pCreature->AI())->BeginEvent(pPlayer);
                 break;
         }
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* pPlayer, Creature* pCreature)
     {
-        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_1 , GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
-        player->SEND_GOSSIP_MENU(7134, creature->GetGUID());
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_1 , GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+        pPlayer->SEND_GOSSIP_MENU(7134, pCreature->GetGUID());
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_victor_nefariusAI (creature);
+        return new boss_victor_nefariusAI (pCreature);
     }
 
     struct boss_victor_nefariusAI : public ScriptedAI
     {
-        boss_victor_nefariusAI(Creature* c) : ScriptedAI(c)
+        boss_victor_nefariusAI(Creature *c) : ScriptedAI(c)
         {
             NefarianGUID = 0;
-            switch (urand(0, 19))
+            switch (urand(0,19))
             {
                 case 0:
                     DrakType1 = CREATURE_BRONZE_DRAKANOID;
@@ -220,12 +219,12 @@ public:
             NefarianGUID = 0;
             NefCheckTime = 2000;
 
-            me->SetUInt32Value(UNIT_NPC_FLAGS, 1);
+            me->SetUInt32Value(UNIT_NPC_FLAGS,1);
             me->setFaction(35);
             me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         }
 
-        void BeginEvent(Player* target)
+        void BeginEvent(Player *pTarget)
         {
             DoScriptText(SAY_GAMESBEGIN_2, me);
 
@@ -238,17 +237,17 @@ public:
             AttackStart((*i));
             }
             */
-            me->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+            me->SetUInt32Value(UNIT_NPC_FLAGS,0);
             me->setFaction(103);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-            AttackStart(target);
+            AttackStart(pTarget);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit * /*who*/)
         {
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit *who)
         {
             //We simply use this function to find players until we can use pMap->GetPlayers()
 
@@ -270,17 +269,17 @@ public:
                 //ShadowBoltTimer
                 if (ShadowBoltTimer <= diff)
                 {
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                        DoCast(target, SPELL_SHADOWBOLT);
+                    if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                        DoCast(pTarget, SPELL_SHADOWBOLT);
 
-                    ShadowBoltTimer = urand(3000, 10000);
+                    ShadowBoltTimer = urand(3000,10000);
                 } else ShadowBoltTimer -= diff;
 
                 //FearTimer
                 if (FearTimer <= diff)
                 {
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                        DoCast(target, SPELL_FEAR);
+                    if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                        DoCast(pTarget, SPELL_FEAR);
 
                     FearTimer = 10000 + (rand()%10000);
                 } else FearTimer -= diff;
@@ -291,10 +290,10 @@ public:
                     //Spawn 2 random types of creatures at the 2 locations
                     uint32 CreatureID;
                     Creature* Spawned = NULL;
-                    Unit* target = NULL;
+                    Unit *pTarget = NULL;
 
                     //1 in 3 chance it will be a chromatic
-                    if (urand(0, 2) == 0)
+                    if (urand(0,2) == 0)
                         CreatureID = CREATURE_CHROMATIC_DRAKANOID;
                     else
                         CreatureID = DrakType1;
@@ -302,27 +301,27 @@ public:
                     ++SpawnedAdds;
 
                     //Spawn Creature and force it to start attacking a random target
-                    Spawned = me->SummonCreature(CreatureID, ADD_X1, ADD_Y1, ADD_Z1, 5.000f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000);
-                    target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true);
-                    if (target && Spawned)
+                    Spawned = me->SummonCreature(CreatureID,ADD_X1,ADD_Y1,ADD_Z1,5.000f,TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT,5000);
+                    pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true);
+                    if (pTarget && Spawned)
                     {
-                        Spawned->AI()->AttackStart(target);
+                        Spawned->AI()->AttackStart(pTarget);
                         Spawned->setFaction(103);
                     }
 
                     //1 in 3 chance it will be a chromatic
-                    if (urand(0, 2) == 0)
+                    if (urand(0,2) == 0)
                         CreatureID = CREATURE_CHROMATIC_DRAKANOID;
                     else
                         CreatureID = DrakType2;
 
                     ++SpawnedAdds;
 
-                    Spawned = me->SummonCreature(CreatureID, ADD_X2, ADD_Y2, ADD_Z2, 5.000f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000);
-                    target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true);
-                    if (target && Spawned)
+                    Spawned = me->SummonCreature(CreatureID,ADD_X2,ADD_Y2,ADD_Z2,5.000f,TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT,5000);
+                    pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true);
+                    if (pTarget && Spawned)
                     {
-                        Spawned->AI()->AttackStart(target);
+                        Spawned->AI()->AttackStart(pTarget);
                         Spawned->setFaction(103);
                     }
 
@@ -330,7 +329,7 @@ public:
                     if (SpawnedAdds >= 42)
                     {
                         //Teleport Victor Nefarius way out of the map
-                        //sMapMgr->GetMap(me->GetMapId(), me)->CreatureRelocation(me, 0, 0, -5000, 0);
+                        //sMapMgr->GetMap(me->GetMapId(), me)->CreatureRelocation(me,0,0,-5000,0);
 
                         //Interrupt any spell casting
                         me->InterruptNonMeleeSpells(false);
@@ -341,20 +340,20 @@ public:
                         //Make super invis
                         DoCast(me, 8149);
 
-                        //Teleport self to a hiding spot (this causes errors in the Strawberry log but no real issues)
-                        DoTeleportTo(HIDE_X, HIDE_Y, HIDE_Z);
+                        //Teleport self to a hiding spot (this causes errors in the Trinity log but no real issues)
+                        DoTeleportTo(HIDE_X,HIDE_Y,HIDE_Z);
                         me->AddUnitState(UNIT_STAT_FLEEING);
 
                         //Spawn nef and have him attack a random target
-                        Creature* Nefarian = me->SummonCreature(CREATURE_NEFARIAN, NEF_X, NEF_Y, NEF_Z, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 120000);
-                        target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true);
-                        if (target && Nefarian)
+                        Creature* Nefarian = me->SummonCreature(CREATURE_NEFARIAN,NEF_X,NEF_Y,NEF_Z,0,TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT,120000);
+                        pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true);
+                        if (pTarget && Nefarian)
                         {
-                            Nefarian->AI()->AttackStart(target);
+                            Nefarian->AI()->AttackStart(pTarget);
                             Nefarian->setFaction(103);
                             NefarianGUID = Nefarian->GetGUID();
                         }
-                        else sLog->outError("TSCR: Blackwing Lair: Unable to spawn nefarian properly.");
+                        else sLog->outError("SCR: Blackwing Lair: Unable to spawn nefarian properly.");
                     }
 
                     AddSpawnTimer = 4000;
@@ -364,7 +363,7 @@ public:
             {
                 if (NefCheckTime <= diff)
                 {
-                    Unit* Nefarian = Unit::GetCreature((*me), NefarianGUID);
+                    Unit* Nefarian = Unit::GetCreature((*me),NefarianGUID);
 
                     //If nef is dead then we die to so the players get out of combat
                     //and cannot repeat the event
@@ -381,6 +380,9 @@ public:
     };
 
 };
+
+
+
 
 void AddSC_boss_victor_nefarius()
 {

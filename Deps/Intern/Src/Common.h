@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -21,12 +23,12 @@
 #define STRAWBERRY_COMMON_H
 
 // config.h needs to be included 1st
-// TODO this thingy looks like hack , but its not, need to
+// TODO this thingy looks like hack ,but its not, need to
 // make separate header however, because It makes mess here.
 #ifdef HAVE_CONFIG_H
 // Remove Some things that we will define
 // This is in case including another config.h
-// before trinity config.h
+// before config.h
 #ifdef PACKAGE
 #undef PACKAGE
 #endif //PACKAGE
@@ -120,7 +122,6 @@
 #define atoll __atoi64
 #define vsnprintf _vsnprintf
 #define finite(X) _finite(X)
-#define llabs _abs64
 
 #else
 
@@ -147,12 +148,12 @@ inline float finiteAlways(float f) { return finite(f) ? f : 0.0f; }
 
 enum TimeConstants
 {
-    MINUTE = 60,
-    HOUR   = MINUTE*60,
-    DAY    = HOUR*24,
-    WEEK   = DAY*7,
-    MONTH  = DAY*30,
-    YEAR   = MONTH*12,
+    MINUTE          = 60,
+    HOUR            = MINUTE * 60,
+    DAY             = HOUR   * 24,
+    WEEK            = DAY    * 7,
+    MONTH           = DAY    * 30,
+    YEAR            = MONTH  * 12,
     IN_MILLISECONDS = 1000
 };
 
@@ -178,7 +179,7 @@ enum LocaleConstant
     LOCALE_ruRU = 8
 };
 
-const uint8 TOTAL_LOCALES = 9;
+#define TOTAL_LOCALES 9
 const LocaleConstant DEFAULT_LOCALE = LOCALE_enUS;
 
 #define MAX_LOCALES 8
@@ -212,5 +213,9 @@ typedef std::vector<std::string> StringVector;
 #define M_PI            3.14159265358979323846f
 #endif
 
-#define MAX_QUERY_LEN 32*1024
+#ifndef M_PI_F
+#  define M_PI_F        float(M_PI)
+#endif
+
+#define MAX_QUERY_LEN 32 * 1024
 #endif

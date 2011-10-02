@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -16,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "naxxramas.h"
 
 //Razuvious - NO TEXT sound only
@@ -33,14 +32,14 @@
 //8860 death - An honorable... death...
 //8947 - Aggro Mixed? - ?
 
-#define SOUND_AGGRO     RAND(8852, 8853, 8854)
-#define SOUND_SLAY      RAND(8861, 8863)
-#define SOUND_COMMND    RAND(8855, 8856, 8858, 8859, 8861)
+#define SOUND_AGGRO     RAND(8852,8853,8854)
+#define SOUND_SLAY      RAND(8861,8863)
+#define SOUND_COMMND    RAND(8855,8856,8858,8859,8861)
 #define SOUND_DEATH     8860
 #define SOUND_AGGROMIX  8847
 
 #define SPELL_UNBALANCING_STRIKE    26613
-#define SPELL_DISRUPTING_SHOUT      RAID_MODE(29107, 55543)
+#define SPELL_DISRUPTING_SHOUT      RAID_MODE(29107,55543)
 #define SPELL_JAGGED_KNIFE          55550
 #define SPELL_HOPELESS              29125
 
@@ -58,14 +57,14 @@ class boss_razuvious : public CreatureScript
 public:
     boss_razuvious() : CreatureScript("boss_razuvious") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_razuviousAI (creature);
+        return new boss_razuviousAI (pCreature);
     }
 
     struct boss_razuviousAI : public BossAI
     {
-        boss_razuviousAI(Creature* c) : BossAI(c, BOSS_RAZUVIOUS) {}
+        boss_razuviousAI(Creature *c) : BossAI(c, BOSS_RAZUVIOUS) {}
 
         void KilledUnit(Unit* /*victim*/)
         {
@@ -89,7 +88,7 @@ public:
             me->CastSpell(me, SPELL_HOPELESS, true); // TODO: this may affect other creatures
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit * /*who*/)
         {
             _EnterCombat();
             DoPlaySoundToSet(me, SOUND_AGGRO);
@@ -119,8 +118,8 @@ public:
                         events.ScheduleEvent(EVENT_SHOUT, 25000);
                         return;
                     case EVENT_KNIFE:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 45.0f))
-                            DoCast(target, SPELL_JAGGED_KNIFE);
+                        if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 45.0f))
+                            DoCast(pTarget, SPELL_JAGGED_KNIFE);
                         events.ScheduleEvent(EVENT_KNIFE, 10000);
                         return;
                     case EVENT_COMMAND:

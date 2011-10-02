@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -28,7 +27,7 @@ EndScriptData */
 mob_crystalcore_devastator
 EndContentData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "the_eye.h"
 
 enum eSpells
@@ -47,7 +46,7 @@ class mob_crystalcore_devastator : public CreatureScript
         }
         struct mob_crystalcore_devastatorAI : public ScriptedAI
         {
-            mob_crystalcore_devastatorAI(Creature* creature) : ScriptedAI(creature) {}
+            mob_crystalcore_devastatorAI(Creature* pCreature) : ScriptedAI(pCreature) {}
 
             uint32 Knockaway_Timer;
             uint32 Countercharge_Timer;
@@ -58,7 +57,7 @@ class mob_crystalcore_devastator : public CreatureScript
                 Knockaway_Timer = 25000;
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit * /*who*/)
             {
             }
 
@@ -74,13 +73,13 @@ class mob_crystalcore_devastator : public CreatureScript
                     DoCast(me->getVictim(), SPELL_KNOCKAWAY, true);
 
                     // current aggro target is knocked away pick new target
-                    Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 0);
+                    Unit* pTarget = SelectTarget(SELECT_TARGET_TOPAGGRO, 0);
 
-                    if (!target || target == me->getVictim())
-                        target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1);
+                    if (!pTarget || pTarget == me->getVictim())
+                        pTarget = SelectTarget(SELECT_TARGET_TOPAGGRO, 1);
 
-                    if (target)
-                        me->TauntApply(target);
+                    if (pTarget)
+                        me->TauntApply(pTarget);
 
                     Knockaway_Timer = 23000;
                 }

@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -31,6 +33,7 @@
 #include "WaypointManager.h"
 #include "Path.h"
 #include "Traveller.h"
+#include "PathFinder.h"
 
 #include "Player.h"
 
@@ -54,8 +57,8 @@ class PathMovementBase
         void ReloadPath(T &);
         uint32 GetCurrentNode() const { return i_currentNode; }
 
-        bool GetDestination(float& x, float& y, float& z) const { i_destinationHolder.GetDestination(x, y, z); return true; }
-        bool GetPosition(float& x, float& y, float& z) const { i_destinationHolder.GetLocationNowNoMicroMovement(x, y, z); return true; }
+        bool GetDestination(float& x, float& y, float& z) const { i_destinationHolder.GetDestination(x,y,z); return true; }
+        bool GetPosition(float& x, float& y, float& z) const { i_destinationHolder.GetLocationNowNoMicroMovement(x,y,z); return true; }
 
     protected:
         uint32 i_currentNode;
@@ -64,7 +67,6 @@ class PathMovementBase
 };
 
 template<class T>
-
 class WaypointMovementGenerator
     : public MovementGeneratorMedium< T, WaypointMovementGenerator<T> >, public PathMovementBase<T, WaypointPath const*>
 {
@@ -74,13 +76,16 @@ class WaypointMovementGenerator
 
         void Initialize(T &);
         void Finalize(T &);
+        void Interrupt(T &);
         void MovementInform(T &);
         void InitTraveller(T &, const WaypointData &);
         void GeneratePathId(T &);
         void Reset(T &unit);
-        bool Update(T &, const uint32);
+        bool Update(T &, const uint32 &);
         bool GetDestination(float &x, float &y, float &z) const;
         MovementGeneratorType GetMovementGeneratorType() { return WAYPOINT_MOTION_TYPE; }
+
+        void MoveToNextNode(CreatureTraveller &traveller);
 
     private:
         WaypointData *node;
@@ -95,7 +100,7 @@ class WaypointMovementGenerator
  */
 class FlightPathMovementGenerator
 : public MovementGeneratorMedium< Player, FlightPathMovementGenerator >,
-public PathMovementBase<Player, TaxiPathNodeList const*>
+public PathMovementBase<Player,TaxiPathNodeList const*>
 {
     public:
         explicit FlightPathMovementGenerator(TaxiPathNodeList const& pathnodes, uint32 startNode = 0)
@@ -106,7 +111,8 @@ public PathMovementBase<Player, TaxiPathNodeList const*>
         void Initialize(Player &);
         void Reset(Player & /*u*/){};
         void Finalize(Player &);
-        bool Update(Player &, const uint32);
+        void Interrupt(Player &);
+        bool Update(Player &, const uint32 &);
         MovementGeneratorType GetMovementGeneratorType() { return FLIGHT_MOTION_TYPE; }
 
         TaxiPathNodeList const& GetPath() { return *i_path; }
@@ -116,7 +122,7 @@ public PathMovementBase<Player, TaxiPathNodeList const*>
         void SkipCurrentNode() { ++i_currentNode; }
         void DoEventIfAny(Player& player, TaxiPathNodeEntry const& node, bool departure);
 
-        bool GetDestination(float& x, float& y, float& z) const { return PathMovementBase<Player, TaxiPathNodeList const*>::GetDestination(x, y, z); }
+        bool GetDestination(float& x, float& y, float& z) const { return PathMovementBase<Player,TaxiPathNodeList const*>::GetDestination(x,y,z); }
 
         void PreloadEndGrid();
         void InitEndGridInfo();
@@ -129,4 +135,5 @@ public PathMovementBase<Player, TaxiPathNodeList const*>
         float m_endGridY;
 };
 #endif
+
 

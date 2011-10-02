@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment: More abilities need to be implemented
 SDCategory: Caverns of Time, The Dark Portal
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "dark_portal.h"
 
 enum eEnums
@@ -48,14 +47,14 @@ class boss_temporus : public CreatureScript
 public:
     boss_temporus() : CreatureScript("boss_temporus") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_temporusAI (creature);
+        return new boss_temporusAI (pCreature);
     }
 
     struct boss_temporusAI : public ScriptedAI
     {
-        boss_temporusAI(Creature* c) : ScriptedAI(c)
+        boss_temporusAI(Creature *c) : ScriptedAI(c)
         {
             pInstance = c->GetInstanceScript();
         }
@@ -75,30 +74,30 @@ public:
             WingBuffet_Timer = 25000+rand()%10000;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit * /*who*/)
         {
             DoScriptText(SAY_AGGRO, me);
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit * /*victim*/)
         {
-            DoScriptText(RAND(SAY_SLAY1, SAY_SLAY2), me);
+            DoScriptText(RAND(SAY_SLAY1,SAY_SLAY2), me);
         }
 
-        void JustDied(Unit* /*victim*/)
+        void JustDied(Unit * /*victim*/)
         {
             DoScriptText(SAY_DEATH, me);
 
             if (pInstance)
-                pInstance->SetData(TYPE_RIFT, SPECIAL);
+                pInstance->SetData(TYPE_RIFT,SPECIAL);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit *who)
         {
             //Despawn Time Keeper
             if (who->GetTypeId() == TYPEID_UNIT && who->GetEntry() == C_TIME_KEEPER)
             {
-                if (me->IsWithinDistInMap(who, 20.0f))
+                if (me->IsWithinDistInMap(who,20.0f))
                 {
                     DoScriptText(SAY_BANISH, me);
 

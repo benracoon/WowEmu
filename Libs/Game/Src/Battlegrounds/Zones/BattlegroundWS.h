@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -158,10 +160,13 @@ class BattlegroundWGScore : public BattlegroundScore
 
 class BattlegroundWS : public Battleground
 {
+    friend class BattlegroundMgr;
+
     public:
         /* Construction */
         BattlegroundWS();
         ~BattlegroundWS();
+        void Update(uint32 diff);
 
         /* inherited from BattlegroundClass */
         virtual void AddPlayer(Player *plr);
@@ -188,9 +193,9 @@ class BattlegroundWS : public Battleground
         virtual void EventPlayerClickedOnFlag(Player *Source, GameObject* target_obj);
         virtual void EventPlayerCapturedFlag(Player *Source);
 
-        void RemovePlayer(Player *plr, uint64 guid, uint32 team);
+        void RemovePlayer(Player *plr, uint64 guid);
         void HandleAreaTrigger(Player *Source, uint32 Trigger);
-        void HandleKillPlayer(Player* player, Player* killer);
+        void HandleKillPlayer(Player *player, Player *killer);
         bool SetupBattleground();
         virtual void Reset();
         void EndBattleground(uint32 winner);
@@ -224,8 +229,6 @@ class BattlegroundWS : public Battleground
         bool m_BothFlagsKept;
         uint8 m_FlagDebuffState;                            // 0 - no debuffs, 1 - focused assault, 2 - brutal assault
         uint8 m_minutesElapsed;
-
-        virtual void PostUpdateImpl(uint32 diff);
 };
 #endif
 

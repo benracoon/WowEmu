@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -229,7 +228,7 @@ bool MySQLPreparedStatement::CheckValidIndex(uint8 index)
     return true;
 }
 
-void MySQLPreparedStatement::setBool(const uint8 index, const bool value)
+void MySQLPreparedStatement::setBool(const uint8 index,const bool value)
 {
     setUInt32(index, value);
 }
@@ -331,70 +330,11 @@ void MySQLPreparedStatement::setValue(MYSQL_BIND* param, enum_field_types type, 
     memcpy(param->buffer, value, len);
 }
 
-std::string MySQLPreparedStatement::getQueryString(const char *query)
-{
-    std::string queryString = query;
-
-    uint32 pos = 0;
-    for (uint32 i = 0; i < m_stmt->statement_data.size(); i++)
-    {
-        pos = queryString.find("?", pos);
-        std::stringstream replace;
-
-        replace << '\'';
-
-        switch (m_stmt->statement_data[i].type)
-        {
-            case TYPE_BOOL:
-                replace << (m_stmt->statement_data[i].data.boolean ? '1' : '0');
-                break;
-            case TYPE_UI8:
-            case TYPE_UI16:
-            case TYPE_UI32:
-                replace << m_stmt->statement_data[i].data.ui32;
-                break;
-            case TYPE_I8:
-            case TYPE_I16:
-            case TYPE_I32:
-                replace << m_stmt->statement_data[i].data.i32;
-                break;
-            case TYPE_UI64:
-                replace << m_stmt->statement_data[i].data.ui64;
-                break;
-            case TYPE_I64:
-                replace << m_stmt->statement_data[i].data.i64;
-                break;
-            case TYPE_FLOAT:
-                replace << m_stmt->statement_data[i].data.f;
-                break;
-            case TYPE_DOUBLE:
-                replace << m_stmt->statement_data[i].data.d;
-                break;
-            case TYPE_STRING:
-                replace << m_stmt->statement_data[i].str;
-                break;
-        }
-        replace << '\'';
-        queryString.replace(pos, 1, replace.str());
-    }
-
-    return queryString;
-}
-
 //- Execution
 PreparedStatementTask::PreparedStatementTask(PreparedStatement* stmt) :
-m_stmt(stmt),
-m_has_result(false)
+m_stmt(stmt)
 {
 }
-
-PreparedStatementTask::PreparedStatementTask(PreparedStatement* stmt, PreparedQueryResultFuture result) :
-m_stmt(stmt),
-m_has_result(true),
-m_result(result)
-{
-}
-
 
 PreparedStatementTask::~PreparedStatementTask()
 {
@@ -403,17 +343,5 @@ PreparedStatementTask::~PreparedStatementTask()
 
 bool PreparedStatementTask::Execute()
 {
-    if (m_has_result)
-    {
-        PreparedResultSet* result = m_conn->Query(m_stmt);
-        if (!result || !result->GetRowCount())
-        {
-            m_result.set(PreparedQueryResult(NULL));
-            return false;
-        }
-        m_result.set(PreparedQueryResult(result));
-        return true;
-    }
-
     return m_conn->Execute(m_stmt);
 }

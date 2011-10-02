@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment:
 SDCategory: Tempest Keep, The Mechanar
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 
 enum eSays
 {
@@ -59,7 +58,7 @@ class boss_gatewatcher_iron_hand : public CreatureScript
             // Gatewatcher Iron-Hand AI
             struct boss_gatewatcher_iron_handAI : public ScriptedAI
             {
-                boss_gatewatcher_iron_handAI(Creature* creature) : ScriptedAI(creature)
+                boss_gatewatcher_iron_handAI(Creature* pCreature) : ScriptedAI(pCreature)
                 {
                 }
 
@@ -74,7 +73,7 @@ class boss_gatewatcher_iron_hand : public CreatureScript
                     Stream_of_Machine_Fluid_Timer = 55000;
 
                 }
-                void EnterCombat(Unit* /*who*/)
+                void EnterCombat(Unit * /*who*/)
                 {
                     DoScriptText(SAY_AGGRO_1, me);
                 }
@@ -84,7 +83,7 @@ class boss_gatewatcher_iron_hand : public CreatureScript
                     if (rand()%2)
                         return;
 
-                    DoScriptText(RAND(SAY_SLAY_1, SAY_SLAY_2), me);
+                    DoScriptText(RAND(SAY_SLAY_1,SAY_SLAY_2), me);
                 }
 
                 void JustDied(Unit* /*Killer*/)
@@ -119,7 +118,7 @@ class boss_gatewatcher_iron_hand : public CreatureScript
                         if (rand()%2)
                                             return;
 
-                        DoScriptText(RAND(SAY_HAMMER_1, SAY_HAMMER_2), me);
+                        DoScriptText(RAND(SAY_HAMMER_1,SAY_HAMMER_2), me);
                         Jackhammer_Timer = 30000;
                     }
                     else

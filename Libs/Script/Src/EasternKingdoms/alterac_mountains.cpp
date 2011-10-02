@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -27,7 +26,7 @@ EndScriptData */
 /* ContentData
 EndContentData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 
 /*void AddSC_alterac_mountains()
 {

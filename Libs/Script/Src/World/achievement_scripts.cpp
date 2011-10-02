@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -16,13 +15,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
-
+#include "ScriptPCH.h"
 #include "BattlegroundAB.h"
 #include "BattlegroundWS.h"
 #include "BattlegroundIC.h"
-#include "BattlegroundSA.h"
-#include "Vehicle.h"
+
+class achievement_school_of_hard_knocks : public AchievementCriteriaScript
+{
+    public:
+        achievement_school_of_hard_knocks() : AchievementCriteriaScript("achievement_school_of_hard_knocks") { }
+
+        bool OnCheck(Player* source, Unit* /*target*/)
+        {
+            static uint32 const orphanEntries[6] = {14305, 14444, 22818, 22817, 33533, 33532};
+            uint32 currentPet = GUID_ENPART(source->GetCritterGUID());
+            for (uint8 i = 0; i < 6; ++i)
+                if (currentPet == orphanEntries[i])
+                    return true;
+
+            return false;
+        }
+};
 
 class achievement_storm_glory : public AchievementCriteriaScript
 {
@@ -91,13 +104,13 @@ class achievement_save_the_day : public AchievementCriteriaScript
             if (!target)
                 return false;
 
-            if (Player const* player = target->ToPlayer())
+            if (Player const* pTarget = target->ToPlayer())
             {
                 if (source->GetBattlegroundTypeId() != BATTLEGROUND_WS || !source->GetBattleground())
                     return false;
 
                 BattlegroundWS* pWSG = static_cast<BattlegroundWS*>(source->GetBattleground());
-                if (pWSG->GetFlagState(player->GetTeam()) == BG_WS_FLAG_STATE_ON_BASE)
+                if (pWSG->GetFlagState(pTarget->GetTeam()) == BG_WS_FLAG_STATE_ON_BASE)
                     return true;
             }
             return false;
@@ -152,88 +165,9 @@ class achievement_bg_ic_mowed_down : public AchievementCriteriaScript
         }
 };
 
-class achievement_bg_sa_artillery : public AchievementCriteriaScript
-{
-    public:
-        achievement_bg_sa_artillery() : AchievementCriteriaScript("achievement_bg_sa_artillery") { }
-
-        bool OnCheck(Player* source, Unit* /*target*/)
-        {
-            if (Creature* vehicle = source->GetVehicleCreatureBase())
-            {
-                if (vehicle->GetEntry() == NPC_ANTI_PERSONNAL_CANNON)
-                    return true;
-            }
-
-            return false;
-        }
-};
-
-class achievement_arena_kills : public AchievementCriteriaScript
-{
-    public:
-        achievement_arena_kills(char const* name, uint8 arenaType) : AchievementCriteriaScript(name),
-            _arenaType(arenaType)
-        {
-        }
-
-        bool OnCheck(Player* source, Unit* /*target*/)
-        {
-            // this checks GetBattleground() for NULL already
-            if (!source->InArena())
-                return false;
-
-            return source->GetBattleground()->GetArenaType() == _arenaType;
-        }
-
-    private:
-        uint8 const _arenaType;
-};
-
-class achievement_sickly_gazelle : public AchievementCriteriaScript
-{
-public:
-    achievement_sickly_gazelle() : AchievementCriteriaScript("achievement_sickly_gazelle") { }
-
-    bool OnCheck(Player* /*source*/, Unit* target)
-    {
-        if (!target)
-            return false;
-
-        if (Player* victim = target->ToPlayer())
-            if (victim->IsMounted())
-                return true;
-
-        return false;
-    }
-};
-
-class achievement_wg_didnt_stand_a_chance : public AchievementCriteriaScript
-{
-public:
-    achievement_wg_didnt_stand_a_chance() : AchievementCriteriaScript("achievement_wg_didnt_stand_a_chance") { }
-
-    bool OnCheck(Player* source, Unit* target)
-    {
-        if (!target)
-            return false;
-
-        if (Player* victim = target->ToPlayer())
-        {
-            if (!victim->IsMounted())
-                return false;
-
-            if (Vehicle* vehicle = source->GetVehicle())
-                if (vehicle->GetVehicleInfo()->m_ID == 244) // Wintergrasp Tower Cannon
-                    return true;
-        }
-
-        return false;
-    }
-};
-
 void AddSC_achievement_scripts()
 {
+    new achievement_school_of_hard_knocks();
     new achievement_storm_glory();
     new achievement_resilient_victory();
     new achievement_bg_control_all_nodes();
@@ -241,10 +175,4 @@ void AddSC_achievement_scripts()
     new achievement_bg_ic_resource_glut();
     new achievement_bg_ic_glaive_grave();
     new achievement_bg_ic_mowed_down();
-    new achievement_bg_sa_artillery();
-    new achievement_sickly_gazelle();
-    new achievement_wg_didnt_stand_a_chance();
-    new achievement_arena_kills("achievement_arena_2v2_kills", ARENA_TYPE_2v2);
-    new achievement_arena_kills("achievement_arena_3v3_kills", ARENA_TYPE_3v3);
-    new achievement_arena_kills("achievement_arena_5v5_kills", ARENA_TYPE_5v5);
 }

@@ -57,7 +57,6 @@ class SystemMgr
         friend class ACE_Singleton<SystemMgr, ACE_Null_Mutex>;
         SystemMgr() {}
         ~SystemMgr() {}
-
     public:
         //Maps and lists
         typedef UNORDERED_MAP<int32, StringTextData> TextDataMap;
@@ -82,20 +81,20 @@ class SystemMgr
 
         ScriptPointVector const& GetPointMoveList(uint32 creatureEntry) const
         {
+            static ScriptPointVector empty;
+
             PointMoveMap::const_iterator itr = m_mPointMoveMap.find(creatureEntry);
 
             if (itr == m_mPointMoveMap.end())
-                return _empty;
+                return empty;
 
             return itr->second;
         }
 
     protected:
+
         TextDataMap     m_mTextDataMap;                     //additional data for text strings
         PointMoveMap    m_mPointMoveMap;                    //coordinates for waypoints
-
-    private:
-        static ScriptPointVector const _empty;
 };
 
 #define sScriptSystemMgr ACE_Singleton<SystemMgr, ACE_Null_Mutex>::instance()

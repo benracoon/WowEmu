@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -16,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "gundrak.h"
 
 //Spells
@@ -71,14 +70,14 @@ class boss_slad_ran : public CreatureScript
 public:
     boss_slad_ran() : CreatureScript("boss_slad_ran") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_slad_ranAI (creature);
+        return new boss_slad_ranAI (pCreature);
     }
 
     struct boss_slad_ranAI : public ScriptedAI
     {
-        boss_slad_ranAI(Creature* c) : ScriptedAI(c), lSummons(me)
+        boss_slad_ranAI(Creature *c) : ScriptedAI(c), lSummons(me)
         {
             pInstance = c->GetInstanceScript();
         }
@@ -146,23 +145,23 @@ public:
                 {
                     if (uiPhase == 1)
                         for (uint8 i = 0; i < DUNGEON_MODE(3, 5); ++i)
-                            me->SummonCreature(CREATURE_SNAKE, SpawnLoc[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20*IN_MILLISECONDS);
+                            me->SummonCreature(CREATURE_SNAKE, SpawnLoc[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN,20*IN_MILLISECONDS);
                     if (uiPhase == 2)
                         for (uint8 i = 0; i < DUNGEON_MODE(3, 5); ++i)
-                            me->SummonCreature(CREATURE_CONSTRICTORS, SpawnLoc[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20*IN_MILLISECONDS);
+                            me->SummonCreature(CREATURE_CONSTRICTORS, SpawnLoc[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN,20*IN_MILLISECONDS);
                     uiSpawnTimer = 5*IN_MILLISECONDS;
                 } else uiSpawnTimer -= diff;
             }
 
             if (uiPhase == 0 && HealthBelowPct(30))
             {
-                DoScriptText(SAY_SUMMON_SNAKES, me);
+                DoScriptText(SAY_SUMMON_SNAKES,me);
                 uiPhase = 1;
             }
 
             if (uiPhase == 1 && HealthBelowPct(25))
             {
-                DoScriptText(SAY_SUMMON_CONSTRICTORS, me);
+                DoScriptText(SAY_SUMMON_CONSTRICTORS,me);
                 uiPhase = 2;
             }
 
@@ -177,14 +176,14 @@ public:
                 pInstance->SetData(DATA_SLAD_RAN_EVENT, DONE);
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit * /*victim*/)
         {
-            DoScriptText(RAND(SAY_SLAY_1, SAY_SLAY_2, SAY_SLAY_3), me);
+            DoScriptText(RAND(SAY_SLAY_1,SAY_SLAY_2,SAY_SLAY_3), me);
         }
 
         void JustSummoned(Creature* summoned)
         {
-            summoned->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
+            summoned->GetMotionMaster()->MovePoint(0,me->GetPositionX(),me->GetPositionY(),me->GetPositionZ());
             lSummons.Summon(summoned);
         }
     };
@@ -196,14 +195,14 @@ class mob_slad_ran_constrictor : public CreatureScript
 public:
     mob_slad_ran_constrictor() : CreatureScript("mob_slad_ran_constrictor") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new mob_slad_ran_constrictorAI (creature);
+        return new mob_slad_ran_constrictorAI (pCreature);
     }
 
     struct mob_slad_ran_constrictorAI : public ScriptedAI
     {
-        mob_slad_ran_constrictorAI(Creature* c) : ScriptedAI(c) {}
+        mob_slad_ran_constrictorAI(Creature *c) : ScriptedAI(c) {}
 
         uint32 uiGripOfSladRanTimer;
 
@@ -233,14 +232,14 @@ class mob_slad_ran_viper : public CreatureScript
 public:
     mob_slad_ran_viper() : CreatureScript("mob_slad_ran_viper") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new mob_slad_ran_viperAI (creature);
+        return new mob_slad_ran_viperAI (pCreature);
     }
 
     struct mob_slad_ran_viperAI : public ScriptedAI
     {
-        mob_slad_ran_viperAI(Creature* c) : ScriptedAI(c) {}
+        mob_slad_ran_viperAI(Creature *c) : ScriptedAI(c) {}
 
         uint32 uiVenomousBiteTimer;
 

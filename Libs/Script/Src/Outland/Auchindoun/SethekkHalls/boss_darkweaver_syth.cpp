@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment: Shock spells/times need more work. Heroic partly implemented.
 SDCategory: Auchindoun, Sethekk Halls
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 
 #define SAY_SUMMON                  -1556000
 
@@ -59,14 +58,14 @@ class boss_darkweaver_syth : public CreatureScript
 public:
     boss_darkweaver_syth() : CreatureScript("boss_darkweaver_syth") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_darkweaver_sythAI (creature);
+        return new boss_darkweaver_sythAI (pCreature);
     }
 
     struct boss_darkweaver_sythAI : public ScriptedAI
     {
-        boss_darkweaver_sythAI(Creature* c) : ScriptedAI(c)
+        boss_darkweaver_sythAI(Creature *c) : ScriptedAI(c)
         {
         }
 
@@ -93,9 +92,9 @@ public:
             summon10 = false;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit * /*who*/)
         {
-            DoScriptText(RAND(SAY_AGGRO_1, SAY_AGGRO_2, SAY_AGGRO_3), me);
+            DoScriptText(RAND(SAY_AGGRO_1,SAY_AGGRO_2,SAY_AGGRO_3), me);
         }
 
         void JustDied(Unit* /*Killer*/)
@@ -108,13 +107,13 @@ public:
             if (rand()%2)
                 return;
 
-            DoScriptText(RAND(SAY_SLAY_1, SAY_SLAY_2), me);
+            DoScriptText(RAND(SAY_SLAY_1,SAY_SLAY_2), me);
         }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature *summoned)
         {
-            if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                summoned->AI()->AttackStart(target);
+            if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM,0))
+                summoned->AI()->AttackStart(pTarget);
         }
 
         void SythSummoning()
@@ -155,40 +154,40 @@ public:
 
             if (flameshock_timer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                    DoCast(target, SPELL_FLAME_SHOCK);
+                if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM,0))
+                    DoCast(pTarget, SPELL_FLAME_SHOCK);
 
                 flameshock_timer = 10000 + rand()%5000;
             } else flameshock_timer -= diff;
 
             if (arcaneshock_timer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                    DoCast(target, SPELL_ARCANE_SHOCK);
+                if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM,0))
+                    DoCast(pTarget, SPELL_ARCANE_SHOCK);
 
                 arcaneshock_timer = 10000 + rand()%5000;
             } else arcaneshock_timer -= diff;
 
             if (frostshock_timer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                    DoCast(target, SPELL_FROST_SHOCK);
+                if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM,0))
+                    DoCast(pTarget, SPELL_FROST_SHOCK);
 
                 frostshock_timer = 10000 + rand()%5000;
             } else frostshock_timer -= diff;
 
             if (shadowshock_timer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                    DoCast(target, SPELL_SHADOW_SHOCK);
+                if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM,0))
+                    DoCast(pTarget, SPELL_SHADOW_SHOCK);
 
                 shadowshock_timer = 10000 + rand()%5000;
             } else shadowshock_timer -= diff;
 
             if (chainlightning_timer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                    DoCast(target, SPELL_CHAIN_LIGHTNING);
+                if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM,0))
+                    DoCast(pTarget, SPELL_CHAIN_LIGHTNING);
 
                 chainlightning_timer = 25000;
             } else chainlightning_timer -= diff;
@@ -207,7 +206,7 @@ public:
 
     struct mob_syth_fireAI : public ScriptedAI
     {
-        mob_syth_fireAI(Creature* c) : ScriptedAI(c)
+        mob_syth_fireAI(Creature *c) : ScriptedAI(c)
         {
         }
 
@@ -221,7 +220,7 @@ public:
             flamebuffet_timer = 5000;
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit * /*who*/) { }
 
         void UpdateAI(const uint32 diff)
         {
@@ -230,16 +229,16 @@ public:
 
             if (flameshock_timer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                    DoCast(target, SPELL_FLAME_SHOCK);
+                if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM,0))
+                    DoCast(pTarget, SPELL_FLAME_SHOCK);
 
                 flameshock_timer = 5000;
             } else flameshock_timer -= diff;
 
             if (flamebuffet_timer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                    DoCast(target, SPELL_FLAME_BUFFET);
+                if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM,0))
+                    DoCast(pTarget, SPELL_FLAME_BUFFET);
 
                 flamebuffet_timer = 5000;
             } else flamebuffet_timer -= diff;
@@ -248,9 +247,9 @@ public:
         }
     };
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new mob_syth_fireAI (creature);
+        return new mob_syth_fireAI (pCreature);
     }
 };
 
@@ -259,14 +258,14 @@ class mob_syth_arcane : public CreatureScript
 public:
     mob_syth_arcane() : CreatureScript("mob_syth_arcane") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new mob_syth_arcaneAI (creature);
+        return new mob_syth_arcaneAI (pCreature);
     }
 
     struct mob_syth_arcaneAI : public ScriptedAI
     {
-        mob_syth_arcaneAI(Creature* c) : ScriptedAI(c)
+        mob_syth_arcaneAI(Creature *c) : ScriptedAI(c)
         {
         }
 
@@ -280,7 +279,7 @@ public:
             arcanebuffet_timer = 5000;
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit * /*who*/) { }
 
         void UpdateAI(const uint32 diff)
         {
@@ -289,16 +288,16 @@ public:
 
             if (arcaneshock_timer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                    DoCast(target, SPELL_ARCANE_SHOCK);
+                if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM,0))
+                    DoCast(pTarget, SPELL_ARCANE_SHOCK);
 
                 arcaneshock_timer = 5000;
             } else arcaneshock_timer -= diff;
 
             if (arcanebuffet_timer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                    DoCast(target, SPELL_ARCANE_BUFFET);
+                if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM,0))
+                    DoCast(pTarget, SPELL_ARCANE_BUFFET);
 
                 arcanebuffet_timer = 5000;
             } else arcanebuffet_timer -= diff;
@@ -313,14 +312,14 @@ class mob_syth_frost : public CreatureScript
 public:
     mob_syth_frost() : CreatureScript("mob_syth_frost") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new mob_syth_frostAI (creature);
+        return new mob_syth_frostAI (pCreature);
     }
 
     struct mob_syth_frostAI : public ScriptedAI
     {
-        mob_syth_frostAI(Creature* c) : ScriptedAI(c)
+        mob_syth_frostAI(Creature *c) : ScriptedAI(c)
         {
         }
 
@@ -334,7 +333,7 @@ public:
             frostbuffet_timer = 5000;
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit * /*who*/) { }
 
         void UpdateAI(const uint32 diff)
         {
@@ -343,16 +342,16 @@ public:
 
             if (frostshock_timer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                    DoCast(target, SPELL_FROST_SHOCK);
+                if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM,0))
+                    DoCast(pTarget, SPELL_FROST_SHOCK);
 
                 frostshock_timer = 5000;
             } else frostshock_timer -= diff;
 
             if (frostbuffet_timer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                    DoCast(target, SPELL_FROST_BUFFET);
+                if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM,0))
+                    DoCast(pTarget, SPELL_FROST_BUFFET);
 
                 frostbuffet_timer = 5000;
             } else frostbuffet_timer -= diff;
@@ -368,14 +367,14 @@ class mob_syth_shadow : public CreatureScript
 public:
     mob_syth_shadow() : CreatureScript("mob_syth_shadow") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new mob_syth_shadowAI (creature);
+        return new mob_syth_shadowAI (pCreature);
     }
 
     struct mob_syth_shadowAI : public ScriptedAI
     {
-        mob_syth_shadowAI(Creature* c) : ScriptedAI(c)
+        mob_syth_shadowAI(Creature *c) : ScriptedAI(c)
         {
         }
 
@@ -389,7 +388,7 @@ public:
             shadowbuffet_timer = 5000;
         }
 
-        void EnterCombat(Unit* /*who*/) { }
+        void EnterCombat(Unit * /*who*/) { }
 
         void UpdateAI(const uint32 diff)
         {
@@ -398,16 +397,16 @@ public:
 
             if (shadowshock_timer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                    DoCast(target, SPELL_SHADOW_SHOCK);
+                if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM,0))
+                    DoCast(pTarget, SPELL_SHADOW_SHOCK);
 
                 shadowshock_timer = 5000;
             } else shadowshock_timer -= diff;
 
             if (shadowbuffet_timer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                    DoCast(target, SPELL_SHADOW_BUFFET);
+                if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM,0))
+                    DoCast(pTarget, SPELL_SHADOW_BUFFET);
 
                 shadowbuffet_timer = 5000;
             } else shadowbuffet_timer -= diff;

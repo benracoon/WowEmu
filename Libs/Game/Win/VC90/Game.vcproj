@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="Game"
 	ProjectGUID="{D24529C8-CE57-4493-94CF-3CF3653F8620}"
 	RootNamespace="Game"
@@ -126,7 +126,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP /Zm200"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\..\Script\Src\Python\Handler\Creature;..\..\..\Script\Src\Python\Handler\General;..\..\Src;..\..\Src\Achievements;..\..\Src\Battlegrounds\Zones;..\..\Src\AI\SmartScripts;..\..\Src\AI\ScriptedAI;..\..\Src\AI\EventAI;..\..\Src\AI\CoreAI;..\..\Src\World;..\..\Src\Weather;..\..\Src\Tools;..\..\Src\Tickets;..\..\Src\Texts;..\..\Src\Spells;..\..\Src\Skills;..\..\Src\Server;..\..\Src\Scripting;..\..\Src\Reputation;..\..\Src\Quests;..\..\Src\Pools;..\..\Src\PCH;..\..\Src\OutdoorPvP;..\..\Src\Movement;..\..\Src\Miscellaneous;..\..\Src\Maps;..\..\Src\Mails;..\..\Src\Loot;..\..\Src\Instances;..\..\Src\Guilds;..\..\Src\Groups;..\..\Src\Grids;..\..\Src\Globals;..\..\Src\Spells\Auras;..\..\Src\Server\Protocol\Handlers;..\..\Src\Server\Protocol;..\..\Src\Server\Sockets;..\..\Src\Server\Sessions;..\..\Src\Server\Logs;..\..\Src\Movement\Waypoints;..\..\Src\Movement\MovementGenerators;..\..\Src\Grids\Notifiers;..\..\Src\Grids\Cells;..\..\Src\Entities\Object\Updates;..\..\Src\Entities\Item\Container;..\..\Src\Entities\Vehicle;..\..\Src\Entities\Unit;..\..\Src\Entities\Transport;..\..\Src\Entities\Totem;..\..\Src\Entities\Player;..\..\Src\Entities\Pet;..\..\Src\Entities\Object;..\..\Src\Entities\Item;..\..\Src\Entities\GameObject;..\..\Src\Entities\DynamicObject;..\..\Src\Entities\Creature;..\..\Src\Entities\Corpse;..\..\Src\Events;..\..\Src\Entities;..\..\Src\DungeonFinding;..\..\Src\DataStores;..\..\Src\DataStores\Structs;..\..\Src\Conditions;..\..\Src\Combat;..\..\Src\Chat\Commands;..\..\Src\Chat\Channels;..\..\Src\Chat;..\..\Src\Calendar;..\..\Src\Battlegrounds;..\..\Src\AuctionHouse\AuctionHouseBot;..\..\Src\AuctionHouse;..\..\Src\AI;..\..\Src\Addons;..\..\Src\Accounts;..\..\..\..\Deps\Extern\Src\Python\Include;..\..\..\..\Deps\Extern\Src\MySql;..\..\..\..\Deps\Extern\Src\MySql\include;..\..\..\..\Deps\Extern\Src\ZLib;..\..\..\..\Deps\Extern\Src\Python\;..\..\..\..\Deps\Extern\Src\MySql\extra\yassl\include;..\..\..\..\Deps\Intern\Src;..\..\..\..\Deps\Intern\Src\Collision;..\..\..\..\Deps\Intern\Src\Collision\Management;..\..\..\..\Deps\Intern\Src\Collision\Maps;..\..\..\..\Deps\Intern\Src\Collision\Models;..\..\..\..\Deps\Intern\Src\Collision\PCH;..\..\..\..\Deps\Intern\Src\Configuration;..\..\..\..\Deps\Intern\Src\Cryptography;..\..\..\..\Deps\Intern\Src\Cryptography\Authentication;..\..\..\..\Deps\Intern\Src\DataStores;..\..\..\..\Deps\Intern\Src\Database;..\..\..\..\Deps\Intern\Src\Dynamic;..\..\..\..\Deps\Intern\Src\Dynamic\LinkedReference;..\..\..\..\Deps\Intern\Src\Logging;..\..\..\..\Deps\Intern\Src\Packets;..\..\..\..\Deps\Intern\Src\Threading;..\..\..\..\Deps\Intern\Src\Utilities;..\..\..\..\Deps\Extern\Src\Ace"
+				AdditionalIncludeDirectories="..\..\..\Script\Src\Python\Handler\Creature;..\..\..\Script\Src\Python\Handler\General;..\..\Src\Maps\MoveMaps;..\..\Src;..\..\Src\Movement\PathFinding;..\..\Src\Achievements;..\..\Src\Battlegrounds\Zones;..\..\Src\AI\SmartScripts;..\..\Src\AI\ScriptedAI;..\..\Src\AI\EventAI;..\..\Src\AI\CoreAI;..\..\Src\World;..\..\Src\Weather;..\..\Src\Tools;..\..\Src\Tickets;..\..\Src\Texts;..\..\Src\Spells;..\..\Src\Skills;..\..\Src\Server;..\..\Src\Scripting;..\..\Src\Reputation;..\..\Src\Quests;..\..\Src\Pools;..\..\Src\PCH;..\..\Src\OutdoorPvP;..\..\Src\Movement;..\..\Src\Miscellaneous;..\..\Src\Maps;..\..\Src\Mails;..\..\Src\Loot;..\..\Src\Instances;..\..\Src\Guilds;..\..\Src\Groups;..\..\Src\Grids;..\..\Src\Globals;..\..\Src\Spells\Auras;..\..\Src\Server\Protocol\Handlers;..\..\Src\Server\Protocol\Handlers\Opcodes;..\..\Src\Server\Protocol\Handlers\Packets;..\..\Src\Server\Protocol;..\..\Src\Server\Sockets;..\..\Src\Server\Sessions;..\..\Src\Server\Logs;..\..\Src\Movement\Waypoints;..\..\Src\Movement\MovementGenerators;..\..\Src\Grids\Notifiers;..\..\Src\Grids\Cells;..\..\Src\Entities\Object\Updates;..\..\Src\Entities\Item\Container;..\..\Src\Entities\Vehicle;..\..\Src\Entities\Unit;..\..\Src\Entities\Transport;..\..\Src\Entities\Totem;..\..\Src\Entities\Player;..\..\Src\Entities\Pet;..\..\Src\Entities\Object;..\..\Src\Entities\Item;..\..\Src\Entities\GameObject;..\..\Src\Entities\DynamicObject;..\..\Src\Entities\Creature;..\..\Src\Entities\Corpse;..\..\Src\Events;..\..\Src\Entities;..\..\Src\DungeonFinding;..\..\Src\DataStores;..\..\Src\DataStores\Structs;..\..\Src\Conditions;..\..\Src\Combat;..\..\Src\Chat\Commands;..\..\Src\Chat\Channels;..\..\Src\Chat;..\..\Src\Calendar;..\..\Src\Battlegrounds;..\..\Src\AuctionHouse\AuctionHouseBot;..\..\Src\AuctionHouse;..\..\Src\AI;..\..\Src\Addons;..\..\Src\Accounts;..\..\..\..\Deps\Extern\Src\G3DLite\include;..\..\..\..\Deps\Extern\Src\Recastnavigation\Detour\Include;..\..\..\..\Deps\Extern\Src\Python\Include;..\..\..\..\Deps\Extern\Src\MySql;..\..\..\..\Deps\Extern\Src\MySql\include;..\..\..\..\Deps\Extern\Src\ZLib;..\..\..\..\Deps\Extern\Src\Python\;..\..\..\..\Deps\Extern\Src\MySql\extra\yassl\include;..\..\..\..\Deps\Intern\Src;..\..\..\..\Deps\Intern\Src\Collision;..\..\..\..\Deps\Intern\Src\Collision\Management;..\..\..\..\Deps\Intern\Src\Collision\Maps;..\..\..\..\Deps\Intern\Src\Collision\Models;..\..\..\..\Deps\Intern\Src\Collision\PCH;..\..\..\..\Deps\Intern\Src\Configuration;..\..\..\..\Deps\Intern\Src\Cryptography;..\..\..\..\Deps\Intern\Src\Cryptography\Authentication;..\..\..\..\Deps\Intern\Src\DataStores;..\..\..\..\Deps\Intern\Src\Database;..\..\..\..\Deps\Intern\Src\Dynamic;..\..\..\..\Deps\Intern\Src\Dynamic\LinkedReference;..\..\..\..\Deps\Intern\Src\Logging;..\..\..\..\Deps\Intern\Src\Packets;..\..\..\..\Deps\Intern\Src\Threading;..\..\..\..\Deps\Intern\Src\Utilities;..\..\..\..\Deps\Extern\Src\Ace"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_SECURE_SCL=0"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -439,14 +439,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\Src\Battlegrounds\ArenaTeamMgr.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Src\Battlegrounds\ArenaTeamMgr.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\Src\Battlegrounds\Battleground.cpp"
 				>
 			</File>
@@ -590,14 +582,6 @@
 				RelativePath="..\..\Src\Calendar\Calendar.h"
 				>
 			</File>
-			<File
-				RelativePath="..\..\Src\Calendar\CalendarMgr.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Src\Calendar\CalendarMgr.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Chat"
@@ -608,14 +592,6 @@
 			</File>
 			<File
 				RelativePath="..\..\Src\Chat\Chat.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Src\Chat\ChatLink.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Src\Chat\ChatLink.h"
 				>
 			</File>
 			<Filter
@@ -744,6 +720,10 @@
 			</File>
 			<File
 				RelativePath="..\..\Src\DataStores\DBCStores.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Src\DataStores\DBCStructure.cpp"
 				>
 			</File>
 			<File
@@ -1147,14 +1127,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\Src\Groups\GroupMgr.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Src\Groups\GroupMgr.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\Src\Groups\GroupReference.cpp"
 				>
 			</File>
@@ -1176,14 +1148,6 @@
 			</File>
 			<File
 				RelativePath="..\..\Src\Guilds\Guild.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Src\Guilds\GuildMgr.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Src\Guilds\GuildMgr.h"
 				>
 			</File>
 		</Filter>
@@ -1278,6 +1242,22 @@
 				RelativePath="..\..\Src\Maps\ZoneScript.h"
 				>
 			</File>
+			<Filter
+				Name="MoveMaps"
+				>
+				<File
+					RelativePath="..\..\Src\Maps\MoveMaps\MoveMap.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Src\Maps\MoveMaps\MoveMap.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Src\Maps\MoveMaps\MoveMapSharedDefines.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Miscellaneous"
@@ -1430,6 +1410,18 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="Pathfinding"
+				>
+				<File
+					RelativePath="..\..\Src\Movement\PathFinding\PathFinder.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Src\Movement\PathFinding\PathFinder.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="OutdoorPvP"
@@ -1518,217 +1510,213 @@
 				RelativePath="..\..\Src\Scripting\ScriptSystem.h"
 				>
 			</File>
-			<Filter
-				Name="Python"
-				>
-				<File
-					RelativePath="..\..\Src\Scripting\Python\Scripts.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Src\Scripting\Python\Scripts.h"
-					>
-				</File>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="Server"
 			>
-			<File
-				RelativePath="..\..\Src\Server\WorldPacket.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Src\Server\WorldSession.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Src\Server\WorldSession.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Src\Server\WorldSocket.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Src\Server\WorldSocket.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Src\Server\WorldSocketAcceptor.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Src\Server\WorldSocketMgr.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Src\Server\WorldSocketMgr.h"
-				>
-			</File>
 			<Filter
 				Name="Protocol"
 				>
-				<File
-					RelativePath="..\..\Src\Server\MovementStructures.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Src\Server\Protocol\Opcodes.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Src\Server\Protocol\Opcodes.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Src\Server\Protocol\WorldLog.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Src\Server\Protocol\WorldLog.h"
-					>
-				</File>
 				<Filter
 					Name="Handlers"
 					>
-					<File
-						RelativePath="..\..\Src\Server\Protocol\Handlers\AddonHandler.cpp"
+					<Filter
+						Name="Packets"
 						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Server\Protocol\Handlers\AddonHandler.h"
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Packets\AddonHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Packets\AddonHandler.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Packets\ArenaTeamHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Packets\AuctionHouseHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Packets\AuthHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Packets\BattleGroundHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Packets\CalendarHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Packets\ChannelHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Packets\CharacterHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Packets\ChatHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Packets\CombatHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Packets\DuelHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Packets\GroupHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Packets\GuildHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Packets\ItemHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Packets\LFGHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Packets\LootHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Packets\MailHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Packets\MiscHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Packets\MovementHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Packets\NPCHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Packets\NPCHandler.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Packets\PetHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Packets\PetitionsHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Packets\QueryHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Packets\QuestHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Packets\SkillHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Packets\SpellHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Packets\TaxiHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Packets\TicketHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Packets\TradeHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Packets\VehicleHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Packets\VoiceChatHandler.cpp"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="Opcodes"
 						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Server\Protocol\Handlers\ArenaTeamHandler.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Server\Protocol\Handlers\AuctionHouseHandler.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Server\Protocol\Handlers\AuthHandler.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Server\Protocol\Handlers\BattleGroundHandler.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Server\Protocol\Handlers\CalendarHandler.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Server\Protocol\Handlers\ChannelHandler.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Server\Protocol\Handlers\CharacterHandler.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Server\Protocol\Handlers\ChatHandler.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Server\Protocol\Handlers\CombatHandler.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Server\Protocol\Handlers\DuelHandler.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Server\Protocol\Handlers\GroupHandler.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Server\Protocol\Handlers\GuildHandler.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Server\Protocol\Handlers\ItemHandler.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Server\Protocol\Handlers\LFGHandler.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Server\Protocol\Handlers\LootHandler.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Server\Protocol\Handlers\MailHandler.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Server\Protocol\Handlers\MiscHandler.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Server\Protocol\Handlers\MovementHandler.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Server\Protocol\Handlers\NPCHandler.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Server\Protocol\Handlers\NPCHandler.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Server\Protocol\Handlers\PetHandler.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Server\Protocol\Handlers\PetitionsHandler.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Server\Protocol\Handlers\QueryHandler.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Server\Protocol\Handlers\QuestHandler.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Server\Protocol\Handlers\ReferAFriendHandler.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Server\Protocol\Handlers\SkillHandler.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Server\Protocol\Handlers\SpellHandler.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Server\Protocol\Handlers\TaxiHandler.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Server\Protocol\Handlers\TicketHandler.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Server\Protocol\Handlers\TradeHandler.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Server\Protocol\Handlers\VehicleHandler.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Server\Protocol\Handlers\VoiceChatHandler.cpp"
-						>
-					</File>
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Opcodes\MovementStructures.h"
+							>
+						</File>
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Opcodes\OpcodeHandler.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\..\Src\Server\Protocol\Handlers\Opcodes\OpcodeHandler.h"
+							>
+						</File>
+					</Filter>
 				</Filter>
+			</Filter>
+			<Filter
+				Name="Sessions"
+				>
+				<File
+					RelativePath="..\..\Src\Server\Sessions\WorldSession.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Src\Server\Sessions\WorldSession.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Logs"
+				>
+				<File
+					RelativePath="..\..\Src\Server\Logs\WorldLog.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Src\Server\Logs\WorldLog.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Sockets"
+				>
+				<File
+					RelativePath="..\..\Src\Server\Sockets\WorldSocket.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Src\Server\Sockets\WorldSocket.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Src\Server\Sockets\WorldSocketMgr.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Src\Server\Sockets\WorldSocketMgr.h"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
@@ -1764,14 +1752,6 @@
 			</File>
 			<File
 				RelativePath="..\..\Src\Spells\SpellEffects.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Src\Spells\SpellInfo.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Src\Spells\SpellInfo.h"
 				>
 			</File>
 			<File

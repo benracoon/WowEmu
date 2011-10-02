@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -16,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "blackfathom_deeps.h"
 
 enum Spells
@@ -30,14 +29,14 @@ class boss_aku_mai : public CreatureScript
 public:
     boss_aku_mai() : CreatureScript("boss_aku_mai") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_aku_maiAI (creature);
+        return new boss_aku_maiAI (pCreature);
     }
 
     struct boss_aku_maiAI : public ScriptedAI
     {
-        boss_aku_maiAI(Creature* c) : ScriptedAI(c)
+        boss_aku_maiAI(Creature *c) : ScriptedAI(c)
         {
             pInstance = c->GetInstanceScript();
         }
@@ -49,7 +48,7 @@ public:
 
         void Reset()
         {
-            uiPoisonCloudTimer = urand(5000, 9000);
+            uiPoisonCloudTimer = urand(5000,9000);
             bIsEnraged = false;
             if (pInstance)
                 pInstance->SetData(TYPE_AKU_MAI, NOT_STARTED);
@@ -75,12 +74,12 @@ public:
             if (uiPoisonCloudTimer < diff)
             {
                 DoCastVictim(SPELL_POISON_CLOUD);
-                uiPoisonCloudTimer = urand(25000, 50000);
+                uiPoisonCloudTimer = urand(25000,50000);
             } else uiPoisonCloudTimer -= diff;
 
             if (!bIsEnraged && HealthBelowPct(30))
             {
-                DoCast(me, SPELL_FRENZIED_RAGE);
+                DoCast(me,SPELL_FRENZIED_RAGE);
                 bIsEnraged = true;
             }
 

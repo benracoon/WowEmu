@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -30,7 +29,7 @@ guard_shattrath_aldor
 guard_shattrath_scryer
 EndContentData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "GuardAI.h"
 
 enum GuardGeneric
@@ -65,8 +64,8 @@ public:
         void EnterCombat(Unit* who)
         {
             if (me->GetEntry() == NPC_CENARION_HOLD_INFANTRY)
-                DoScriptText(RAND(SAY_GUARD_SIL_AGGRO1, SAY_GUARD_SIL_AGGRO2, SAY_GUARD_SIL_AGGRO3), me, who);
-            if (SpellInfo const* spell = me->reachWithSpellAttack(who))
+                DoScriptText(RAND(SAY_GUARD_SIL_AGGRO1,SAY_GUARD_SIL_AGGRO2,SAY_GUARD_SIL_AGGRO3), me, who);
+            if (SpellEntry const* spell = me->reachWithSpellAttack(who))
                 DoCast(who, spell->Id);
         }
 
@@ -84,7 +83,7 @@ public:
                 if (buffTimer <= diff)
                 {
                     //Find a spell that targets friendly and applies an aura (these are generally buffs)
-                    SpellInfo const *info = SelectSpell(me, 0, 0, SELECT_TARGET_ANY_FRIEND, 0, 0, 0, 0, SELECT_EFFECT_AURA);
+                    SpellEntry const *info = SelectSpell(me, 0, 0, SELECT_TARGET_ANY_FRIEND, 0, 0, 0, 0, SELECT_EFFECT_AURA);
 
                     if (info && !globalCooldown)
                     {
@@ -112,7 +111,7 @@ public:
                 if (me->IsWithinMeleeRange(me->getVictim()))
                 {
                     bool healing = false;
-                    SpellInfo const *info = NULL;
+                    SpellEntry const *info = NULL;
 
                     //Select a healing spell if less than 30% hp
                     if (me->HealthBelowPct(30))
@@ -125,7 +124,7 @@ public:
                         info = SelectSpell(me->getVictim(), 0, 0, SELECT_TARGET_ANY_ENEMY, 0, 0, 0, 0, SELECT_EFFECT_DONTCARE);
 
                     //20% chance to replace our white hit with a spell
-                    if (info && urand(0, 99) < 20 && !globalCooldown)
+                    if (info && urand(0,99) < 20 && !globalCooldown)
                     {
                         //Cast the spell
                         if (healing)
@@ -148,7 +147,7 @@ public:
                 if (!me->IsNonMeleeSpellCasted(false))
                 {
                     bool healing = false;
-                    SpellInfo const *info = NULL;
+                    SpellEntry const *info = NULL;
 
                     //Select a healing spell if less than 30% hp ONLY 33% of the time
                     if (me->HealthBelowPct(30) && 33 > urand(0, 99))
@@ -172,9 +171,9 @@ public:
 
                         //Cast spell
                         if (healing)
-                            DoCast(me, info->Id);
+                            DoCast(me,info->Id);
                         else
-                            DoCast(me->getVictim(), info->Id);
+                            DoCast(me->getVictim(),info->Id);
 
                         //Set our global cooldown
                         globalCooldown = GENERIC_CREATURE_COOLDOWN;
@@ -269,10 +268,10 @@ public:
             {
                 if (exileTimer <= diff)
                 {
-                    if (Unit* temp = Unit::GetUnit(*me, playerGUID))
+                    if (Unit* temp = Unit::GetUnit(*me,playerGUID))
                     {
-                        temp->CastSpell(temp, SPELL_EXILE, true);
-                        temp->CastSpell(temp, SPELL_BANISH_TELEPORT, true);
+                        temp->CastSpell(temp,SPELL_EXILE,true);
+                        temp->CastSpell(temp,SPELL_BANISH_TELEPORT,true);
                     }
                     playerGUID = 0;
                     exileTimer = 8500;
@@ -302,7 +301,7 @@ public:
         bool canTeleport;
     };
 
-    CreatureAI *GetAI(Creature* creature) const
+    CreatureAI *GetAI(Creature *creature) const
     {
         return new guard_shattrath_scryerAI(creature);
     }
@@ -334,10 +333,10 @@ public:
             {
                 if (exileTimer <= diff)
                 {
-                    if (Unit* temp = Unit::GetUnit(*me, playerGUID))
+                    if (Unit* temp = Unit::GetUnit(*me,playerGUID))
                     {
-                        temp->CastSpell(temp, SPELL_EXILE, true);
-                        temp->CastSpell(temp, SPELL_BANISH_TELEPORT, true);
+                        temp->CastSpell(temp,SPELL_EXILE,true);
+                        temp->CastSpell(temp,SPELL_BANISH_TELEPORT,true);
                     }
                     playerGUID = 0;
                     exileTimer = 8500;
@@ -366,7 +365,7 @@ public:
         bool canTeleport;
     };
 
-    CreatureAI *GetAI(Creature* creature) const
+    CreatureAI *GetAI(Creature *creature) const
     {
         return new guard_shattrath_aldorAI(creature);
     }

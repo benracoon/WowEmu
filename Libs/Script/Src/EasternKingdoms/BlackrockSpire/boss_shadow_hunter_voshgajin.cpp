@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -55,7 +54,7 @@ public:
             //DoCast(me, SPELL_ICEARMOR, true);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit * /*who*/)
         {
             _EnterCombat();
             events.ScheduleEvent(EVENT_CURSE_OF_BLOOD, 2*IN_MILLISECONDS);
@@ -87,8 +86,8 @@ public:
                         events.ScheduleEvent(EVENT_CURSE_OF_BLOOD, 45*IN_MILLISECONDS);
                         break;
                     case EVENT_HEX:
-                        if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                            DoCast(target, SPELL_HEX);
+                        if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                            DoCast(pTarget, SPELL_HEX);
                         events.ScheduleEvent(EVENT_HEX, 15*IN_MILLISECONDS);
                         break;
                     case EVENT_CLEAVE:

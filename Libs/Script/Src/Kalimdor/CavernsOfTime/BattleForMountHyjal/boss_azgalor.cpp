@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -16,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "hyjal.h"
 #include "hyjal_trash.h"
 
@@ -49,18 +48,22 @@ class boss_azgalor : public CreatureScript
 public:
     boss_azgalor() : CreatureScript("boss_azgalor") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_azgalorAI (creature);
+        return new boss_azgalorAI (pCreature);
     }
 
     struct boss_azgalorAI : public hyjal_trashAI
     {
-        boss_azgalorAI(Creature* c) : hyjal_trashAI(c)
+        boss_azgalorAI(Creature *c) : hyjal_trashAI(c)
         {
             pInstance = c->GetInstanceScript();
             pGo = false;
             pos = 0;
+            SpellEntry *TempSpell = GET_SPELL(SPELL_HOWL_OF_AZGALOR);
+             SpellEffectEntry const* spellEffect = TempSpell->GetSpellEffect(EFFECT_0);
+            //if (TempSpell)
+                //spellEffect->EffectRadiusIndex = 12;//100yards instead of 50000?!
         }
 
         uint32 RainTimer;
@@ -87,29 +90,29 @@ public:
                 pInstance->SetData(DATA_AZGALOREVENT, NOT_STARTED);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit * /*who*/)
         {
             if (pInstance && IsEvent)
                 pInstance->SetData(DATA_AZGALOREVENT, IN_PROGRESS);
             DoPlaySoundToSet(me, SOUND_ONAGGRO);
-            me->MonsterYell(SAY_ONAGGRO, LANG_UNIVERSAL, 0);
+            me->MonsterYell(SAY_ONAGGRO, LANG_UNIVERSAL, NULL);
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit * /*victim*/)
         {
-            switch (urand(0, 2))
+            switch (urand(0,2))
             {
                 case 0:
                     DoPlaySoundToSet(me, SOUND_ONSLAY1);
-                    me->MonsterYell(SAY_ONSLAY1, LANG_UNIVERSAL, 0);
+                    me->MonsterYell(SAY_ONSLAY1, LANG_UNIVERSAL, NULL);
                     break;
                 case 1:
                     DoPlaySoundToSet(me, SOUND_ONSLAY2);
-                    me->MonsterYell(SAY_ONSLAY2, LANG_UNIVERSAL, 0);
+                    me->MonsterYell(SAY_ONSLAY2, LANG_UNIVERSAL, NULL);
                     break;
                 case 2:
                     DoPlaySoundToSet(me, SOUND_ONSLAY3);
-                    me->MonsterYell(SAY_ONSLAY3, LANG_UNIVERSAL, 0);
+                    me->MonsterYell(SAY_ONSLAY3, LANG_UNIVERSAL, NULL);
                     break;
             }
         }
@@ -119,13 +122,13 @@ public:
             pos = i;
             if (i == 7 && pInstance)
             {
-                Unit* target = Unit::GetUnit((*me), pInstance->GetData64(DATA_THRALL));
-                if (target && target->isAlive())
-                    me->AddThreat(target, 0.0f);
+                Unit *pTarget = Unit::GetUnit((*me), pInstance->GetData64(DATA_THRALL));
+                if (pTarget && pTarget->isAlive())
+                    me->AddThreat(pTarget,0.0f);
             }
         }
 
-        void JustDied(Unit* victim)
+        void JustDied(Unit *victim)
         {
             hyjal_trashAI::JustDied(victim);
             if (pInstance && IsEvent)
@@ -164,13 +167,13 @@ public:
 
             if (RainTimer <= diff)
             {
-                DoCast(SelectTarget(SELECT_TARGET_RANDOM, 0, 30, true), SPELL_RAIN_OF_FIRE);
+                DoCast(SelectTarget(SELECT_TARGET_RANDOM,0,30,true), SPELL_RAIN_OF_FIRE);
                 RainTimer = 20000+rand()%15000;
             } else RainTimer -= diff;
 
             if (DoomTimer <= diff)
             {
-                DoCast(SelectTarget(SELECT_TARGET_RANDOM, 1, 100, true), SPELL_DOOM);//never on tank
+                DoCast(SelectTarget(SELECT_TARGET_RANDOM,1,100,true), SPELL_DOOM);//never on tank
                 DoomTimer = 45000+rand()%5000;
             } else DoomTimer -= diff;
 
@@ -200,6 +203,7 @@ public:
 
 };
 
+
 #define SPELL_THRASH 12787
 #define SPELL_CRIPPLE 31406
 #define SPELL_WARSTOMP 31408
@@ -209,14 +213,14 @@ class mob_lesser_doomguard : public CreatureScript
 public:
     mob_lesser_doomguard() : CreatureScript("mob_lesser_doomguard") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new mob_lesser_doomguardAI (creature);
+        return new mob_lesser_doomguardAI (pCreature);
     }
 
     struct mob_lesser_doomguardAI : public hyjal_trashAI
     {
-        mob_lesser_doomguardAI(Creature* c) : hyjal_trashAI(c)
+        mob_lesser_doomguardAI(Creature *c) : hyjal_trashAI(c)
         {
             pInstance = c->GetInstanceScript();
             if (pInstance)
@@ -237,11 +241,11 @@ public:
             CheckTimer = 5000;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit * /*who*/)
         {
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit * /*victim*/)
         {
         }
 
@@ -249,13 +253,13 @@ public:
         {
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit *who)
         {
             if (me->IsWithinDist(who, 50) && !me->isInCombat() && me->IsHostileTo(who))
                 AttackStart(who);
         }
 
-        void JustDied(Unit* /*victim*/)
+        void JustDied(Unit * /*victim*/)
         {
         }
 
@@ -265,7 +269,7 @@ public:
             {
                 if (AzgalorGUID)
                 {
-                    Creature* boss = Unit::GetCreature((*me), AzgalorGUID);
+                    Creature* boss = Unit::GetCreature((*me),AzgalorGUID);
                     if (!boss || (boss && boss->isDead()))
                     {
                         me->setDeathState(JUST_DIED);
@@ -297,6 +301,7 @@ public:
     };
 
 };
+
 
 void AddSC_boss_azgalor()
 {

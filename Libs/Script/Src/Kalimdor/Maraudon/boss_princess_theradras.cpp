@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment:
 SDCategory: Maraudon
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 
 #define SPELL_DUSTFIELD             21909
 #define SPELL_BOULDER               21832
@@ -36,14 +35,14 @@ class boss_princess_theradras : public CreatureScript
 public:
     boss_princess_theradras() : CreatureScript("boss_princess_theradras") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_ptheradrasAI (creature);
+        return new boss_ptheradrasAI (pCreature);
     }
 
     struct boss_ptheradrasAI : public ScriptedAI
     {
-        boss_ptheradrasAI(Creature* c) : ScriptedAI(c) {}
+        boss_ptheradrasAI(Creature *c) : ScriptedAI(c) {}
 
         uint32 Dustfield_Timer;
         uint32 Boulder_Timer;
@@ -58,13 +57,13 @@ public:
             RepulsiveGaze_Timer = 23000;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit * /*who*/)
         {
         }
 
         void JustDied(Unit* /*killer*/)
         {
-            me->SummonCreature(12238, 28.067f, 61.875f, -123.405f, 4.67f, TEMPSUMMON_TIMED_DESPAWN, 600000);
+            me->SummonCreature(12238,28.067f,61.875f,-123.405f,4.67f,TEMPSUMMON_TIMED_DESPAWN,600000);
         }
 
         void UpdateAI(const uint32 diff)
@@ -82,10 +81,10 @@ public:
             //Boulder_Timer
             if (Boulder_Timer <= diff)
             {
-                Unit* target = NULL;
-                target = SelectTarget(SELECT_TARGET_RANDOM, 0);
-                if (target)
-                    DoCast(target, SPELL_BOULDER);
+                Unit *pTarget = NULL;
+                pTarget = SelectTarget(SELECT_TARGET_RANDOM,0);
+                if (pTarget)
+                    DoCast(pTarget, SPELL_BOULDER);
                 Boulder_Timer = 10000;
             } else Boulder_Timer -= diff;
 

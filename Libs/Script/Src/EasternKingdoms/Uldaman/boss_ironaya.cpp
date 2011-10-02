@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment:
 SDCategory: Uldaman
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 
 #define SAY_AGGRO                   -1070000
 
@@ -43,7 +42,7 @@ class boss_ironaya : public CreatureScript
 
         struct boss_ironayaAI : public ScriptedAI
         {
-            boss_ironayaAI(Creature* creature) : ScriptedAI(creature) {}
+            boss_ironayaAI(Creature* pCreature) : ScriptedAI(pCreature) {}
 
             uint32 uiArcingTimer;
             bool bHasCastedWstomp;
@@ -56,7 +55,7 @@ class boss_ironaya : public CreatureScript
                 bHasCastedWstomp = false;
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit * /*who*/)
             {
                 DoScriptText(SAY_AGGRO, me);
             }
@@ -73,13 +72,13 @@ class boss_ironaya : public CreatureScript
                     DoCast(me->getVictim(), SPELL_KNOCKAWAY, true);
 
                     // current aggro target is knocked away pick new target
-                    Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 0);
+                    Unit* pTarget = SelectTarget(SELECT_TARGET_TOPAGGRO, 0);
 
-                    if (!target || target == me->getVictim())
-                        target = SelectTarget(SELECT_TARGET_TOPAGGRO, 1);
+                    if (!pTarget || pTarget == me->getVictim())
+                        pTarget = SelectTarget(SELECT_TARGET_TOPAGGRO, 1);
 
-                    if (target)
-                        me->TauntApply(target);
+                    if (pTarget)
+                        me->TauntApply(pTarget);
 
                     //Shouldn't cast this agian
                     bHasCastedKnockaway = true;

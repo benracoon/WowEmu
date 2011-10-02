@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -16,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "oculus.h"
 
 #define MAX_ENCOUNTER 4
@@ -53,8 +52,6 @@ public:
             platformUrom = 0;
             centrifugueConstructCounter = 0;
 
-            eregosCacheGUID = 0;
-
             azureDragonsList.clear();
             gameObjectList.clear();
         }
@@ -64,7 +61,7 @@ public:
             if (creature->GetEntry() != NPC_CENTRIFUGE_CONSTRUCT)
                 return;
 
-             DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT, --centrifugueConstructCounter);
+             DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT,--centrifugueConstructCounter);
 
              if (!centrifugueConstructCounter)
                 if (Creature* varos = instance->GetCreature(varosGUID))
@@ -75,16 +72,20 @@ public:
         {
             if (GetBossState(DATA_DRAKOS_EVENT) == DONE && GetBossState(DATA_VAROS_EVENT) != DONE)
             {
-                player->SendUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_SHOW, 1);
-                player->SendUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT, centrifugueConstructCounter);
+                player->SendUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_SHOW,1);
+                player->SendUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT,centrifugueConstructCounter);
             } else
             {
-                player->SendUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_SHOW, 0);
-                player->SendUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT, 0);
+                player->SendUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_SHOW,0);
+                player->SendUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT,0);
             }
         }
 
-        void ProcessEvent(WorldObject* /*unit*/, uint32 eventId)
+        void ProcessEvent(GameObject* /*go*/, uint32 /*eventId*/)
+        {
+        }
+
+        void ProcessEvent(Unit* /*unit*/, uint32 eventId)
         {
             if (eventId != EVENT_CALL_DRAGON)
                 return;
@@ -94,7 +95,7 @@ public:
             if (!varos)
                 return;
 
-            if (Creature* drake = varos->SummonCreature(NPC_AZURE_RING_GUARDIAN, varos->GetPositionX(), varos->GetPositionY(), varos->GetPositionZ()+40))
+            if (Creature* drake = varos->SummonCreature(NPC_AZURE_RING_GUARDIAN,varos->GetPositionX(),varos->GetPositionY(),varos->GetPositionZ()+40))
                 drake->AI()->DoAction(ACTION_CALL_DRAGON_EVENT);
         }
 
@@ -116,28 +117,21 @@ public:
                     break;
                 case NPC_CENTRIFUGE_CONSTRUCT:
                     if (creature->isAlive())
-                        DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT, ++centrifugueConstructCounter);
+                        DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT,++centrifugueConstructCounter);
                     break;
             }
         }
 
         void OnGameObjectCreate(GameObject* go)
         {
-            switch (go->GetEntry())
+            if (go->GetEntry() == GO_DRAGON_CAGE_DOOR)
             {
-                case GO_DRAGON_CAGE_DOOR:
-                    if (GetBossState(DATA_DRAKOS_EVENT) == DONE)
-                        go->SetGoState(GO_STATE_ACTIVE);
-                    else
-                        go->SetGoState(GO_STATE_READY);
-                    gameObjectList.push_back(go->GetGUID());
-                    break;
-                case GO_EREGOS_CACHE_N:
-                case GO_EREGOS_CACHE_H:
-                    eregosCacheGUID = go->GetGUID();
-                    break;
-                default:
-                    break;
+                if (GetBossState(DATA_DRAKOS_EVENT) == DONE)
+                    go->SetGoState(GO_STATE_ACTIVE);
+                else
+                    go->SetGoState(GO_STATE_READY);
+
+                gameObjectList.push_back(go->GetGUID());
             }
         }
 
@@ -151,18 +145,14 @@ public:
                 case DATA_DRAKOS_EVENT:
                     if (state == DONE)
                     {
-                        DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_SHOW, 1);
-                        DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT, centrifugueConstructCounter);
+                        DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_SHOW,1);
+                        DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT,centrifugueConstructCounter);
                         OpenCageDoors();
                     }
                     break;
                 case DATA_VAROS_EVENT:
                     if (state == DONE)
-                        DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_SHOW, 0);
-                    break;
-                case DATA_EREGOS_EVENT:
-                    if (state == DONE)
-                        DoRespawnGameObject(eregosCacheGUID, 7*DAY);
+                        DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_SHOW,0);
                     break;
             }
 
@@ -266,8 +256,6 @@ public:
 
             uint8 platformUrom;
             uint8 centrifugueConstructCounter;
-
-            uint64 eregosCacheGUID;
 
             std::string str_data;
 

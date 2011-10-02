@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment:
 SDCategory: Zul'Gurub
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "zulgurub.h"
 
 #define SPELL_AMBUSH            24337
@@ -43,7 +42,7 @@ class boss_renataki : public CreatureScript
 
         struct boss_renatakiAI : public ScriptedAI
         {
-            boss_renatakiAI(Creature* c) : ScriptedAI(c) {}
+            boss_renatakiAI(Creature *c) : ScriptedAI(c) {}
 
             uint32 Invisible_Timer;
             uint32 Ambush_Timer;
@@ -66,7 +65,7 @@ class boss_renataki : public CreatureScript
                 Ambushed = false;
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit * /*who*/)
             {
             }
 
@@ -93,12 +92,12 @@ class boss_renataki : public CreatureScript
                 {
                     if (Ambush_Timer <= diff)
                     {
-                        Unit* target = NULL;
-                        target = SelectTarget(SELECT_TARGET_RANDOM, 0);
-                        if (target)
+                        Unit *pTarget = NULL;
+                        pTarget = SelectTarget(SELECT_TARGET_RANDOM,0);
+                        if (pTarget)
                         {
-                            DoTeleportTo(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
-                            DoCast(target, SPELL_AMBUSH);
+                            DoTeleportTo(pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ());
+                            DoCast(pTarget, SPELL_AMBUSH);
                         }
 
                         Ambushed = true;
@@ -127,14 +126,14 @@ class boss_renataki : public CreatureScript
                 {
                     if (Aggro_Timer <= diff)
                     {
-                        Unit* target = NULL;
-                        target = SelectTarget(SELECT_TARGET_RANDOM, 1);
+                        Unit *pTarget = NULL;
+                        pTarget = SelectTarget(SELECT_TARGET_RANDOM,1);
 
                         if (DoGetThreat(me->getVictim()))
-                            DoModifyThreatPercent(me->getVictim(), -50);
+                            DoModifyThreatPercent(me->getVictim(),-50);
 
-                        if (target)
-                            AttackStart(target);
+                        if (pTarget)
+                            AttackStart(pTarget);
 
                         Aggro_Timer = 7000 + rand()%13000;
                     } else Aggro_Timer -= diff;

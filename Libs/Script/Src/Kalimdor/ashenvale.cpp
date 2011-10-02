@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -29,7 +28,7 @@ npc_torek
 npc_ruul_snowhoof
 EndContentData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "ScriptedEscortAI.h"
 
 /*####
@@ -63,7 +62,7 @@ class npc_torek : public CreatureScript
 
         struct npc_torekAI : public npc_escortAI
         {
-            npc_torekAI(Creature* c) : npc_escortAI(c) {}
+            npc_torekAI(Creature *c) : npc_escortAI(c) {}
 
             uint32 Rend_Timer;
             uint32 Thunderclap_Timer;
@@ -71,33 +70,33 @@ class npc_torek : public CreatureScript
 
             void WaypointReached(uint32 i)
             {
-                Player* player = GetPlayerForEscort();
+                Player* pPlayer = GetPlayerForEscort();
 
-                if (!player)
+                if (!pPlayer)
                     return;
 
                 switch (i)
                 {
                 case 1:
-                    DoScriptText(SAY_MOVE, me, player);
+                    DoScriptText(SAY_MOVE, me, pPlayer);
                     break;
                 case 8:
-                    DoScriptText(SAY_PREPARE, me, player);
+                    DoScriptText(SAY_PREPARE, me, pPlayer);
                     break;
                 case 19:
                     //TODO: verify location and creatures amount.
-                    me->SummonCreature(ENTRY_DURIEL, 1776.73f, -2049.06f, 109.83f, 1.54f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
-                    me->SummonCreature(ENTRY_SILVERWING_SENTINEL, 1774.64f, -2049.41f, 109.83f, 1.40f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
-                    me->SummonCreature(ENTRY_SILVERWING_WARRIOR, 1778.73f, -2049.50f, 109.83f, 1.67f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
+                    me->SummonCreature(ENTRY_DURIEL,1776.73f,-2049.06f,109.83f,1.54f,TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT,25000);
+                    me->SummonCreature(ENTRY_SILVERWING_SENTINEL,1774.64f,-2049.41f,109.83f,1.40f,TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT,25000);
+                    me->SummonCreature(ENTRY_SILVERWING_WARRIOR,1778.73f,-2049.50f,109.83f,1.67f,TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT,25000);
                     break;
                 case 20:
-                    DoScriptText(SAY_WIN, me, player);
+                    DoScriptText(SAY_WIN, me, pPlayer);
                     Completed = true;
-                    if (player)
-                        player->GroupEventHappens(QUEST_TOREK_ASSULT, me);
+                    if (pPlayer)
+                        pPlayer->GroupEventHappens(QUEST_TOREK_ASSULT, me);
                     break;
                 case 21:
-                    DoScriptText(SAY_END, me, player);
+                    DoScriptText(SAY_END, me, pPlayer);
                     break;
                 }
             }
@@ -178,13 +177,13 @@ class npc_ruul_snowhoof : public CreatureScript
 
         struct npc_ruul_snowhoofAI : public npc_escortAI
         {
-            npc_ruul_snowhoofAI(Creature* c) : npc_escortAI(c) {}
+            npc_ruul_snowhoofAI(Creature *c) : npc_escortAI(c) {}
 
             void WaypointReached(uint32 i)
             {
-                Player* player = GetPlayerForEscort();
+                Player* pPlayer = GetPlayerForEscort();
 
-                if (!player)
+                if (!pPlayer)
                     return;
 
                 switch(i)
@@ -207,8 +206,8 @@ class npc_ruul_snowhoof : public CreatureScript
                         break;
 
                 case 21:{
-                        if (player)
-                            player->GroupEventHappens(QUEST_FREEDOM_TO_RUUL, me);
+                        if (pPlayer)
+                            pPlayer->GroupEventHappens(QUEST_FREEDOM_TO_RUUL, me);
 
                         break;  }
                 }
@@ -305,30 +304,30 @@ class npc_muglash : public CreatureScript
 
         struct npc_muglashAI : public npc_escortAI
         {
-            npc_muglashAI(Creature* creature) : npc_escortAI(creature) { }
+            npc_muglashAI(Creature* pCreature) : npc_escortAI(pCreature) { }
 
             uint32 m_uiWaveId;
             uint32 m_uiEventTimer;
             bool m_bIsBrazierExtinguished;
 
-            void JustSummoned(Creature* summoned)
+            void JustSummoned(Creature* pSummoned)
             {
-                summoned->AI()->AttackStart(me);
+                pSummoned->AI()->AttackStart(me);
             }
 
             void WaypointReached(uint32 i)
             {
-                Player* player = GetPlayerForEscort();
+                Player* pPlayer = GetPlayerForEscort();
 
                 switch(i)
                 {
                     case 0:
-                        if (player)
-                            DoScriptText(SAY_MUG_START2, me, player);
+                        if (pPlayer)
+                            DoScriptText(SAY_MUG_START2, me, pPlayer);
                         break;
                     case 24:
-                        if (player)
-                            DoScriptText(SAY_MUG_BRAZIER, me, player);
+                        if (pPlayer)
+                            DoScriptText(SAY_MUG_BRAZIER, me, pPlayer);
 
                         if (GameObject* pGo = GetClosestGameObjectWithEntry(me, GO_NAGA_BRAZIER, INTERACTION_DISTANCE*2))
                         {
@@ -339,8 +338,8 @@ class npc_muglash : public CreatureScript
                     case 25:
                         DoScriptText(SAY_MUG_GRATITUDE, me);
 
-                        if (player)
-                            player->GroupEventHappens(QUEST_VORSHA, me);
+                        if (pPlayer)
+                            pPlayer->GroupEventHappens(QUEST_VORSHA, me);
                         break;
                     case 26:
                         DoScriptText(SAY_MUG_PATROL, me);
@@ -351,13 +350,13 @@ class npc_muglash : public CreatureScript
                 }
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit* /*pWho*/)
             {
-                if (Player* player = GetPlayerForEscort())
+                if (Player* pPlayer = GetPlayerForEscort())
                     if (HasEscortState(STATE_ESCORT_PAUSED))
                     {
                         if (urand(0, 1))
-                            DoScriptText(SAY_MUG_ON_GUARD, me, player);
+                            DoScriptText(SAY_MUG_ON_GUARD, me, pPlayer);
                         return;
                     }
             }
@@ -369,14 +368,14 @@ class npc_muglash : public CreatureScript
                 m_bIsBrazierExtinguished = false;
             }
 
-            void JustDied(Unit* /*killer*/)
+            void JustDied(Unit* /*pKiller*/)
             {
-                Player* player = GetPlayerForEscort();
+                Player* pPlayer = GetPlayerForEscort();
                 if (HasEscortState(STATE_ESCORT_ESCORTING))
                 {
-                    if (player)
+                    if (pPlayer)
                     {
-                        player->FailQuest(QUEST_VORSHA);
+                        pPlayer->FailQuest(QUEST_VORSHA);
                     }
                 }
             }
@@ -428,9 +427,9 @@ class npc_muglash : public CreatureScript
             }
         };
 
-        CreatureAI* GetAI(Creature* creature) const
+        CreatureAI* GetAI(Creature* pCreature) const
         {
-            return new npc_muglashAI(creature);
+            return new npc_muglashAI(pCreature);
         }
 
         bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)

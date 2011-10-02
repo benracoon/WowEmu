@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -37,7 +39,8 @@ struct Traveller
     Traveller(const Traveller &obj) : i_traveller(obj) {}
     Traveller& operator=(const Traveller &obj)
     {
-        this.i_traveller = obj.i_traveller;
+        this->~Traveller();
+        new (this) Traveller(obj);
         return *this;
     }
 
@@ -60,7 +63,7 @@ struct Traveller
 template<class T>
 inline uint32 Traveller<T>::GetTotalTrevelTimeTo(float x, float y, float z)
 {
-    float dist = GetMoveDestinationTo(x, y, z);
+    float dist = GetMoveDestinationTo(x,y,z);
     float speed = Speed();
     if (speed < 0.0f)
         return 0xfffffffe;  // almost infinity-unit should stop

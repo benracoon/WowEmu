@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment: Healing of Emperor NYI
 SDCategory: Blackrock Depths
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 
 enum Spells
 {
@@ -41,14 +40,14 @@ class boss_moira_bronzebeard : public CreatureScript
 public:
     boss_moira_bronzebeard() : CreatureScript("boss_moira_bronzebeard") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_moira_bronzebeardAI (creature);
+        return new boss_moira_bronzebeardAI (pCreature);
     }
 
     struct boss_moira_bronzebeardAI : public ScriptedAI
     {
-        boss_moira_bronzebeardAI(Creature* c) : ScriptedAI(c) {}
+        boss_moira_bronzebeardAI(Creature *c) : ScriptedAI(c) {}
 
         uint32 Heal_Timer;
         uint32 MindBlast_Timer;
@@ -63,7 +62,7 @@ public:
             Smite_Timer = 8000;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit * /*who*/)
         {
         }
 

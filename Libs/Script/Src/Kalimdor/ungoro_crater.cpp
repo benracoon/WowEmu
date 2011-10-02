@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -29,7 +28,7 @@ npc_a-me
 npc_ringo
 EndContentData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedFollowerAI.h"
 
@@ -55,58 +54,58 @@ class npc_ame : public CreatureScript
 public:
     npc_ame() : CreatureScript("npc_ame") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* pPlayer, Creature* pCreature, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_CHASING_AME)
         {
-            CAST_AI(npc_escortAI, (creature->AI()))->Start(false, false, player->GetGUID());
-            DoScriptText(SAY_READY, creature, player);
-            creature->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
+            CAST_AI(npc_escortAI, (pCreature->AI()))->Start(false, false, pPlayer->GetGUID());
+            DoScriptText(SAY_READY, pCreature, pPlayer);
+            pCreature->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
             // Change faction so mobs attack
-            creature->setFaction(113);
+            pCreature->setFaction(113);
         }
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new npc_ameAI(creature);
+        return new npc_ameAI(pCreature);
     }
 
     struct npc_ameAI : public npc_escortAI
     {
-        npc_ameAI(Creature* c) : npc_escortAI(c) {}
+        npc_ameAI(Creature *c) : npc_escortAI(c) {}
 
         uint32 DEMORALIZINGSHOUT_Timer;
 
         void WaypointReached(uint32 i)
         {
-            Player* player = GetPlayerForEscort();
+            Player* pPlayer = GetPlayerForEscort();
 
-            if (!player)
+            if (!pPlayer)
                 return;
 
             switch (i)
             {
                 case 19:
                     me->SummonCreature(ENTRY_STOMPER, -6391.69f, -1730.49f, -272.83f, 4.96f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
-                    DoScriptText(SAY_AGGRO1, me, player);
+                    DoScriptText(SAY_AGGRO1, me, pPlayer);
                     break;
                 case 28:
-                    DoScriptText(SAY_SEARCH, me, player);
+                    DoScriptText(SAY_SEARCH, me, pPlayer);
                     break;
                 case 38:
                     me->SummonCreature(ENTRY_TARLORD, -6370.75f, -1382.84f, -270.51f, 6.06f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
-                    DoScriptText(SAY_AGGRO2, me, player);
+                    DoScriptText(SAY_AGGRO2, me, pPlayer);
                     break;
                 case 49:
                     me->SummonCreature(ENTRY_TARLORD1, -6324.44f, -1181.05f, -270.17f, 4.34f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
-                    DoScriptText(SAY_AGGRO3, me, player);
+                    DoScriptText(SAY_AGGRO3, me, pPlayer);
                     break;
                 case 55:
-                    DoScriptText(SAY_FINISH, me, player);
-                    if (player)
-                        player->GroupEventHappens(QUEST_CHASING_AME, me);
+                    DoScriptText(SAY_FINISH, me, pPlayer);
+                    if (pPlayer)
+                        pPlayer->GroupEventHappens(QUEST_CHASING_AME, me);
                     break;
             }
         }
@@ -123,8 +122,8 @@ public:
 
         void JustDied(Unit* /*killer*/)
         {
-            if (Player* player = GetPlayerForEscort())
-                player->FailQuest(QUEST_CHASING_AME);
+            if (Player* pPlayer = GetPlayerForEscort())
+                pPlayer->FailQuest(QUEST_CHASING_AME);
         }
 
         void UpdateAI(const uint32 diff)
@@ -181,28 +180,28 @@ class npc_ringo : public CreatureScript
 public:
     npc_ringo() : CreatureScript("npc_ringo") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* pQuest)
+    bool OnQuestAccept(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
     {
         if (pQuest->GetQuestId() == QUEST_A_LITTLE_HELP)
         {
-            if (npc_ringoAI* pRingoAI = CAST_AI(npc_ringo::npc_ringoAI, creature->AI()))
+            if (npc_ringoAI* pRingoAI = CAST_AI(npc_ringo::npc_ringoAI, pCreature->AI()))
             {
-                creature->SetStandState(UNIT_STAND_STATE_STAND);
-                pRingoAI->StartFollow(player, FACTION_ESCORTEE, pQuest);
+                pCreature->SetStandState(UNIT_STAND_STATE_STAND);
+                pRingoAI->StartFollow(pPlayer, FACTION_ESCORTEE, pQuest);
             }
         }
 
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new npc_ringoAI(creature);
+        return new npc_ringoAI(pCreature);
     }
 
     struct npc_ringoAI : public FollowerAI
     {
-        npc_ringoAI(Creature* creature) : FollowerAI(creature) { }
+        npc_ringoAI(Creature* pCreature) : FollowerAI(pCreature) { }
 
         uint32 m_uiFaintTimer;
         uint32 m_uiEndEventProgress;
@@ -218,27 +217,27 @@ public:
             SpraggleGUID = 0;
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit *pWho)
         {
-            FollowerAI::MoveInLineOfSight(who);
+            FollowerAI::MoveInLineOfSight(pWho);
 
-            if (!me->getVictim() && !HasFollowState(STATE_FOLLOW_COMPLETE) && who->GetEntry() == NPC_SPRAGGLE)
+            if (!me->getVictim() && !HasFollowState(STATE_FOLLOW_COMPLETE) && pWho->GetEntry() == NPC_SPRAGGLE)
             {
-                if (me->IsWithinDistInMap(who, INTERACTION_DISTANCE))
+                if (me->IsWithinDistInMap(pWho, INTERACTION_DISTANCE))
                 {
-                    if (Player* player = GetLeaderForFollower())
+                    if (Player* pPlayer = GetLeaderForFollower())
                     {
-                        if (player->GetQuestStatus(QUEST_A_LITTLE_HELP) == QUEST_STATUS_INCOMPLETE)
-                            player->GroupEventHappens(QUEST_A_LITTLE_HELP, me);
+                        if (pPlayer->GetQuestStatus(QUEST_A_LITTLE_HELP) == QUEST_STATUS_INCOMPLETE)
+                            pPlayer->GroupEventHappens(QUEST_A_LITTLE_HELP, me);
                     }
 
-                    SpraggleGUID = who->GetGUID();
+                    SpraggleGUID = pWho->GetGUID();
                     SetFollowComplete(true);
                 }
             }
         }
 
-        void SpellHit(Unit* /*pCaster*/, const SpellInfo* pSpell)
+        void SpellHit(Unit* /*pCaster*/, const SpellEntry* pSpell)
         {
             if (HasFollowState(STATE_FOLLOW_INPROGRESS | STATE_FOLLOW_PAUSED) && pSpell->Id == SPELL_REVIVE_RINGO)
                 ClearFaint();
@@ -250,7 +249,7 @@ public:
             {
                 SetFollowPaused(true);
 
-                DoScriptText(RAND(SAY_FAINT_1, SAY_FAINT_2, SAY_FAINT_3, SAY_FAINT_4), me);
+                DoScriptText(RAND(SAY_FAINT_1,SAY_FAINT_2,SAY_FAINT_3,SAY_FAINT_4), me);
             }
 
             //what does actually happen here? Emote? Aura?
@@ -264,7 +263,7 @@ public:
             if (HasFollowState(STATE_FOLLOW_POSTEVENT))
                 return;
 
-            DoScriptText(RAND(SAY_WAKE_1, SAY_WAKE_2, SAY_WAKE_3, SAY_WAKE_4), me);
+            DoScriptText(RAND(SAY_WAKE_1,SAY_WAKE_2,SAY_WAKE_3,SAY_WAKE_4), me);
 
             SetFollowPaused(false);
         }
@@ -277,7 +276,7 @@ public:
                 {
                     if (m_uiEndEventTimer <= uiDiff)
                     {
-                        Unit* pSpraggle = Unit::GetUnit(*me, SpraggleGUID);
+                        Unit *pSpraggle = Unit::GetUnit(*me, SpraggleGUID);
                         if (!pSpraggle || !pSpraggle->isAlive())
                         {
                             SetFollowComplete();

@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -16,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "hyjal.h"
 #include "hyjal_trash.h"
 
@@ -52,14 +51,14 @@ class boss_rage_winterchill : public CreatureScript
 public:
     boss_rage_winterchill() : CreatureScript("boss_rage_winterchill") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_rage_winterchillAI (creature);
+        return new boss_rage_winterchillAI (pCreature);
     }
 
     struct boss_rage_winterchillAI : public hyjal_trashAI
     {
-        boss_rage_winterchillAI(Creature* c) : hyjal_trashAI(c)
+        boss_rage_winterchillAI(Creature *c) : hyjal_trashAI(c)
         {
             pInstance = c->GetInstanceScript();
             pGo = false;
@@ -85,7 +84,7 @@ public:
                 pInstance->SetData(DATA_RAGEWINTERCHILLEVENT, NOT_STARTED);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit * /*who*/)
         {
             if (pInstance && IsEvent)
                 pInstance->SetData(DATA_RAGEWINTERCHILLEVENT, IN_PROGRESS);
@@ -93,17 +92,17 @@ public:
             me->MonsterYell(SAY_ONAGGRO, LANG_UNIVERSAL, 0);
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit * /*victim*/)
         {
-            switch (urand(0, 1))
+            switch (urand(0,1))
             {
                 case 0:
                     DoPlaySoundToSet(me, SOUND_ONSLAY1);
-                    me->MonsterYell(SAY_ONSLAY1, LANG_UNIVERSAL, 0);
+                    me->MonsterYell(SAY_ONSLAY1, LANG_UNIVERSAL, NULL);
                     break;
                 case 1:
                     DoPlaySoundToSet(me, SOUND_ONSLAY2);
-                    me->MonsterYell(SAY_ONSLAY2, LANG_UNIVERSAL, 0);
+                    me->MonsterYell(SAY_ONSLAY2, LANG_UNIVERSAL, NULL);
                     break;
             }
         }
@@ -113,19 +112,19 @@ public:
             pos = i;
             if (i == 7 && pInstance)
             {
-                Unit* target = Unit::GetUnit((*me), pInstance->GetData64(DATA_JAINAPROUDMOORE));
-                if (target && target->isAlive())
-                    me->AddThreat(target, 0.0f);
+                Unit *pTarget = Unit::GetUnit((*me), pInstance->GetData64(DATA_JAINAPROUDMOORE));
+                if (pTarget && pTarget->isAlive())
+                    me->AddThreat(pTarget,0.0f);
             }
         }
 
-        void JustDied(Unit* victim)
+        void JustDied(Unit *victim)
         {
             hyjal_trashAI::JustDied(victim);
             if (pInstance && IsEvent)
                 pInstance->SetData(DATA_RAGEWINTERCHILLEVENT, DONE);
             DoPlaySoundToSet(me, SOUND_ONDEATH);
-            me->MonsterYell(SAY_ONDEATH, LANG_UNIVERSAL, 0);
+            me->MonsterYell(SAY_ONDEATH, LANG_UNIVERSAL, NULL);
         }
 
         void UpdateAI(const uint32 diff)
@@ -166,15 +165,15 @@ public:
             {
                 DoCast(me->getVictim(), SPELL_DEATH_AND_DECAY);
                 DecayTimer = 60000+rand()%20000;
-                switch (urand(0, 1))
+                switch (urand(0,1))
                 {
                     case 0:
                         DoPlaySoundToSet(me, SOUND_DECAY1);
-                        me->MonsterYell(SAY_DECAY1, LANG_UNIVERSAL, 0);
+                        me->MonsterYell(SAY_DECAY1, LANG_UNIVERSAL, NULL);
                         break;
                     case 1:
                         DoPlaySoundToSet(me, SOUND_DECAY2);
-                        me->MonsterYell(SAY_DECAY2, LANG_UNIVERSAL, 0);
+                        me->MonsterYell(SAY_DECAY2, LANG_UNIVERSAL, NULL);
                         break;
                 }
             } else DecayTimer -= diff;
@@ -182,21 +181,21 @@ public:
             {
                 DoCast(me->getVictim(), SPELL_FROST_NOVA);
                 NovaTimer = 30000+rand()%15000;
-                switch (urand(0, 1))
+                switch (urand(0,1))
                 {
                     case 0:
                         DoPlaySoundToSet(me, SOUND_NOVA1);
-                        me->MonsterYell(SAY_NOVA1, LANG_UNIVERSAL, 0);
+                        me->MonsterYell(SAY_NOVA1, LANG_UNIVERSAL, NULL);
                         break;
                     case 1:
                         DoPlaySoundToSet(me, SOUND_NOVA2);
-                        me->MonsterYell(SAY_NOVA2, LANG_UNIVERSAL, 0);
+                        me->MonsterYell(SAY_NOVA2, LANG_UNIVERSAL, NULL);
                         break;
                 }
             } else NovaTimer -= diff;
             if (IceboltTimer <= diff)
             {
-                DoCast(SelectTarget(SELECT_TARGET_RANDOM, 0, 40, true), SPELL_ICEBOLT);
+                DoCast(SelectTarget(SELECT_TARGET_RANDOM,0,40,true), SPELL_ICEBOLT);
                 IceboltTimer = 11000+rand()%20000;
             } else IceboltTimer -= diff;
 

@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment: Place holder
 SDCategory: Ruins of Ahn'Qiraj
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "ruins_of_ahnqiraj.h"
 
 enum Yells
@@ -42,20 +41,42 @@ enum Yells
 
 class boss_ossirian : public CreatureScript
 {
-    public:
-        boss_ossirian() : CreatureScript("boss_ossirian") { }
+public:
+    boss_ossirian() : CreatureScript("boss_ossirian") { }
 
-        struct boss_ossirianAI : public ScriptedAI
-        {
-            boss_ossirianAI(Creature* creature) : ScriptedAI(creature)
-            {
-            }
-        };
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new boss_ossirianAI (pCreature);
+    }
 
-        CreatureAI* GetAI(Creature* creature) const
+    struct boss_ossirianAI : public ScriptedAI
+    {
+        boss_ossirianAI(Creature *c) : ScriptedAI(c)
         {
-            return new boss_ossirianAI (creature);
+            pInstance = c->GetInstanceScript();
         }
+
+        InstanceScript *pInstance;
+
+        void Reset()
+        {
+            if (pInstance)
+                pInstance->SetData(DATA_OSSIRIAN_EVENT, NOT_STARTED);
+        }
+
+        void EnterCombat(Unit * /*who*/)
+        {
+            if (pInstance)
+                pInstance->SetData(DATA_OSSIRIAN_EVENT, IN_PROGRESS);
+        }
+
+        void JustDied(Unit * /*killer*/)
+        {
+            if (pInstance)
+                pInstance->SetData(DATA_OSSIRIAN_EVENT, DONE);
+        }
+    };
+
 };
 
 void AddSC_boss_ossirian()

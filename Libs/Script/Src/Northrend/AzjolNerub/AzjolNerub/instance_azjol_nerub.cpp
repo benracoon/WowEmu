@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -16,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "azjol_nerub.h"
 
 #define MAX_ENCOUNTER     3
@@ -90,7 +89,7 @@ public:
                 case 192395:
                     uiKrikthirDoor = go->GetGUID();
                     if (auiEncounter[0] == DONE)
-                        HandleGameObject(0, true, go);
+                        HandleGameObject(NULL,true,go);
                     break;
                 case 192396:
                     uiAnubarakDoor[0] = go->GetGUID();
@@ -126,7 +125,7 @@ public:
             case DATA_KRIKTHIR_THE_GATEWATCHER_EVENT:
                 auiEncounter[0] = data;
                 if (data == DONE)
-                    HandleGameObject(uiKrikthirDoor, true);
+                    HandleGameObject(uiKrikthirDoor,true);
                 break;
             case DATA_HADRONOX_EVENT:
                 auiEncounter[1] = data;
@@ -165,7 +164,7 @@ public:
             OUT_SAVE_INST_DATA;
 
             std::ostringstream saveStream;
-            saveStream << "A N " << auiEncounter[0] << ' ' << auiEncounter[1] << ' '
+            saveStream << "A N " << auiEncounter[0] << " " << auiEncounter[1] << " "
                 << auiEncounter[2];
 
             OUT_SAVE_INST_DATA_COMPLETE;
@@ -183,7 +182,7 @@ public:
             OUT_LOAD_INST_DATA(in);
 
             char dataHead1, dataHead2;
-            uint16 data0, data1, data2;
+            uint16 data0,data1,data2;
 
             std::istringstream loadStream(in);
             loadStream >> dataHead1 >> dataHead2 >> data0 >> data1 >> data2;

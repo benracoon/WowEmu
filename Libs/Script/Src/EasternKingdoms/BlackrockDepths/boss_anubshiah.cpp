@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment:
 SDCategory: Blackrock Depths
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 
 enum Spells
 {
@@ -40,14 +39,14 @@ class boss_anubshiah : public CreatureScript
 public:
     boss_anubshiah() : CreatureScript("boss_anubshiah") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_anubshiahAI (creature);
+        return new boss_anubshiahAI (pCreature);
     }
 
     struct boss_anubshiahAI : public ScriptedAI
     {
-        boss_anubshiahAI(Creature* c) : ScriptedAI(c) {}
+        boss_anubshiahAI(Creature *c) : ScriptedAI(c) {}
 
         uint32 ShadowBolt_Timer;
         uint32 CurseOfTongues_Timer;
@@ -64,7 +63,7 @@ public:
             EnvelopingWeb_Timer = 16000;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit * /*who*/)
         {
         }
 
@@ -84,8 +83,8 @@ public:
             //CurseOfTongues_Timer
             if (CurseOfTongues_Timer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                    DoCast(target, SPELL_CURSEOFTONGUES);
+                if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                    DoCast(pTarget, SPELL_CURSEOFTONGUES);
                 CurseOfTongues_Timer = 18000;
             } else CurseOfTongues_Timer -= diff;
 
@@ -106,8 +105,8 @@ public:
             //EnvelopingWeb_Timer
             if (EnvelopingWeb_Timer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                    DoCast(target, SPELL_ENVELOPINGWEB);
+                if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                    DoCast(pTarget, SPELL_ENVELOPINGWEB);
                 EnvelopingWeb_Timer = 12000;
             } else EnvelopingWeb_Timer -= diff;
 

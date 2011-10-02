@@ -1,5 +1,4 @@
  /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -34,7 +33,7 @@ go_ravager_cage
 npc_death_ravager
 EndContentData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "ScriptedEscortAI.h"
 #include <cmath>
 
@@ -63,14 +62,14 @@ class npc_draenei_survivor : public CreatureScript
 public:
     npc_draenei_survivor() : CreatureScript("npc_draenei_survivor") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new npc_draenei_survivorAI (creature);
+        return new npc_draenei_survivorAI (pCreature);
     }
 
     struct npc_draenei_survivorAI : public ScriptedAI
     {
-        npc_draenei_survivorAI(Creature* c) : ScriptedAI(c) {}
+        npc_draenei_survivorAI(Creature *c) : ScriptedAI(c) {}
 
         uint64 pCaster;
 
@@ -98,9 +97,9 @@ public:
             me->SetStandState(UNIT_STAND_STATE_SLEEP);
         }
 
-        void EnterCombat(Unit* /*who*/) {}
+        void EnterCombat(Unit * /*who*/) {}
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit *who)
         {
             if (CanSayHelp && who->GetTypeId() == TYPEID_PLAYER && me->IsFriendlyTo(who) && me->IsWithinDistInMap(who, 25.0f))
             {
@@ -112,9 +111,10 @@ public:
             }
         }
 
-        void SpellHit(Unit* Caster, const SpellInfo *Spell)
+        void SpellHit(Unit *Caster, const SpellEntry *Spell)
         {
-            if (Spell->SpellFamilyFlags[2] & 0x080000000)
+            SpellClassOptionsEntry const* classOptions = Spell->GetSpellClassOptions();
+            if (classOptions && classOptions->SpellFamilyFlags2 & 0x080000000)
             {
                 me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
                 me->SetStandState(UNIT_STAND_STATE_STAND);
@@ -135,11 +135,11 @@ public:
                 {
                     me->RemoveAurasDueToSpell(SPELL_IRRIDATION);
 
-                    if (Player* player = Unit::GetPlayer(*me, pCaster))
+                    if (Player* pPlayer = Unit::GetPlayer(*me, pCaster))
                     {
-                        DoScriptText(RAND(SAY_HEAL1, SAY_HEAL2, SAY_HEAL3, SAY_HEAL4), me, player);
+                        DoScriptText(RAND(SAY_HEAL1, SAY_HEAL2, SAY_HEAL3, SAY_HEAL4), me, pPlayer);
 
-                        player->TalkedToCreature(me->GetEntry(), me->GetGUID());
+                        pPlayer->TalkedToCreature(me->GetEntry(),me->GetGUID());
                     }
 
                     me->GetMotionMaster()->Clear();
@@ -196,35 +196,35 @@ class npc_engineer_spark_overgrind : public CreatureScript
 public:
     npc_engineer_spark_overgrind() : CreatureScript("npc_engineer_spark_overgrind") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction)
+    bool OnGossipSelect(Player* pPlayer, Creature* pCreature, uint32 /*uiSender*/, uint32 uiAction)
     {
-        player->PlayerTalkClass->ClearMenus();
+        pPlayer->PlayerTalkClass->ClearMenus();
         if (uiAction == GOSSIP_ACTION_INFO_DEF)
         {
-            player->CLOSE_GOSSIP_MENU();
-            creature->setFaction(FACTION_HOSTILE);
-            CAST_AI(npc_engineer_spark_overgrind::npc_engineer_spark_overgrindAI, creature->AI())->AttackStart(player);
+            pPlayer->CLOSE_GOSSIP_MENU();
+            pCreature->setFaction(FACTION_HOSTILE);
+            CAST_AI(npc_engineer_spark_overgrind::npc_engineer_spark_overgrindAI, pCreature->AI())->AttackStart(pPlayer);
         }
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* pPlayer, Creature* pCreature)
     {
-        if (player->GetQuestStatus(QUEST_GNOMERCY) == QUEST_STATUS_INCOMPLETE)
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_FIGHT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+        if (pPlayer->GetQuestStatus(QUEST_GNOMERCY) == QUEST_STATUS_INCOMPLETE)
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_FIGHT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
 
-        player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+        pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new npc_engineer_spark_overgrindAI (creature);
+        return new npc_engineer_spark_overgrindAI (pCreature);
     }
 
     struct npc_engineer_spark_overgrindAI : public ScriptedAI
     {
-        npc_engineer_spark_overgrindAI(Creature* c) : ScriptedAI(c)
+        npc_engineer_spark_overgrindAI(Creature *c) : ScriptedAI(c)
         {
             NormFaction = c->getFaction();
             NpcFlags = c->GetUInt32Value(UNIT_NPC_FLAGS);
@@ -295,14 +295,14 @@ class npc_injured_draenei : public CreatureScript
 public:
     npc_injured_draenei() : CreatureScript("npc_injured_draenei") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new npc_injured_draeneiAI (creature);
+        return new npc_injured_draeneiAI (pCreature);
     }
 
     struct npc_injured_draeneiAI : public ScriptedAI
     {
-        npc_injured_draeneiAI(Creature* c) : ScriptedAI(c) {}
+        npc_injured_draeneiAI(Creature *c) : ScriptedAI(c) {}
 
         void Reset()
         {
@@ -315,9 +315,9 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) {}
+        void EnterCombat(Unit * /*who*/) {}
 
-        void MoveInLineOfSight(Unit* /*who*/)
+        void MoveInLineOfSight(Unit * /*who*/)
         {
         }
 
@@ -350,48 +350,48 @@ class npc_magwin : public CreatureScript
 public:
     npc_magwin() : CreatureScript("npc_magwin") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest)
+    bool OnQuestAccept(Player* pPlayer, Creature* pCreature, Quest const* quest)
     {
         if (quest->GetQuestId() == QUEST_A_CRY_FOR_SAY_HELP)
         {
-            creature->setFaction(113);
-            if (npc_escortAI* pEscortAI = CAST_AI(npc_escortAI, creature->AI()))
-                pEscortAI->Start(true, false, player->GetGUID());
+            pCreature->setFaction(113);
+            if (npc_escortAI* pEscortAI = CAST_AI(npc_escortAI, pCreature->AI()))
+                pEscortAI->Start(true, false, pPlayer->GetGUID());
         }
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new npc_magwinAI(creature);
+        return new npc_magwinAI(pCreature);
     }
 
     struct npc_magwinAI : public npc_escortAI
     {
-        npc_magwinAI(Creature* c) : npc_escortAI(c) {}
+        npc_magwinAI(Creature *c) : npc_escortAI(c) {}
 
         void WaypointReached(uint32 i)
         {
-            Player* player = GetPlayerForEscort();
+            Player* pPlayer = GetPlayerForEscort();
 
-            if (!player)
+            if (!pPlayer)
                 return;
 
             switch(i)
             {
             case 0:
-                DoScriptText(SAY_START, me, player);
+                DoScriptText(SAY_START, me, pPlayer);
                 break;
             case 17:
-                DoScriptText(SAY_PROGRESS, me, player);
+                DoScriptText(SAY_PROGRESS, me, pPlayer);
                 break;
             case 28:
-                DoScriptText(SAY_END1, me, player);
+                DoScriptText(SAY_END1, me, pPlayer);
                 break;
             case 29:
-                DoScriptText(EMOTE_HUG, me, player);
-                DoScriptText(SAY_END2, me, player);
-                player->GroupEventHappens(QUEST_A_CRY_FOR_SAY_HELP, me);
+                DoScriptText(EMOTE_HUG, me, pPlayer);
+                DoScriptText(SAY_END2, me, pPlayer);
+                pPlayer->GroupEventHappens(QUEST_A_CRY_FOR_SAY_HELP,me);
                 break;
             }
         }
@@ -437,14 +437,14 @@ class npc_geezle : public CreatureScript
 public:
     npc_geezle() : CreatureScript("npc_geezle") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new npc_geezleAI(creature);
+        return new npc_geezleAI(pCreature);
     }
 
     struct npc_geezleAI : public ScriptedAI
     {
-        npc_geezleAI(Creature* c) : ScriptedAI(c) {}
+        npc_geezleAI(Creature *c) : ScriptedAI(c) {}
 
         uint64 SparkGUID;
 
@@ -534,7 +534,7 @@ public:
                 if ((*itr)->GetQuestStatus(QUEST_TREES_COMPANY) == QUEST_STATUS_INCOMPLETE
                     &&(*itr)->HasAura(SPELL_TREE_DISGUISE))
                 {
-                    (*itr)->KilledMonsterCredit(MOB_SPARK, 0);
+                    (*itr)->KilledMonsterCredit(MOB_SPARK,0);
                 }
             }
         }
@@ -542,7 +542,7 @@ public:
         void DespawnNagaFlag(bool despawn)
         {
             std::list<GameObject*> FlagList;
-            me->GetGameObjectListWithEntryInGrid(FlagList, GO_NAGA_FLAG, 100.0f);
+            me->GetGameObjectListWithEntryInGrid(FlagList,GO_NAGA_FLAG, 100.0f);
 
             if (!FlagList.empty())
             {
@@ -587,15 +587,15 @@ class go_ravager_cage : public GameObjectScript
 public:
     go_ravager_cage() : GameObjectScript("go_ravager_cage") { }
 
-    bool OnGossipHello(Player* player, GameObject* pGo)
+    bool OnGossipHello(Player* pPlayer, GameObject* pGo)
     {
-        if (player->GetQuestStatus(QUEST_STRENGTH_ONE) == QUEST_STATUS_INCOMPLETE)
+        if (pPlayer->GetQuestStatus(QUEST_STRENGTH_ONE) == QUEST_STATUS_INCOMPLETE)
         {
             if (Creature* ravager = pGo->FindNearestCreature(NPC_DEATH_RAVAGER, 5.0f, true))
             {
-                ravager->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                ravager->RemoveFlag(UNIT_FIELD_FLAGS,UNIT_FLAG_NON_ATTACKABLE);
                 ravager->SetReactState(REACT_AGGRESSIVE);
-                ravager->AI()->AttackStart(player);
+                ravager->AI()->AttackStart(pPlayer);
             }
         }
         return true ;
@@ -607,14 +607,14 @@ class npc_death_ravager : public CreatureScript
 public:
     npc_death_ravager() : CreatureScript("npc_death_ravager") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new npc_death_ravagerAI(creature);
+        return new npc_death_ravagerAI(pCreature);
     }
 
     struct npc_death_ravagerAI : public ScriptedAI
     {
-        npc_death_ravagerAI(Creature* c) : ScriptedAI(c){}
+        npc_death_ravagerAI(Creature *c) : ScriptedAI(c){}
 
         uint32 RendTimer;
         uint32 EnragingBiteTimer;
@@ -656,109 +656,75 @@ public:
 /*########
 ## Quest: The Prophecy of Akida
 ########*/
-
 enum BristlelimbCage
 {
     QUEST_THE_PROPHECY_OF_AKIDA         = 9544,
     NPC_STILLPINE_CAPITIVE              = 17375,
     GO_BRISTELIMB_CAGE                  = 181714,
-
     CAPITIVE_SAY_1                      = -1000474,
     CAPITIVE_SAY_2                      = -1000475,
-    CAPITIVE_SAY_3                      = -1000476,
-
-    POINT_INIT                          = 1,
-    EVENT_DESPAWN                       = 1,
+    CAPITIVE_SAY_3                      = -1000476
 };
 
 class npc_stillpine_capitive : public CreatureScript
 {
-    public:
-        npc_stillpine_capitive() : CreatureScript("npc_stillpine_capitive") { }
+public:
+    npc_stillpine_capitive() : CreatureScript("npc_stillpine_capitive") { }
 
-        struct npc_stillpine_capitiveAI : public ScriptedAI
+    struct npc_stillpine_capitiveAI : public ScriptedAI
+    {
+        npc_stillpine_capitiveAI(Creature *c) : ScriptedAI(c){}
+
+        uint32 FleeTimer;
+
+        void Reset()
         {
-            npc_stillpine_capitiveAI(Creature* creature) : ScriptedAI(creature)
-            {
-            }
-
-            void Reset()
-            {
-                if (GameObject* cage = me->FindNearestGameObject(GO_BRISTELIMB_CAGE, 5.0f))
-                {
-                    cage->SetLootState(GO_JUST_DEACTIVATED);
-                    cage->SetGoState(GO_STATE_READY);
-                }
-                _events.Reset();
-                _player = NULL;
-                _movementComplete = false;
-            }
-
-            void StartMoving(Player* owner)
-            {
-                if (owner)
-                {
-                    DoScriptText(RAND(CAPITIVE_SAY_1, CAPITIVE_SAY_2, CAPITIVE_SAY_3), me, owner);
-                    _player = owner;
-                }
-                Position pos;
-                me->GetNearPosition(pos, 3.0f, 0.0f);
-                me->GetMotionMaster()->MovePoint(POINT_INIT, pos);
-            }
-
-            void MovementInform(uint32 type, uint32 id)
-            {
-                if (type != POINT_MOTION_TYPE || id != POINT_INIT)
-                    return;
-
-                if (_player)
-                    _player->KilledMonsterCredit(me->GetEntry(), me->GetGUID());
-
-                _movementComplete = true;
-                _events.ScheduleEvent(EVENT_DESPAWN, 3500);
-            }
-
-            void UpdateAI(uint32 const diff)
-            {
-                if (!_movementComplete)
-                    return;
-
-                _events.Update(diff);
-
-                if (_events.ExecuteEvent() == EVENT_DESPAWN)
-                    me->DespawnOrUnsummon();
-            }
-
-        private:
-            Player* _player;
-            EventMap _events;
-            bool _movementComplete;
-        };
-
-        CreatureAI* GetAI(Creature* creature) const
-        {
-            return new npc_stillpine_capitiveAI(creature);
+            FleeTimer = 0;
+            GameObject* cage = me->FindNearestGameObject(GO_BRISTELIMB_CAGE, 5.0f);
+            if(cage)
+                cage->ResetDoorOrButton();
         }
+
+        void UpdateAI(const uint32 diff)
+        {
+            if(FleeTimer)
+            {
+                if(FleeTimer <= diff)
+                    me->DespawnOrUnsummon();
+                else FleeTimer -= diff;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* pCreature) const
+    {
+        return new npc_stillpine_capitiveAI(pCreature);
+    }
+
 };
 
 class go_bristlelimb_cage : public GameObjectScript
 {
-    public:
-        go_bristlelimb_cage() : GameObjectScript("go_bristlelimb_cage") { }
+public:
+    go_bristlelimb_cage() : GameObjectScript("go_bristlelimb_cage") { }
 
-        bool OnGossipHello(Player* player, GameObject* go)
+    bool OnGossipHello(Player* pPlayer, GameObject* pGo)
+    {
+        if(pPlayer->GetQuestStatus(QUEST_THE_PROPHECY_OF_AKIDA) == QUEST_STATUS_INCOMPLETE)
         {
-            if (player->GetQuestStatus(QUEST_THE_PROPHECY_OF_AKIDA) == QUEST_STATUS_INCOMPLETE)
+            Creature* pCreature = pGo->FindNearestCreature(NPC_STILLPINE_CAPITIVE, 5.0f, true);
+            if(pCreature)
             {
-                if (Creature* capitive = go->FindNearestCreature(NPC_STILLPINE_CAPITIVE, 5.0f, true))
-                {
-                    go->ResetDoorOrButton();
-                    CAST_AI(npc_stillpine_capitive::npc_stillpine_capitiveAI, capitive->AI())->StartMoving(player);
-                    return false;
-                }
+                DoScriptText(RAND(CAPITIVE_SAY_1, CAPITIVE_SAY_2, CAPITIVE_SAY_3), pCreature, pPlayer);
+                pCreature->GetMotionMaster()->MoveFleeing(pPlayer, 3500);
+                pPlayer->KilledMonsterCredit(pCreature->GetEntry(), pCreature->GetGUID());
+                CAST_AI(npc_stillpine_capitive::npc_stillpine_capitiveAI, pCreature->AI())->FleeTimer = 3500;
+                return false;
             }
-            return true;
         }
+        return true;
+    }
+
 };
 
 void AddSC_azuremyst_isle()

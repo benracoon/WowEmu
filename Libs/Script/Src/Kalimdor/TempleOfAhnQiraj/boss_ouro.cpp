@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment: No model for submerging. Currently just invisible.
 SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "temple_of_ahnqiraj.h"
 
 #define SPELL_SWEEP             26103
@@ -39,14 +38,14 @@ class boss_ouro : public CreatureScript
 public:
     boss_ouro() : CreatureScript("boss_ouro") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_ouroAI (creature);
+        return new boss_ouroAI (pCreature);
     }
 
     struct boss_ouroAI : public ScriptedAI
     {
-        boss_ouroAI(Creature* c) : ScriptedAI(c) {}
+        boss_ouroAI(Creature *c) : ScriptedAI(c) {}
 
         uint32 Sweep_Timer;
         uint32 SandBlast_Timer;
@@ -71,7 +70,7 @@ public:
             Submerged = false;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit * /*who*/)
         {
             DoCast(me->getVictim(), SPELL_BIRTH);
         }
@@ -112,11 +111,11 @@ public:
             //ChangeTarget_Timer
             if (Submerged && ChangeTarget_Timer <= diff)
             {
-                Unit* target = NULL;
-                target = SelectTarget(SELECT_TARGET_RANDOM, 0);
+                Unit *pTarget = NULL;
+                pTarget = SelectTarget(SELECT_TARGET_RANDOM,0);
 
-                if (target)
-                    DoTeleportTo(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
+                if (pTarget)
+                    DoTeleportTo(pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ());
 
                 ChangeTarget_Timer = 10000 + rand()%10000;
             } else ChangeTarget_Timer -= diff;

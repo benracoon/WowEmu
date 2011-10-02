@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -52,7 +51,7 @@ void LFGScripts::OnAddMember(Group* group, uint64 guid)
         sLFGMgr->Leave(NULL, group);
 
     if (sLFGMgr->GetState(guid) == LFG_STATE_QUEUED)
-        if (Player *plr = ObjectAccessor::FindPlayer(guid))
+        if (Player *plr = sObjectMgr->GetPlayer(guid))
             sLFGMgr->Leave(plr);
 }
 
@@ -83,7 +82,7 @@ void LFGScripts::OnRemoveMember(Group* group, uint64 guid, RemoveMethod& method,
     }
 
     sLFGMgr->ClearState(guid);
-    if (Player *plr = ObjectAccessor::FindPlayer(guid))
+    if (Player *plr = sObjectMgr->GetPlayer(guid))
     {
         /*
         if (method == GROUP_REMOVEMETHOD_LEAVE)
@@ -117,13 +116,14 @@ void LFGScripts::OnChangeLeader(Group* group, uint64 newLeaderGuid, uint64 oldLe
         return;
 
     sLog->outDebug(LOG_FILTER_LFG, "LFGScripts::OnChangeLeader [" UI64FMTD "]: old [" UI64FMTD "] new [" UI64FMTD "]", gguid, newLeaderGuid, oldLeaderGuid);
-    Player *plr = ObjectAccessor::FindPlayer(newLeaderGuid);
+    Player *plr = sObjectMgr->GetPlayer(newLeaderGuid);
 
     LfgUpdateData updateData = LfgUpdateData(LFG_UPDATETYPE_LEADER);
     if (plr)
         plr->GetSession()->SendLfgUpdateParty(updateData);
 
-    plr = ObjectAccessor::FindPlayer(oldLeaderGuid);
+
+    plr = sObjectMgr->GetPlayer(oldLeaderGuid);
     if (plr)
     {
         updateData.updateType = LFG_UPDATETYPE_GROUP_DISBAND;
@@ -141,7 +141,7 @@ void LFGScripts::OnInviteMember(Group* group, uint64 guid)
     sLFGMgr->Leave(NULL, group);
 }
 
-void LFGScripts::OnLevelChanged(Player* player, uint8 /*oldLevel*/)
+void LFGScripts::OnLevelChanged(Player* player, uint8 /*newLevel*/)
 {
     sLFGMgr->InitializeLockedDungeons(player);
 }

@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment: Placeholder
 SDCategory: Deadmines
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "deadmines.h"
 #include "Spell.h"
 
@@ -48,7 +47,8 @@ public:
         }
         if (pInstance->GetData(EVENT_STATE)!= CANNON_NOT_USED)
             return false;
-        if (targets.GetGOTarget() && targets.GetGOTarget()->GetEntry() == GO_DEFIAS_CANNON)
+        if (targets.getGOTarget() && targets.getGOTarget()->GetTypeId() == TYPEID_GAMEOBJECT &&
+           targets.getGOTarget()->GetEntry() == GO_DEFIAS_CANNON)
         {
             pInstance->SetData(EVENT_STATE, CANNON_GUNPOWDER_USED);
         }

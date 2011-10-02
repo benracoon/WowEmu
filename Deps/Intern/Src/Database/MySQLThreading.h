@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -34,7 +33,7 @@ class MySQL
         static void Thread_Init()
         {
             mysql_thread_init();
-            sLog->outSQLDriver("Core thread with ID ["UI64FMTD"] initializing MySQL thread.",
+            printf("Core thread with ID ["UI64FMTD"] initializing MySQL thread.\n",
                     (uint64)ACE_Based::Thread::currentId());
         }
 
@@ -45,7 +44,7 @@ class MySQL
         static void Thread_End()
         {
             mysql_thread_end();
-            sLog->outSQLDriver("Core thread with ID ["UI64FMTD"] shutting down MySQL thread.",
+            sLog->outSQLDriver("Core thread with ID ["UI64FMTD"] shutting down MySQL thread.\n",
                 (uint64)ACE_Based::Thread::currentId());
         }
 

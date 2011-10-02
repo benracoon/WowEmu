@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -63,33 +65,33 @@ struct DefaultTargetSelector : public std::unary_function<Unit* , bool>
     // aura: if 0: ignored, if > 0: the target shall have the aura, if < 0, the target shall NOT have the aura
     DefaultTargetSelector(Unit const* pUnit, float dist, bool playerOnly, int32 aura) : me(pUnit), m_dist(dist), m_playerOnly(playerOnly), m_aura(aura) {}
 
-    bool operator()(Unit const* target) const
+    bool operator() (Unit const* pTarget)
     {
         if (!me)
             return false;
 
-        if (!target)
+        if (!pTarget)
             return false;
 
-        if (m_playerOnly && (target->GetTypeId() != TYPEID_PLAYER))
+        if (m_playerOnly && (pTarget->GetTypeId() != TYPEID_PLAYER))
             return false;
 
-        if (m_dist > 0.0f && !me->IsWithinCombatRange(target, m_dist))
+        if (m_dist > 0.0f && !me->IsWithinCombatRange(pTarget, m_dist))
             return false;
 
-        if (m_dist < 0.0f && me->IsWithinCombatRange(target, -m_dist))
+        if (m_dist < 0.0f && me->IsWithinCombatRange(pTarget, -m_dist))
             return false;
 
         if (m_aura)
         {
             if (m_aura > 0)
             {
-                if (!target->HasAura(m_aura))
+                if (!pTarget->HasAura(m_aura))
                     return false;
             }
             else
             {
-                if (target->HasAura(-m_aura))
+                if (pTarget->HasAura(-m_aura))
                     return false;
             }
         }
@@ -101,7 +103,7 @@ struct DefaultTargetSelector : public std::unary_function<Unit* , bool>
 class UnitAI
 {
     protected:
-        Unit* const me;
+        Unit * const me;
     public:
         explicit UnitAI(Unit* unit) : me(unit) {}
         virtual ~UnitAI() {}
@@ -121,13 +123,13 @@ class UnitAI
         virtual void DoAction(int32 const /*param*/) {}
         virtual uint32 GetData(uint32 /*id = 0*/) { return 0; }
         virtual void SetData(uint32 /*id*/, uint32 /*value*/) {}
-        virtual void SetGUID(uint64 const /*guid*/, int32 /*id*/ = 0) {}
+        virtual void SetGUID(uint64 const&/*guid*/, int32 /*id*/ = 0) {}
         virtual uint64 GetGUID(int32 /*id*/ = 0) { return 0; }
 
         Unit* SelectTarget(SelectAggroTarget targetType, uint32 position = 0, float dist = 0.0f, bool playerOnly = false, int32 aura = 0);
         // Select the targets satifying the predicate.
         // predicate shall extend std::unary_function<Unit* , bool>
-        template <class PREDICATE> Unit* SelectTarget(SelectAggroTarget targetType, uint32 position, PREDICATE const& predicate)
+        template <class PREDICATE> Unit* SelectTarget(SelectAggroTarget targetType, uint32 position, PREDICATE predicate)
         {
             const std::list<HostileReference* > &threatlist = me->getThreatManager().getThreatList();
             if (position >= threatlist.size())
@@ -177,7 +179,7 @@ class UnitAI
 
         // Select the targets satifying the predicate.
         // predicate shall extend std::unary_function<Unit* , bool>
-        template <class PREDICATE> void SelectTargetList(std::list<Unit*> &targetList, PREDICATE const& predicate, uint32 maxTargets, SelectAggroTarget targetType)
+        template <class PREDICATE> void SelectTargetList(std::list<Unit*> &targetList, PREDICATE predicate, uint32 maxTargets, SelectAggroTarget targetType)
         {
             std::list<HostileReference*> const& threatlist = me->getThreatManager().getThreatList();
             if (threatlist.empty())

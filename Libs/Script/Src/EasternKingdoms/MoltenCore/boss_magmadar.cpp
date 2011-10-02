@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -56,7 +55,7 @@ class boss_magmadar : public CreatureScript
 
         struct boss_magmadarAI : public BossAI
         {
-            boss_magmadarAI(Creature* creature) : BossAI(creature, BOSS_MAGMADAR)
+            boss_magmadarAI(Creature *pCreature) : BossAI(pCreature, BOSS_MAGMADAR)
             {
             }
 

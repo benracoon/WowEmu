@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -29,7 +28,7 @@ npc_converted_sentry
 npc_greengill_slave
 EndContentData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 
 /*######
 ## npc_converted_sentry
@@ -45,14 +44,14 @@ class npc_converted_sentry : public CreatureScript
 public:
     npc_converted_sentry() : CreatureScript("npc_converted_sentry") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new npc_converted_sentryAI (creature);
+        return new npc_converted_sentryAI (pCreature);
     }
 
     struct npc_converted_sentryAI : public ScriptedAI
     {
-        npc_converted_sentryAI(Creature* c) : ScriptedAI(c) {}
+        npc_converted_sentryAI(Creature *c) : ScriptedAI(c) {}
 
         bool Credit;
         uint32 Timer;
@@ -63,7 +62,7 @@ public:
             Timer = 2500;
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) {}
+        void MoveInLineOfSight(Unit * /*who*/) {}
         void EnterCombat(Unit* /*who*/) {}
 
         void UpdateAI(const uint32 diff)
@@ -72,7 +71,7 @@ public:
             {
                 if (Timer <= diff)
                 {
-                    uint32 i = urand(1, 2);
+                    uint32 i = urand(1,2);
                     if (i == 1)
                         DoScriptText(SAY_CONVERTED_1, me);
                     else
@@ -80,7 +79,7 @@ public:
 
                     DoCast(me, SPELL_CONVERT_CREDIT);
                     if (me->isPet())
-                        me->ToPet()->SetDuration(7500);
+                        CAST_PET(me)->SetDuration(7500);
                     Credit = true;
                 } else Timer -= diff;
             }
@@ -103,9 +102,9 @@ class npc_greengill_slave : public CreatureScript
 public:
     npc_greengill_slave() : CreatureScript("npc_greengill_slave") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new npc_greengill_slaveAI(creature);
+        return new npc_greengill_slaveAI(pCreature);
     }
 
     struct npc_greengill_slaveAI : public ScriptedAI
@@ -121,7 +120,7 @@ public:
         PlayerGUID = 0;
         }
 
-        void SpellHit(Unit* caster, const SpellInfo* spell)
+        void SpellHit(Unit* caster, const SpellEntry* spell)
         {
             if (!caster)
                 return;
@@ -131,9 +130,9 @@ public:
                 PlayerGUID = caster->GetGUID();
                 if (PlayerGUID)
                 {
-                    Unit* player = Unit::GetUnit((*me), PlayerGUID);
-                    if (player && CAST_PLR(player)->GetQuestStatus(QUESTG) == QUEST_STATUS_INCOMPLETE)
-                        DoCast(player, 45110, true);
+                    Unit* plr = Unit::GetUnit((*me), PlayerGUID);
+                    if (plr && CAST_PLR(plr)->GetQuestStatus(QUESTG) == QUEST_STATUS_INCOMPLETE)
+                        DoCast(plr, 45110, true);
                 }
                 DoCast(me, ENRAGE);
                 Unit* Myrmidon = me->FindNearestCreature(DM, 70);

@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -38,8 +37,7 @@ enum Data64
     DATA_MOORABI_STATUE,
     DATA_DRAKKARI_COLOSSUS_STATUE,
     DATA_DRAKKARI_COLOSSUS,
-    DATA_RUIN_DWELLER_DIED,
-    DATA_STATUE_ACTIVATE,
+    DATA_RUIN_DWELLER_DIED
 };
 
 enum mainCreatures

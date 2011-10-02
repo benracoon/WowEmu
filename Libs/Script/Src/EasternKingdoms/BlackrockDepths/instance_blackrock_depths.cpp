@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment:
 SDCategory: Blackrock Depths
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "blackrock_depths.h"
 
 #define TIMER_TOMBOFTHESEVEN    15000
@@ -215,7 +214,7 @@ public:
 
         void SetData64(uint32 type, uint64 data)
         {
-            sLog->outDebug(LOG_FILTER_TSCR, "TSCR: Instance Blackrock Depths: SetData64 update (Type: %u Data " UI64FMTD ")", type, data);
+            sLog->outDebug(LOG_FILTER_SSCR, "SCR: Instance Blackrock Depths: SetData64 update (Type: %u Data " UI64FMTD ")", type, data);
 
             switch(type)
             {
@@ -231,7 +230,7 @@ public:
 
         void SetData(uint32 type, uint32 data)
         {
-            sLog->outDebug(LOG_FILTER_TSCR, "TSCR: Instance Blackrock Depths: SetData update (Type: %u Data %u)", type, data);
+            sLog->outDebug(LOG_FILTER_SSCR, "SCR: Instance Blackrock Depths: SetData update (Type: %u Data %u)", type, data);
 
             switch(type)
             {
@@ -266,8 +265,8 @@ public:
                 OUT_SAVE_INST_DATA;
 
                 std::ostringstream saveStream;
-                saveStream << m_auiEncounter[0] << ' ' << m_auiEncounter[1] << ' ' << m_auiEncounter[2] << ' '
-                    << m_auiEncounter[3] << ' ' << m_auiEncounter[4] << ' ' << m_auiEncounter[5] << ' ' << GhostKillCount;
+                saveStream << m_auiEncounter[0] << " " << m_auiEncounter[1] << " " << m_auiEncounter[2] << " "
+                    << m_auiEncounter[3] << " " << m_auiEncounter[4] << " " << m_auiEncounter[5] << " " << GhostKillCount;
 
                 str_data = saveStream.str();
 
@@ -379,16 +378,16 @@ public:
                 {
                     boss->setFaction(FACTION_HOSTILE);
                     boss->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE);
-                    if (Unit* target = boss->SelectNearestTarget(500))
-                        boss->AI()->AttackStart(target);
+                    if (Unit *pTarget = boss->SelectNearestTarget(500))
+                        boss->AI()->AttackStart(pTarget);
                 }
             }
         }
 
         void TombOfSevenReset()
         {
-            HandleGameObject(GoTombExitGUID, false);//event reseted, close exit door
-            HandleGameObject(GoTombEnterGUID, true);//event reseted, open entrance door
+            HandleGameObject(GoTombExitGUID,false);//event reseted, close exit door
+            HandleGameObject(GoTombEnterGUID,true);//event reseted, open entrance door
             for (uint8 i = 0; i < 7; ++i)
             {
                 if (Creature* boss = instance->GetCreature(TombBossGUIDs[i]))
@@ -415,16 +414,16 @@ public:
 
         void TombOfSevenStart()
         {
-            HandleGameObject(GoTombExitGUID, false);//event started, close exit door
-            HandleGameObject(GoTombEnterGUID, false);//event started, close entrance door
+            HandleGameObject(GoTombExitGUID,false);//event started, close exit door
+            HandleGameObject(GoTombEnterGUID,false);//event started, close entrance door
             SetData(TYPE_TOMB_OF_SEVEN, IN_PROGRESS);
         }
 
         void TombOfSevenEnd()
         {
-            DoRespawnGameObject(GoChestGUID, DAY);
-            HandleGameObject(GoTombExitGUID, true);//event done, open exit door
-            HandleGameObject(GoTombEnterGUID, true);//event done, open entrance door
+            DoRespawnGameObject(GoChestGUID,DAY);
+            HandleGameObject(GoTombExitGUID,true);//event done, open exit door
+            HandleGameObject(GoTombEnterGUID,true);//event done, open entrance door
             TombEventStarterGUID = 0;
             SetData(TYPE_TOMB_OF_SEVEN, DONE);
         }

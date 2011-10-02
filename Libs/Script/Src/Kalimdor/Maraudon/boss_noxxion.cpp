@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment:
 SDCategory: Maraudon
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 
 #define SPELL_TOXICVOLLEY           21687
 #define SPELL_UPPERCUT              22916
@@ -34,14 +33,14 @@ class boss_noxxion : public CreatureScript
 public:
     boss_noxxion() : CreatureScript("boss_noxxion") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_noxxionAI (creature);
+        return new boss_noxxionAI (pCreature);
     }
 
     struct boss_noxxionAI : public ScriptedAI
     {
-        boss_noxxionAI(Creature* c) : ScriptedAI(c) {}
+        boss_noxxionAI(Creature *c) : ScriptedAI(c) {}
 
         uint32 ToxicVolley_Timer;
         uint32 Uppercut_Timer;
@@ -58,14 +57,14 @@ public:
             Invisible = false;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit * /*who*/)
         {
         }
 
-        void SummonAdds(Unit* victim)
+        void SummonAdds(Unit* pVictim)
         {
-            if (Creature* Add = DoSpawnCreature(13456, float(irand(-7, 7)), float(irand(-7, 7)), 0, 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000))
-                Add->AI()->AttackStart(victim);
+            if (Creature *Add = DoSpawnCreature(13456, float(irand(-7,7)), float(irand(-7,7)), 0, 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 90000))
+                Add->AI()->AttackStart(pVictim);
         }
 
         void UpdateAI(const uint32 diff)

@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -22,20 +21,19 @@
 #include "DatabaseWorkerPool.h"
 #include "MySQLConnection.h"
 
-class CharacterDatabaseConnection : public MySQLConnection
+class CharDBConnection : public MySQLConnection
 {
     public:
         //- Constructors for sync and async connections
-        CharacterDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo) {}
-        CharacterDatabaseConnection(ACE_Activation_Queue* q, MySQLConnectionInfo& connInfo) : MySQLConnection(q, connInfo) {}
+        CharDBConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo) {}
 
-        //- Loads database type specific prepared statements
-        void DoPrepareStatements();
+        //- Loads databasetype specific prepared statements
+        bool Open();
 };
 
-typedef DatabaseWorkerPool<CharacterDatabaseConnection> CharDBWorkerPool;
+typedef DatabaseWorkerPool<CharDBConnection> CharDBWorkerPool;
 
-enum CharacterDatabaseStatements
+enum CharDBStatements
 {
     /*  Naming standard for defines:
         {DB}_{SET/DEL/ADD/REP}_{Summary of data changed}
@@ -45,12 +43,11 @@ enum CharacterDatabaseStatements
 
     CHAR_DEL_QUEST_POOL_SAVE,
     CHAR_ADD_QUEST_POOL_SAVE,
+    CHAR_DEL_OLD_GUILD_EVENT_LOGS,
+    CHAR_DEL_OLD_GUILD_BANK_EVENT_LOGS,
     CHAR_DEL_NONEXISTENT_GUILD_BANK_ITEM,
     CHAR_DEL_EXPIRED_BANS,
     CHAR_GET_GUID_BY_NAME,
-    CHAR_GET_CHECK_NAME,
-    CHAR_GET_SUM_CHARS,
-    CHAR_GET_CHAR_CREATE_INFO,
     CHAR_ADD_BAN,
     CHAR_SET_NOT_BANNED,
     CHAR_GET_BANINFO,
@@ -98,7 +95,7 @@ enum CharacterDatabaseStatements
     CHAR_ADD_MAIL_ITEM,
     CHAR_DEL_EMPTY_EXPIRED_MAIL,
     CHAR_GET_EXPIRED_MAIL,
-    CHAR_GET_EXPIRED_MAIL_ITEMS,
+    CHAR_GET_MAIL_ITEM_LITE,
     CHAR_SET_MAIL_RETURNED,
     CHAR_SET_MAIL_ITEM_RECEIVER,
     CHAR_SET_ITEM_OWNER,
@@ -120,7 +117,6 @@ enum CharacterDatabaseStatements
     CHAR_ADD_ACCOUNT_INSTANCE_LOCK_TIMES,
     CHAR_LOAD_PLAYER_NAME_CLASS,
     CHAR_LOAD_MATCH_MAKER_RATING,
-    CHAR_GET_CHARACTER_COUNT,
 
     CHAR_ADD_GUILD,
     CHAR_DEL_GUILD,
@@ -155,6 +151,7 @@ enum CharacterDatabaseStatements
     CHAR_SET_GUILD_LEADER,
     CHAR_SET_GUILD_RANK_NAME,
     CHAR_SET_GUILD_RANK_RIGHTS,
+    CHAR_GUILD_SAVE_XP,
     CHAR_SET_GUILD_EMBLEM_INFO,
     CHAR_SET_GUILD_BANK_TAB_INFO,
     CHAR_SET_GUILD_BANK_MONEY,
@@ -182,7 +179,19 @@ enum CharacterDatabaseStatements
     CHAR_RESET_GUILD_RANK_BANK_TIME3,
     CHAR_RESET_GUILD_RANK_BANK_TIME4,
     CHAR_RESET_GUILD_RANK_BANK_TIME5,
+    CHAR_LOAD_GUILDS,
+    CHAR_LOAD_GUILD_RANKS,
     CHAR_LOAD_CHAR_DATA_FOR_GUILD,
+    CHAR_LOAD_GUILD_MEMBERS,
+    CHAR_LOAD_GUILD_BANK_RIGHTS,
+    CHAR_LOAD_GUILD_BANK_TABS,
+    CHAR_LOAD_GUILD_EVENTLOGS,
+    CHAR_LOAD_GUILD_BANK_EVENTLOGS,
+    CHAR_DEL_NONEXISTENT_GUILD_RANKS,
+    CHAR_DEL_NONEXISTENT_GUILD_MEMBERS,
+    CHAR_DEL_NONEXISTENT_GUILD_BANK_TABS,
+    CHAR_DEL_NONEXISTENT_GUILD_BANK_RIGHTS,
+    CHAR_DEL_NONEXISTENT_GUILD_BANK_ITEMS,
 
     CHAR_LOAD_CHANNEL,
     CHAR_ADD_CHANNEL,
@@ -265,16 +274,8 @@ enum CharacterDatabaseStatements
     CHAR_DEL_EXPIRED_GO_RESPAWNS,
     CHAR_DEL_NONEXISTENT_INSTANCE_GO_RESPAWNS,
 
-    CHAR_LOAD_GM_TICKETS,
-    CHAR_ADD_GM_TICKET,
-    CHAR_DEL_GM_TICKET,
-    CHAR_DEL_PLAYER_GM_TICKETS,
-
-    CHAR_ADD_GM_SURVEY,
-    CHAR_ADD_GM_SUBSURVEY,
-    CHAR_ADD_LAG_REPORT,
-
-    CHAR_LOAD_EXPIRED_AUCTIONS,
+    CHAR_LOAD_PLAYER_CURRENCY,
+    CHAR_LOAD_PLAYER_TALENTBRANCHSPECS,
 
     MAX_CHARACTERDATABASE_STATEMENTS,
 };

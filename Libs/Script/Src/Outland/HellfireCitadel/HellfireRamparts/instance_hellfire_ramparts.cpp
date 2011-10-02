@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment:
 SDCategory: Hellfire Ramparts
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "hellfire_ramparts.h"
 
 class instance_ramparts : public InstanceMapScript
@@ -67,7 +66,7 @@ class instance_ramparts : public InstanceMapScript
 
             void SetData(uint32 uiType, uint32 uiData)
             {
-                sLog->outDebug(LOG_FILTER_TSCR, "TSCR: Instance Ramparts: SetData received for type %u with data %u", uiType, uiData);
+                sLog->outDebug(LOG_FILTER_SSCR, "SCR: Instance Ramparts: SetData received for type %u with data %u",uiType,uiData);
 
                 switch(uiType)
                 {

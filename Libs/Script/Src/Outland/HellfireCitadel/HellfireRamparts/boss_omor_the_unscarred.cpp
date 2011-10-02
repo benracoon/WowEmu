@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment: Temporary solution for orbital/shadow whip-ability. Needs more core s
 SDCategory: Hellfire Citadel, Hellfire Ramparts
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 
 enum eSays
 {
@@ -61,7 +60,7 @@ class boss_omor_the_unscarred : public CreatureScript
 
         struct boss_omor_the_unscarredAI : public ScriptedAI
         {
-            boss_omor_the_unscarredAI(Creature* creature) : ScriptedAI(creature)
+            boss_omor_the_unscarredAI(Creature* pCreature) : ScriptedAI(pCreature)
             {
                 SetCombatMovement(false);
             }
@@ -91,9 +90,9 @@ class boss_omor_the_unscarred : public CreatureScript
                 CanPullBack = false;
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit * /*who*/)
             {
-                DoScriptText(RAND(SAY_AGGRO_1, SAY_AGGRO_2, SAY_AGGRO_3), me);
+                DoScriptText(RAND(SAY_AGGRO_1,SAY_AGGRO_2,SAY_AGGRO_3), me);
             }
 
             void KilledUnit(Unit* /*victim*/)
@@ -108,7 +107,7 @@ class boss_omor_the_unscarred : public CreatureScript
             {
                 DoScriptText(SAY_SUMMON, me);
 
-                if (Unit* random = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                if (Unit* random = SelectTarget(SELECT_TARGET_RANDOM,0))
                     summoned->AI()->AttackStart(random);
 
                 ++SummonedCount;
@@ -163,7 +162,7 @@ class boss_omor_the_unscarred : public CreatureScript
                         Unit* temp = NULL;
                         if (me->IsWithinMeleeRange(me->getVictim()))
                             temp = me->getVictim();
-                        else temp = SelectTarget(SELECT_TARGET_RANDOM, 0);
+                        else temp = SelectTarget(SELECT_TARGET_RANDOM,0);
 
                         if (temp && temp->GetTypeId() == TYPEID_PLAYER)
                         {
@@ -193,9 +192,9 @@ class boss_omor_the_unscarred : public CreatureScript
                 {
                     DoScriptText(SAY_CURSE, me);
 
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM,0))
                     {
-                        DoCast(target, SPELL_TREACHEROUS_AURA);
+                        DoCast(pTarget, SPELL_TREACHEROUS_AURA);
                         Aura_Timer = 8000+rand()%8000;
                     }
                 }
@@ -204,12 +203,12 @@ class boss_omor_the_unscarred : public CreatureScript
 
                 if (Shadowbolt_Timer <= diff)
                 {
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
+                    if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM,0))
                     {
-                        if (target)
-                            target = me->getVictim();
+                        if (pTarget)
+                            pTarget = me->getVictim();
 
-                        DoCast(target, SPELL_SHADOW_BOLT);
+                        DoCast(pTarget, SPELL_SHADOW_BOLT);
                         Shadowbolt_Timer = 4000+rand()%2500;
                     }
                 }

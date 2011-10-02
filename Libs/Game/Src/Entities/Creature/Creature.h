@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -30,7 +32,7 @@
 
 #include <list>
 
-class SpellInfo;
+struct SpellEntry;
 
 class CreatureAI;
 class Quest;
@@ -65,11 +67,11 @@ enum CreatureFlagsExtra
     CREATURE_FLAG_EXTRA_NO_SKILLGAIN | CREATURE_FLAG_EXTRA_TAUNT_DIMINISH | CREATURE_FLAG_EXTRA_ALL_DIMINISH | \
     CREATURE_FLAG_EXTRA_GUARD)
 
-// GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push, N), also any gcc version not support it at some platform
+// GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push,N), also any gcc version not support it at some platform
 #if defined(__GNUC__)
 #pragma pack(1)
 #else
-#pragma pack(push, 1)
+#pragma pack(push,1)
 #endif
 
 #define MAX_KILL_CREDIT 2
@@ -77,10 +79,8 @@ enum CreatureFlagsExtra
 
 #define MAX_CREATURE_QUEST_ITEMS 6
 
-#define MAX_EQUIPMENT_ITEMS 3
-
 // from `creature_template` table
-struct CreatureTemplate
+struct CreatureInfo
 {
     uint32  Entry;
     uint32  DifficultyEntry[MAX_DIFFICULTY - 1];
@@ -89,9 +89,9 @@ struct CreatureTemplate
     uint32  Modelid2;
     uint32  Modelid3;
     uint32  Modelid4;
-    std::string  Name;
-    std::string  SubName;
-    std::string  IconName;
+    char*   Name;
+    char*   SubName;
+    char*   IconName;
     uint32  GossipMenuId;
     uint8   minlevel;
     uint8   maxlevel;
@@ -122,17 +122,22 @@ struct CreatureTemplate
     float   maxrangedmg;
     uint32  rangedattackpower;
     uint32  type;                                           // enum CreatureType values
-    uint32  type_flags[2];                                   // enum CreatureTypeFlags mask values
+    uint32  type_flags;                                     // enum CreatureTypeFlags mask values
     uint32  lootid;
     uint32  pickpocketLootId;
     uint32  SkinLootId;
-    int32   resistance[MAX_SPELL_SCHOOL];
+    int32   resistance1;
+    int32   resistance2;
+    int32   resistance3;
+    int32   resistance4;
+    int32   resistance5;
+    int32   resistance6;
     uint32  spells[CREATURE_MAX_SPELLS];
     uint32  PetSpellDataId;
     uint32  VehicleId;
     uint32  mingold;
     uint32  maxgold;
-    std::string AIName;
+    char const* AIName;
     uint32  MovementType;
     uint32  InhabitType;
     float   ModHealth;
@@ -148,16 +153,15 @@ struct CreatureTemplate
     uint32  ScriptID;
     uint32  GetRandomValidModelId() const;
     uint32  GetFirstValidModelId() const;
-    uint32  Unknown;
 
     // helpers
     SkillType GetRequiredLootSkill() const
     {
-        if (type_flags[0] & CREATURE_TYPEFLAGS_HERBLOOT)
+        if (type_flags & CREATURE_TYPEFLAGS_HERBLOOT)
             return SKILL_HERBALISM;
-        else if (type_flags[0] & CREATURE_TYPEFLAGS_MININGLOOT)
+        else if (type_flags & CREATURE_TYPEFLAGS_MININGLOOT)
             return SKILL_MINING;
-        else if (type_flags[0] & CREATURE_TYPEFLAGS_ENGINEERLOOT)
+        else if (type_flags & CREATURE_TYPEFLAGS_ENGINEERLOOT)
             return SKILL_ENGINERING;
         else
             return SKILL_SKINNING;                          // normal case
@@ -165,16 +169,13 @@ struct CreatureTemplate
 
     bool isTameable(bool exotic) const
     {
-        if (type != CREATURE_TYPE_BEAST || family == 0 || (type_flags[0] & CREATURE_TYPEFLAGS_TAMEABLE) == 0)
+        if (type != CREATURE_TYPE_BEAST || family == 0 || (type_flags & CREATURE_TYPEFLAGS_TAMEABLE) == 0)
             return false;
 
         // if can tame exotic then can tame any temable
-        return exotic || (type_flags[0] & CREATURE_TYPEFLAGS_EXOTIC) == 0;
+        return exotic || (type_flags & CREATURE_TYPEFLAGS_EXOTIC) == 0;
     }
 };
-
-// Benchmarked: Faster than std::map (insert/find)
-typedef UNORDERED_MAP<uint32, CreatureTemplate> CreatureTemplateContainer;
 
 // Represents max amount of expansions.
 // TODO: Add MAX_EXPANSION constant.
@@ -189,12 +190,12 @@ struct CreatureBaseStats
 
     // Helpers
 
-    uint32 GenerateHealth(CreatureTemplate const* info) const
+    uint32 GenerateHealth(CreatureInfo const* info) const
     {
         return uint32((BaseHealth[info->expansion] * info->ModHealth) + 0.5f);
     }
 
-    uint32 GenerateMana(CreatureTemplate const* info) const
+    uint32 GenerateMana(CreatureInfo const* info) const
     {
         // Mana can be 0.
         if (!BaseMana)
@@ -203,7 +204,7 @@ struct CreatureBaseStats
         return uint32((BaseMana * info->ModMana) + 0.5f);
     }
 
-    uint32 GenerateArmor(CreatureTemplate const* info) const
+    uint32 GenerateArmor(CreatureInfo const* info) const
     {
         return uint32((BaseArmor * info->ModArmor) + 0.5f);
     }
@@ -232,11 +233,9 @@ struct PointOfInterestLocale
 
 struct EquipmentInfo
 {
-    uint32  ItemEntry[MAX_EQUIPMENT_ITEMS];
+    uint32  entry;
+    uint32  equipentry[3];
 };
-
-// Benchmarked: Faster than std::map (insert/find)
-typedef UNORDERED_MAP<uint16, EquipmentInfo> EquipmentInfoContainer;
 
 // from `creature` table
 struct CreatureData
@@ -256,6 +255,7 @@ struct CreatureData
     uint32 currentwaypoint;
     uint32 curhealth;
     uint32 curmana;
+    bool  is_dead;
     uint8 movementType;
     uint8 spawnMask;
     uint32 npcflag;
@@ -264,8 +264,14 @@ struct CreatureData
     bool dbData;
 };
 
-// `creature_addon` table
-struct CreatureAddon
+struct CreatureDataAddonAura
+{
+    uint32 spell_id;
+    uint8 effectMask;
+};
+
+// from `creature_addon` table
+struct CreatureDataAddon
 {
     uint32 guidOrEntry;
     uint32 path_id;
@@ -273,21 +279,17 @@ struct CreatureAddon
     uint32 bytes1;
     uint32 bytes2;
     uint32 emote;
-    std::vector<uint32> auras;
+    CreatureDataAddonAura const* auras;                     // loaded as char* "spell1 eff1 spell2 eff2 ... "
 };
-
-typedef UNORDERED_MAP<uint32, CreatureAddon> CreatureAddonContainer;
 
 struct CreatureModelInfo
 {
+    uint32 modelid;
     float bounding_radius;
     float combat_reach;
     uint8 gender;
     uint32 modelid_other_gender;
 };
-
-// Benchmarked: Faster than std::map (insert/find)
-typedef UNORDERED_MAP<uint16, CreatureModelInfo> CreatureModelContainer;
 
 enum InhabitTypeValues
 {
@@ -329,7 +331,7 @@ struct VendorItem
     uint32 ExtendedCost;
 
     //helpers
-    bool IsGoldRequired(ItemTemplate const* pProto) const { return pProto->Flags2 & ITEM_FLAGS_EXTRA_EXT_COST_REQUIRES_GOLD || !ExtendedCost; }
+    bool IsGoldRequired(ItemPrototype const* pProto) const { return pProto->Flags2 & ITEM_FLAGS_EXTRA_EXT_COST_REQUIRES_GOLD || !ExtendedCost; }
 };
 typedef std::vector<VendorItem*> VendorItemList;
 
@@ -393,22 +395,21 @@ typedef UNORDERED_MAP<uint32 /*spellid*/, TrainerSpell> TrainerSpellMap;
 
 struct TrainerSpellData
 {
-    TrainerSpellData() : trainerType(0), trainerId(0) {}
+    TrainerSpellData() : trainerType(0) {}
     ~TrainerSpellData() { spellList.clear(); }
 
     TrainerSpellMap spellList;
     uint32 trainerType;                                     // trainer type based at trainer spells, can be different from creature_template value.
                                                             // req. for correct show non-prof. trainers like weaponmaster, allowed values 0 and 2.
-    uint32 trainerId;                                       // trainer id - different trainer...
     TrainerSpell const* Find(uint32 spell_id) const;
 };
 
-typedef std::map<uint32, time_t> CreatureSpellCooldowns;
+typedef std::map<uint32,time_t> CreatureSpellCooldowns;
 
 // max different by z coordinate for creature aggro reaction
 #define CREATURE_Z_ATTACK_RANGE 3
 
-#define MAX_VENDOR_ITEMS 150                                // Limitation in 3.x.x item count in SMSG_LIST_INVENTORY
+#define MAX_VENDOR_ITEMS 300                                // Limitation in 3.x.x item count in SMSG_VENDOR_INVENTORY
 
 class Creature : public Unit, public GridObject<Creature>
 {
@@ -424,17 +425,17 @@ class Creature : public Unit, public GridObject<Creature>
 
         bool Create(uint32 guidlow, Map *map, uint32 phaseMask, uint32 Entry, uint32 vehId, uint32 team, float x, float y, float z, float ang, const CreatureData *data = NULL);
         bool LoadCreaturesAddon(bool reload = false);
-        void SelectLevel(const CreatureTemplate *cinfo);
+        void SelectLevel(const CreatureInfo *cinfo);
         void LoadEquipment(uint32 equip_entry, bool force=false);
 
         uint32 GetDBTableGUIDLow() const { return m_DBTableGuid; }
+        char const* GetSubName() const { return GetCreatureInfo()->SubName; }
 
         void Update(uint32 time);                         // overwrited Unit::Update
         void GetRespawnCoord(float &x, float &y, float &z, float* ori = NULL, float* dist =NULL) const;
         uint32 GetEquipmentId() const { return GetCreatureInfo()->equipmentId; }
 
         void SetCorpseDelay(uint32 delay) { m_corpseDelay = delay; }
-        uint32 GetCorpseDelay() const { return m_corpseDelay; }
         bool isRacialLeader() const { return GetCreatureInfo()->RacialLeader; }
         bool isCivilian() const { return GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_CIVILIAN; }
         bool isTrigger() const { return GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_TRIGGER; }
@@ -461,9 +462,9 @@ class Creature : public Unit, public GridObject<Creature>
         bool isCanInteractWithBattleMaster(Player* player, bool msg) const;
         bool isCanTrainingAndResetTalentsOf(Player* pPlayer) const;
         bool canCreatureAttack(Unit const *pVictim, bool force = true) const;
-        bool IsImmunedToSpell(SpellInfo const* spellInfo);
+        bool IsImmunedToSpell(SpellEntry const* spellInfo);
                                                             // redefine Unit::IsImmunedToSpell
-        bool IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) const;
+        bool IsImmunedToSpellEffect(SpellEntry const* spellInfo, uint32 index) const;
                                                             // redefine Unit::IsImmunedToSpellEffect
         bool isElite() const
         {
@@ -529,19 +530,19 @@ class Creature : public Unit, public GridObject<Creature>
 
         TrainerSpellData const* GetTrainerSpells() const;
 
-        CreatureTemplate const *GetCreatureInfo() const { return m_creatureInfo; }
+        CreatureInfo const *GetCreatureInfo() const { return m_creatureInfo; }
         CreatureData const *GetCreatureData() const { return m_creatureData; }
-        CreatureAddon const* GetCreatureAddon() const;
+        CreatureDataAddon const* GetCreatureAddon() const;
 
         std::string GetAIName() const;
         std::string GetScriptName() const;
         uint32 GetScriptId() const;
 
-        void Say(int32 textId, uint32 language, uint64 TargetGuid) { MonsterSay(textId, language, TargetGuid); }
-        void Yell(int32 textId, uint32 language, uint64 TargetGuid) { MonsterYell(textId, language, TargetGuid); }
-        void TextEmote(int32 textId, uint64 TargetGuid, bool IsBossEmote = false) { MonsterTextEmote(textId, TargetGuid, IsBossEmote); }
-        void Whisper(int32 textId, uint64 receiver, bool IsBossWhisper = false) { MonsterWhisper(textId, receiver, IsBossWhisper); }
-        void YellToZone(int32 textId, uint32 language, uint64 TargetGuid) { MonsterYellToZone(textId, language, TargetGuid); }
+        void Say(int32 textId, uint32 language, uint64 TargetGuid) { MonsterSay(textId,language,TargetGuid); }
+        void Yell(int32 textId, uint32 language, uint64 TargetGuid) { MonsterYell(textId,language,TargetGuid); }
+        void TextEmote(int32 textId, uint64 TargetGuid, bool IsBossEmote = false) { MonsterTextEmote(textId,TargetGuid,IsBossEmote); }
+        void Whisper(int32 textId, uint64 receiver, bool IsBossWhisper = false) { MonsterWhisper(textId,receiver,IsBossWhisper); }
+        void YellToZone(int32 textId, uint32 language, uint64 TargetGuid) { MonsterYellToZone(textId,language,TargetGuid); }
 
         // override WorldObject function for proper name localization
         const char* GetNameForLocaleIdx(LocaleConstant locale_idx) const;
@@ -561,7 +562,7 @@ class Creature : public Unit, public GridObject<Creature>
         Player *GetLootRecipient() const;
         Group *GetLootRecipientGroup() const;
         bool hasLootRecipient() const { return m_lootRecipient || m_lootRecipientGroup; }
-        bool isTappedBy(Player* player) const;                          // return true if the creature is tapped by the player or a member of his party.
+        bool isTappedBy(Player *player) const;                          // return true if the creature is tapped by the player or a member of his party.
 
         void SetLootRecipient (Unit* unit);
         void AllLootRemovedFromCorpse();
@@ -573,8 +574,8 @@ class Creature : public Unit, public GridObject<Creature>
         void RemoveLootMode(uint16 lootMode) { m_LootMode &= ~lootMode; }
         void ResetLootMode() { m_LootMode = LOOT_MODE_DEFAULT; }
 
-        SpellInfo const *reachWithSpellAttack(Unit *pVictim);
-        SpellInfo const *reachWithSpellCure(Unit *pVictim);
+        SpellEntry const *reachWithSpellAttack(Unit *pVictim);
+        SpellEntry const *reachWithSpellCure(Unit *pVictim);
 
         uint32 m_spells[CREATURE_MAX_SPELLS];
         CreatureSpellCooldowns m_CreatureSpellCooldowns;
@@ -587,7 +588,6 @@ class Creature : public Unit, public GridObject<Creature>
 
         Unit* SelectNearestTarget(float dist = 0) const;
         Unit* SelectNearestTargetInAttackDistance(float dist = 0) const;
-        Player* SelectNearestPlayer(float distance = 0) const;
 
         void DoFleeToGetAssistance();
         void CallForHelp(float fRadius);
@@ -606,6 +606,7 @@ class Creature : public Unit, public GridObject<Creature>
         void SetCurrentCell(Cell const& cell) { m_currentCell = cell; }
 
         void RemoveCorpse(bool setSpawnTime = true);
+        bool isDeadByDefault() const { return m_isDeadByDefault; };
 
         void ForcedDespawn(uint32 timeMSToDespawn = 0);
         void DespawnOrUnsummon(uint32 msTimeToDespawn = 0);
@@ -658,6 +659,7 @@ class Creature : public Unit, public GridObject<Creature>
         void SetFormation(CreatureGroup *formation) {m_formation = formation;}
 
         Unit *SelectVictim();
+        void SetDeadByDefault (bool death_state) {m_isDeadByDefault = death_state;}
 
         void SetDisableReputationGain(bool disable) { DisableReputationGain = disable; }
         bool IsReputationGainDisabled() { return DisableReputationGain; }
@@ -670,7 +672,6 @@ class Creature : public Unit, public GridObject<Creature>
         void ResetPlayerDamageReq() { m_PlayerDamageReq = GetHealth() / 2; }
         uint32 m_PlayerDamageReq;
 
-        uint32 GetOriginalEntry() const { return m_originalEntry; }
         void SetOriginalEntry(uint32 entry) { m_originalEntry = entry; }
 
         static float _GetDamageMod(int32 Rank);
@@ -714,6 +715,7 @@ class Creature : public Unit, public GridObject<Creature>
         bool m_AlreadySearchedAssistance;
         bool m_regenHealth;
         bool m_AI_locked;
+        bool m_isDeadByDefault;
 
         SpellSchoolMask m_meleeDamageSchoolMask;
         uint32 m_originalEntry;
@@ -722,7 +724,7 @@ class Creature : public Unit, public GridObject<Creature>
 
         bool DisableReputationGain;
 
-        CreatureTemplate const* m_creatureInfo;                 // in difficulty mode > 0 can different from sObjectMgr->GetCreatureTemplate(GetEntry())
+        CreatureInfo const* m_creatureInfo;                 // in difficulty mode > 0 can different from ObjectMgr::GetCreatureTemplate(GetEntry())
         CreatureData const* m_creatureData;
 
         uint16 m_LootMode;                                  // bitmask, default LOOT_MODE_DEFAULT, determines what loot will be lootable
@@ -743,10 +745,10 @@ class Creature : public Unit, public GridObject<Creature>
 class AssistDelayEvent : public BasicEvent
 {
     public:
-        AssistDelayEvent(const uint64 victim, Unit& owner) : BasicEvent(), m_victim(victim), m_owner(owner) { }
+        AssistDelayEvent(const uint64& victim, Unit& owner) : BasicEvent(), m_victim(victim), m_owner(owner) { }
 
         bool Execute(uint64 e_time, uint32 p_time);
-        void AddAssistant(const uint64 guid) { m_assistants.push_back(guid); }
+        void AddAssistant(const uint64& guid) { m_assistants.push_back(guid); }
     private:
         AssistDelayEvent();
 

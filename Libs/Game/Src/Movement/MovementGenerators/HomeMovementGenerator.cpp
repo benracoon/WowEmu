@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -24,23 +26,29 @@
 #include "DestinationHolderImp.h"
 #include "WorldPacket.h"
 
-void HomeMovementGenerator<Creature>::Initialize(Creature & owner)
+void
+HomeMovementGenerator<Creature>::Initialize(Creature & owner)
 {
+    float x, y, z;
+    owner.GetHomePosition(x, y, z, ori);
     owner.RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
     owner.AddUnitState(UNIT_STAT_EVADE);
     _setTargetLocation(owner);
 }
 
-void HomeMovementGenerator<Creature>::Finalize(Creature & owner)
+void
+HomeMovementGenerator<Creature>::Finalize(Creature & owner)
 {
     owner.ClearUnitState(UNIT_STAT_EVADE);
 }
 
-void HomeMovementGenerator<Creature>::Reset(Creature &)
+void
+HomeMovementGenerator<Creature>::Reset(Creature &)
 {
 }
 
-void HomeMovementGenerator<Creature>::_setTargetLocation(Creature & owner)
+void
+HomeMovementGenerator<Creature>::_setTargetLocation(Creature & owner)
 {
     if (!&owner)
         return;
@@ -52,13 +60,21 @@ void HomeMovementGenerator<Creature>::_setTargetLocation(Creature & owner)
     owner.GetHomePosition(x, y, z, ori);
 
     CreatureTraveller traveller(owner);
+    i_destinationHolder.SetDestination(traveller, x, y, z, false);
 
-    uint32 travel_time = i_destinationHolder.SetDestination(traveller, x, y, z);
-    modifyTravelTime(travel_time);
+    PathFinder path(&owner, x, y, z, false, false);
+    PointPath pointPath = path.getFullPath();
+
+    float speed = traveller.Speed() * 0.001f; // in ms
+    uint32 traveltime = uint32(pointPath.GetTotalLength() / speed);
+    modifyTravelTime(traveltime);
+
+    owner.SendMonsterMoveByPath(pointPath, 1, pointPath.size(), owner.GetUnitMovementFlags(), traveltime);
     owner.ClearUnitState(uint32(UNIT_STAT_ALL_STATE & ~UNIT_STAT_EVADE));
 }
 
-bool HomeMovementGenerator<Creature>::Update(Creature &owner, const uint32 time_diff)
+bool
+HomeMovementGenerator<Creature>::Update(Creature &owner, const uint32& time_diff)
 {
     CreatureTraveller traveller(owner);
     i_destinationHolder.UpdateTraveller(traveller, time_diff);
@@ -70,7 +86,7 @@ bool HomeMovementGenerator<Creature>::Update(Creature &owner, const uint32 time_
         // restore orientation of not moving creature at returning to home
         if (owner.GetDefaultMovementType() == IDLE_MOTION_TYPE)
         {
-            //sLog->outDebug("Entering HomeMovement::GetDestination(z, y, z)");
+            //sLog->outDebug("Entering HomeMovement::GetDestination(z,y,z)");
             owner.SetOrientation(ori);
             WorldPacket packet;
             owner.BuildHeartBeatMsg(&packet);
@@ -87,3 +103,5 @@ bool HomeMovementGenerator<Creature>::Update(Creature &owner, const uint32 time_
 
     return true;
 }
+
+

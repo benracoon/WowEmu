@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment: Some issues with class calls effecting more than one class
 SDCategory: Blackwing Lair
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 
 #define SAY_AGGRO               -1469007
 #define SAY_XHEALTH             -1469008
@@ -66,14 +65,14 @@ class boss_nefarian : public CreatureScript
 public:
     boss_nefarian() : CreatureScript("boss_nefarian") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_nefarianAI (creature);
+        return new boss_nefarianAI (pCreature);
     }
 
     struct boss_nefarianAI : public ScriptedAI
     {
-        boss_nefarianAI(Creature* c) : ScriptedAI(c) {}
+        boss_nefarianAI(Creature *c) : ScriptedAI(c) {}
 
         uint32 ShadowFlame_Timer;
         uint32 BellowingRoar_Timer;
@@ -111,9 +110,9 @@ public:
             DoScriptText(SAY_DEATH, me);
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit * who)
         {
-            DoScriptText(RAND(SAY_XHEALTH, SAY_AGGRO, SAY_SHADOWFLAME), me);
+            DoScriptText(RAND(SAY_XHEALTH,SAY_AGGRO,SAY_SHADOWFLAME), me);
 
             DoCast(who, SPELL_SHADOWFLAME_INITIAL);
             DoZoneInCombat();
@@ -175,7 +174,7 @@ public:
                 //On official it is based on what classes are currently on the hostil list
                 //but we can't do that yet so just randomly call one
 
-                switch (urand(0, 8))
+                switch (urand(0,8))
                 {
                     case 0:
                         DoScriptText(SAY_MAGE, me);

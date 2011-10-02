@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -31,7 +33,7 @@ enum DebugLogFilters
     LOG_FILTER_UNITS                    = 0x00000001,   // Anything related to units that doesn't fit in other categories. ie. creature formations
     LOG_FILTER_PETS                     = 0x00000002,
     LOG_FILTER_VEHICLES                 = 0x00000004,
-    LOG_FILTER_TSCR                     = 0x00000008,   // C++ AI, instance scripts, etc.
+    LOG_FILTER_SSCR                     = 0x00000008,   // C++ AI, instance scripts, etc.
     LOG_FILTER_DATABASE_AI              = 0x08000010,   // SmartAI, EventAI, CreatureAI
     LOG_FILTER_MAPSCRIPTS               = 0x00000020,
     LOG_FILTER_NETWORKIO                = 0x00000040,   // Anything packet/netcode related
@@ -51,6 +53,7 @@ enum DebugLogFilters
     LOG_FILTER_LOOT                     = 0x00100000,   // Loot related
     LOG_FILTER_GUILD                    = 0x00200000,   // Guild related
     LOG_FILTER_TRANSPORTS               = 0x00400000,   // Transport related
+    LOG_FILTER_PATHFINDING              = 0x00800000,   // Pathfinding
 };
 
 enum LogTypes
@@ -114,24 +117,23 @@ class Log
         void ResetColor(bool stdout_stream);
 
         void outDB( LogTypes type, const char * str );
-        void outString( const char * str, ... )                 ATTR_PRINTF(2, 3);
+        void outString( const char * str, ... )                 ATTR_PRINTF(2,3);
         void outString( );
-        void outStringInLine( const char * str, ... )           ATTR_PRINTF(2, 3);
-        void outError( const char * err, ... )                  ATTR_PRINTF(2, 3);
-        void outCrash( const char * err, ... )                  ATTR_PRINTF(2, 3);
-        void outBasic( const char * str, ... )                  ATTR_PRINTF(2, 3);
-        void outDetail( const char * str, ... )                 ATTR_PRINTF(2, 3);
-        void outSQLDev( const char * str, ... )                 ATTR_PRINTF(2, 3);
-        void outDebug(DebugLogFilters f, const char* str, ...)  ATTR_PRINTF(3, 4);
-        void outStaticDebug( const char * str, ... )            ATTR_PRINTF(2, 3);
-        void outDebugInLine( const char * str, ... )            ATTR_PRINTF(2, 3);
-        void outErrorDb( const char * str, ... )                ATTR_PRINTF(2, 3);
-        void outChar( const char * str, ... )                   ATTR_PRINTF(2, 3);
-        void outCommand( uint32 account, const char * str, ...) ATTR_PRINTF(3, 4);
-        void outRemote( const char * str, ... )                 ATTR_PRINTF(2, 3);
-        void outChat( const char * str, ... )                   ATTR_PRINTF(2, 3);
-        void outArena( const char * str, ... )                  ATTR_PRINTF(2, 3);
-        void outSQLDriver( const char* str, ... )               ATTR_PRINTF(2, 3);
+        void outStringInLine( const char * str, ... )           ATTR_PRINTF(2,3);
+        void outError( const char * err, ... )                  ATTR_PRINTF(2,3);
+        void outCrash( const char * err, ... )                  ATTR_PRINTF(2,3);
+        void outBasic( const char * str, ... )                  ATTR_PRINTF(2,3);
+        void outDetail( const char * str, ... )                 ATTR_PRINTF(2,3);
+        void outDebug(DebugLogFilters f, const char* str, ...)  ATTR_PRINTF(3,4);
+        void outStaticDebug( const char * str, ... )            ATTR_PRINTF(2,3);
+        void outDebugInLine( const char * str, ... )            ATTR_PRINTF(2,3);
+        void outErrorDb( const char * str, ... )                ATTR_PRINTF(2,3);
+        void outChar( const char * str, ... )                   ATTR_PRINTF(2,3);
+        void outCommand( uint32 account, const char * str, ...) ATTR_PRINTF(3,4);
+        void outRemote( const char * str, ... )                 ATTR_PRINTF(2,3);
+        void outChat( const char * str, ... )                   ATTR_PRINTF(2,3);
+        void outArena( const char * str, ... )                  ATTR_PRINTF(2,3);
+        void outSQLDriver( const char* str, ... )               ATTR_PRINTF(2,3);
         void outCharDump( const char * str, uint32 account_id, uint32 guid, const char * name );
 
         static void outTimestamp(FILE* file);
@@ -152,7 +154,7 @@ class Log
         void SetLogDBLater(bool value) { m_enableLogDBLater = value; }
         bool GetSQLDriverQueryLogging() const { return m_sqlDriverQueryLogging; }
     private:
-        FILE* openLogFile(char const* configFileName, char const* configTimeStampFlag, char const* mode);
+        FILE* openLogFile(char const* configFileName,char const* configTimeStampFlag, char const* mode);
         FILE* openGmlogPerAccount(uint32 account);
 
         FILE* raLogfile;
@@ -163,7 +165,6 @@ class Log
         FILE* chatLogfile;
         FILE* arenaLogFile;
         FILE* sqlLogFile;
-        FILE* sqlDevLogFile;
 
         // cache values for after initilization use (like gm log per account case)
         std::string m_logsDir;

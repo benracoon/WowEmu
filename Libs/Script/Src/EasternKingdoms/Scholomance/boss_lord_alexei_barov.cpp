@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment: aura applied/defined in database
 SDCategory: Scholomance
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "scholomance.h"
 
 #define SPELL_IMMOLATE             20294                    // Old ID  was 15570
@@ -35,14 +34,14 @@ class boss_lord_alexei_barov : public CreatureScript
 public:
     boss_lord_alexei_barov() : CreatureScript("boss_lord_alexei_barov") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_lordalexeibarovAI (creature);
+        return new boss_lordalexeibarovAI (pCreature);
     }
 
     struct boss_lordalexeibarovAI : public ScriptedAI
     {
-        boss_lordalexeibarovAI(Creature* c) : ScriptedAI(c) {}
+        boss_lordalexeibarovAI(Creature *c) : ScriptedAI(c) {}
 
         uint32 Immolate_Timer;
         uint32 VeilofShadow_Timer;
@@ -55,7 +54,7 @@ public:
             me->LoadCreaturesAddon();
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit * /*killer*/)
         {
             InstanceScript *pInstance = me->GetInstanceScript();
             if (pInstance)
@@ -67,7 +66,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit * /*who*/)
         {
         }
 
@@ -79,9 +78,9 @@ public:
             //Immolate_Timer
             if (Immolate_Timer <= diff)
             {
-                Unit* target = NULL;
-                target = SelectTarget(SELECT_TARGET_RANDOM, 0);
-                if (target) DoCast(target, SPELL_IMMOLATE);
+                Unit *pTarget = NULL;
+                pTarget = SelectTarget(SELECT_TARGET_RANDOM,0);
+                if (pTarget) DoCast(pTarget, SPELL_IMMOLATE);
 
                 Immolate_Timer = 12000;
             } else Immolate_Timer -= diff;

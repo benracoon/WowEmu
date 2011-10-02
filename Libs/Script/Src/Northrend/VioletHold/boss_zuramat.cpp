@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -16,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "violet_hold.h"
 
 enum Spells
@@ -48,21 +47,19 @@ enum Yells
     SAY_WHISPER                                 = -1608044
 };
 
-#define DATA_VOID_DANCE                         2153
-
 class boss_zuramat : public CreatureScript
 {
 public:
     boss_zuramat() : CreatureScript("boss_zuramat") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_zuramatAI (creature);
+        return new boss_zuramatAI (pCreature);
     }
 
     struct boss_zuramatAI : public ScriptedAI
     {
-        boss_zuramatAI(Creature* c) : ScriptedAI(c)
+        boss_zuramatAI(Creature *c) : ScriptedAI(c)
         {
             pInstance = c->GetInstanceScript();
         }
@@ -72,7 +69,6 @@ public:
         uint32 SpellVoidShiftTimer;
         uint32 SpellSummonVoidTimer;
         uint32 SpellShroudOfDarknessTimer;
-        bool voidDance;
 
         void Reset()
         {
@@ -87,20 +83,19 @@ public:
             SpellShroudOfDarknessTimer = 22000;
             SpellVoidShiftTimer = 15000;
             SpellSummonVoidTimer = 12000;
-            voidDance = true;
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* pWho)
         {
             if (me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE) || me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
                 return;
 
-            if (me->Attack(who, true))
+            if (me->Attack(pWho, true))
             {
-                me->AddThreat(who, 0.0f);
-                me->SetInCombatWith(who);
-                who->SetInCombatWith(me);
-                DoStartMovement(who);
+                me->AddThreat(pWho, 0.0f);
+                me->SetInCombatWith(pWho);
+                pWho->SetInCombatWith(me);
+                DoStartMovement(pWho);
             }
         }
 
@@ -109,7 +104,7 @@ public:
             DoScriptText(SAY_AGGRO, me);
             if (pInstance)
             {
-                if (GameObject* pDoor = pInstance->instance->GetGameObject(pInstance->GetData64(DATA_ZURAMAT_CELL)))
+                if (GameObject *pDoor = pInstance->instance->GetGameObject(pInstance->GetData64(DATA_ZURAMAT_CELL)))
                     if (pDoor->GetGoState() == GO_STATE_READY)
                     {
                         EnterEvadeMode();
@@ -152,20 +147,6 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        void SummonedCreatureDies(Creature* summoned, Unit* /*who*/)
-        {
-            if (summoned->GetEntry() == CREATURE_VOID_SENTRY)
-                voidDance = false;
-        }
-
-        uint32 GetData(uint32 type)
-        {
-            if (type == DATA_VOID_DANCE)
-                return voidDance ? 1 : 0;
-
-            return 0;
-        }
-
         void JustDied(Unit* /*killer*/)
         {
             DoScriptText(SAY_DEATH, me);
@@ -185,46 +166,25 @@ public:
             }
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit * victim)
         {
             if (victim == me)
                 return;
 
-            DoScriptText(RAND(SAY_SLAY_1, SAY_SLAY_2, SAY_SLAY_3), me);
+            DoScriptText(RAND(SAY_SLAY_1,SAY_SLAY_2,SAY_SLAY_3), me);
         }
 
         void JustSummoned(Creature* summon)
         {
             summon->AI()->AttackStart(me->getVictim());
             summon->AI()->DoCastAOE(SPELL_ZURAMAT_ADD_2);
-            summon->SetPhaseMask(17, true);
+            summon->SetPhaseMask(17,true);
         }
     };
 
 };
 
-class achievement_void_dance : public AchievementCriteriaScript
-{
-    public:
-        achievement_void_dance() : AchievementCriteriaScript("achievement_void_dance")
-        {
-        }
-
-        bool OnCheck(Player* /*player*/, Unit* target)
-        {
-            if (!target)
-                return false;
-
-            if (Creature* Zuramat = target->ToCreature())
-                if (Zuramat->AI()->GetData(DATA_VOID_DANCE))
-                    return true;
-
-            return false;
-        }
-};
-
 void AddSC_boss_zuramat()
 {
     new boss_zuramat();
-    new achievement_void_dance();
 }

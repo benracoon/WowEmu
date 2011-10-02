@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment:
 SDCategory: Scholomance
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "scholomance.h"
 
 enum eEnums
@@ -39,14 +38,14 @@ class boss_doctor_theolen_krastinov : public CreatureScript
 public:
     boss_doctor_theolen_krastinov() : CreatureScript("boss_doctor_theolen_krastinov") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_theolenkrastinovAI (creature);
+        return new boss_theolenkrastinovAI (pCreature);
     }
 
     struct boss_theolenkrastinovAI : public ScriptedAI
     {
-        boss_theolenkrastinovAI(Creature* c) : ScriptedAI(c) {}
+        boss_theolenkrastinovAI(Creature *c) : ScriptedAI(c) {}
 
         uint32 m_uiRend_Timer;
         uint32 m_uiBackhand_Timer;
@@ -59,7 +58,7 @@ public:
             m_uiFrenzy_Timer = 1000;
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit* /*pKiller*/)
         {
             InstanceScript* pInstance = me->GetInstanceScript();
             if (pInstance)

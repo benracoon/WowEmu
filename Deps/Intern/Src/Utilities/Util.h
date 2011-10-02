@@ -1,6 +1,9 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010 DiamondCore <http://www.diamondcore.eu/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -24,16 +27,6 @@
 
 #include <string>
 #include <vector>
-
-// Searcher for map of structs
-template<typename T, class S> struct Finder
-{
-    T val_;
-    T S::* idMember_;
-
-    Finder(T val, T S::* idMember) : val_(val), idMember_(idMember) {}
-    bool operator()(const std::pair<int, S> &obj) { return obj.second.*idMember_ == val_; }
-};
 
 struct Tokens: public std::vector<char*>
 {
@@ -62,6 +55,9 @@ inline uint32 secsToTimeBitFields(time_t secs)
 * between max and min should be less than RAND32_MAX. */
  uint32 urand(uint32 min, uint32 max);
 
+ /* Return a random number in the range min..max (inclusive). */
+ float frand(float min, float max);
+
 /* Return a random number in the range 0 .. RAND32_MAX. */
  int32 rand32();
 
@@ -69,6 +65,7 @@ inline uint32 secsToTimeBitFields(time_t secs)
  * A double supports up to 15 valid decimal digits and is used internally (RAND32_MAX has 10 digits).
  * With an FPU, there is usually no difference in performance between float and double. */
  double rand_norm(void);
+ float rand_norm_f(void);
 
 /* Return a random double from 0.0 to 99.9999999999999. Floats support only 7 valid decimal digits.
  * A double supports up to 15 valid decimal digits and is used internaly (RAND32_MAX has 10 digits).
@@ -185,7 +182,7 @@ bool WStrToUtf8(std::wstring wstr, std::string& utf8str);
 bool WStrToUtf8(wchar_t* wstr, size_t size, std::string& utf8str);
 
 size_t utf8length(std::string& utf8str);                    // set string to "" if invalid utf8 sequence
-void utf8truncate(std::string& utf8str, size_t len);
+void utf8truncate(std::string& utf8str,size_t len);
 
 inline bool isBasicLatinCharacter(wchar_t wchar)
 {
@@ -367,7 +364,7 @@ inline void wstrToLower(std::wstring& str)
 std::wstring GetMainPartOfName(std::wstring wname, uint32 declension);
 
 bool utf8ToConsole(const std::string& utf8str, std::string& conStr);
-bool consoleToUtf8(const std::string& conStr, std::string& utf8str);
+bool consoleToUtf8(const std::string& conStr,std::string& utf8str);
 bool Utf8FitTo(const std::string& str, std::wstring search);
 void utf8printf(FILE *out, const char *str, ...);
 void vutf8printf(FILE *out, const char *str, va_list* ap);
@@ -392,15 +389,13 @@ template <typename T>
 class HookList
 {
     typedef typename std::list<T>::iterator ListIterator;
-    private:
-        typename std::list<T> m_list;
     public:
-        HookList<T> & operator+=(T t)
+        HookList<T> & operator += (T t)
         {
             m_list.push_back(t);
             return *this;
         }
-        HookList<T> & operator-=(T t)
+        HookList<T> & operator -= (T t)
         {
             m_list.remove(t);
             return *this;
@@ -417,236 +412,208 @@ class HookList
         {
             return m_list.end();
         }
+
+        private:
+            typename std::list<T> m_list;
 };
 
 class flag96
 {
-private:
-    uint32 part[3];
-public:
-    flag96(uint32 p1=0, uint32 p2=0, uint32 p3=0)
-    {
-        part[0]=p1;
-        part[1]=p2;
-        part[2]=p3;
-    }
-
-    flag96(uint64 p1, uint32 p2)
-    {
-        part[0]=PAIR64_LOPART(p1);
-        part[1]=PAIR64_HIPART(p1);
-        part[2]=p2;
-    }
-
-    inline bool IsEqual(uint32 p1=0, uint32 p2=0, uint32 p3=0) const
-    {
-        return (
-            part[0]==p1 &&
-            part[1]==p2 &&
-            part[2]==p3);
-    };
-
-    inline bool HasFlag(uint32 p1=0, uint32 p2=0, uint32 p3=0) const
-    {
-        return (
-            part[0]&p1 ||
-            part[1]&p2 ||
-            part[2]&p3);
-    };
-
-    inline void Set(uint32 p1=0, uint32 p2=0, uint32 p3=0)
-    {
-        part[0]=p1;
-        part[1]=p2;
-        part[2]=p3;
-    };
-
-    template<class type>
-    inline bool operator < (type & right)
-    {
-        for (uint8 i=3; i > 0; --i)
+    public:
+        flag96(uint32 p1=0,uint32 p2=0,uint32 p3=0)
         {
-            if (part[i-1]<right.part[i-1])
-                return 1;
-            else if (part[i-1]>right.part[i-1])
-                return 0;
+            part[0] = p1;
+            part[1] = p2;
+            part[2] = p3;
         }
-        return 0;
-    };
 
-    template<class type>
-    inline bool operator < (type & right) const
-    {
-        for (uint8 i = 3; i > 0; --i)
+        flag96(uint64 p1, uint32 p2)
         {
-            if (part[i-1]<right.part[i-1])
-                return 1;
-            else if (part[i-1]>right.part[i-1])
-                return 0;
+            part[0] = PAIR64_LOPART(p1);
+            part[1] = PAIR64_HIPART(p1);
+            part[2] = p2;
         }
-        return 0;
-    };
 
-    template<class type>
-    inline bool operator != (type & right)
-    {
-        if (part[0]!=right.part[0]
-            || part[1]!=right.part[1]
-            || part[2]!=right.part[2])
+        inline bool IsEqual(uint32 p1=0, uint32 p2=0, uint32 p3=0) const
+        {
+            return (part[0] == p1 && part[1] == p2 && part[2] == p3);
+        };
+
+        inline bool HasFlag(uint32 p1=0, uint32 p2=0, uint32 p3=0) const
+        {
+            return (part[0] & p1 || part[1] & p2 || part[2] & p3);
+        };
+
+        inline void Set(uint32 p1=0, uint32 p2=0, uint32 p3=0)
+        {
+            part[0] = p1;
+            part[1] = p2;
+            part[2] = p3;
+        };
+
+        template<class type>
+        inline bool operator < (type & right)
+        {
+            for (uint8 i = 3; i > 0; --i)
+            {
+                if (part[i - 1] < right.part[i - 1])
+                    return 1;
+                else if (part[i - 1] > right.part[i - 1])
+                    return 0;
+            }
+            return 0;
+        };
+
+        template<class type>
+        inline bool operator < (type & right) const
+        {
+            for (uint8 i = 3; i > 0; --i)
+            {
+                if (part[i - 1] < right.part[i - 1])
+                    return 1;
+                else if (part[i - 1] > right.part[i - 1])
+                    return 0;
+            }
+            return 0;
+        };
+
+        template<class type>
+        inline bool operator != (type & right)
+        {
+            if (part[0] != right.part[0] | part[1] != right.part[1]  || part[2] != right.part[2])
                 return true;
-        return false;
-    }
+            return false;
+        }
 
-    template<class type>
-    inline bool operator != (type & right) const
-    {
-        if (part[0]!=right.part[0]
-            || part[1]!=right.part[1]
-            || part[2]!=right.part[2])
+        template<class type>
+        inline bool operator != (type & right) const
+        {
+            if (part[0] != right.part[0] || part[1] != right.part[1] || part[2] != right.part[2])
                 return true;
-        return false;
-    };
+            return false;
+        };
 
-    template<class type>
-    inline bool operator == (type & right)
-    {
-        if (part[0]!=right.part[0]
-            || part[1]!=right.part[1]
-            || part[2]!=right.part[2])
+        template<class type>
+        inline bool operator == (type & right)
+        {
+            if (part[0] != right.part[0] || part[1] != right.part[1] || part[2] != right.part[2])
                 return false;
-        return true;
-    };
+            return true;
+        };
 
-    template<class type>
-    inline bool operator == (type & right) const
-    {
-        if (part[0]!=right.part[0]
-            || part[1]!=right.part[1]
-            || part[2]!=right.part[2])
+        template<class type>
+        inline bool operator == (type & right) const
+        {
+            if (part[0] != right.part[0] || part[1] != right.part[1] || part[2] != right.part[2])
                 return false;
-        return true;
-    };
+            return true;
+        };
 
-    template<class type>
-    inline void operator = (type & right)
-    {
-        part[0]=right.part[0];
-        part[1]=right.part[1];
-        part[2]=right.part[2];
-    };
+        template<class type>
+        inline void operator = (type & right)
+        {
+            part[0] = right.part[0];
+            part[1] = right.part[1];
+            part[2] = right.part[2];
+        };
 
-    template<class type>
-    inline flag96 operator & (type & right)
-    {
-        flag96 ret(part[0] & right.part[0], part[1] & right.part[1], part[2] & right.part[2]);
-        return
-            ret;
-    };
-    template<class type>
-    inline flag96 operator & (type & right) const
-    {
-        flag96 ret(part[0] & right.part[0], part[1] & right.part[1], part[2] & right.part[2]);
-        return
-            ret;
-    };
+        template<class type>
+        inline flag96 operator & (type & right)
+        {
+            flag96 ret(part[0] & right.part[0],part[1] & right.part[1],part[2] & right.part[2]);
+            return ret;
+        };
+        template<class type>
+        inline flag96 operator & (type & right) const
+        {
+            flag96 ret(part[0] & right.part[0],part[1] & right.part[1],part[2] & right.part[2]);
+            return  ret;
+        };
 
-    template<class type>
-    inline void operator &= (type & right)
-    {
-        *this=*this & right;
-    };
+        template<class type>
+        inline void operator &= (type & right)
+        {
+            *this = *this & right;
+        };
 
-    template<class type>
-    inline flag96 operator | (type & right)
-    {
-        flag96 ret(part[0] | right.part[0], part[1] | right.part[1], part[2] | right.part[2]);
-        return
-            ret;
-    };
+        template<class type>
+        inline flag96 operator | (type & right)
+        {
+            flag96 ret(part[0] | right.part[0],part[1] | right.part[1],part[2] | right.part[2]);
+            return  ret;
+        };
 
-    template<class type>
-    inline flag96 operator | (type & right) const
-    {
-        flag96 ret(part[0] | right.part[0], part[1] | right.part[1], part[2] | right.part[2]);
-        return
-            ret;
-    };
+        template<class type>
+        inline flag96 operator | (type & right) const
+        {
+            flag96 ret(part[0] | right.part[0],part[1] | right.part[1],part[2] | right.part[2]);
+            return ret;
+        };
 
-    template<class type>
-    inline void operator |= (type & right)
-    {
-        *this=*this | right;
-    };
+        template<class type>
+        inline void operator |= (type & right)
+        {
+            *this = *this | right;
+        };
 
-    inline void operator ~ ()
-    {
-        part[2]=~part[2];
-        part[1]=~part[1];
-        part[0]=~part[0];
-    };
+        inline void operator ~ ()
+        {
+            part[2] = ~part[2];
+            part[1] = ~part[1];
+            part[0] = ~part[0];
+        };
 
-    template<class type>
-    inline flag96 operator ^ (type & right)
-    {
-        flag96 ret(part[0] ^ right.part[0], part[1] ^ right.part[1], part[2] ^ right.part[2]);
-        return
-            ret;
-    };
+        template<class type>
+        inline flag96 operator ^ (type & right)
+        {
+            flag96 ret(part[0] ^ right.part[0],part[1] ^ right.part[1],part[2] ^ right.part[2]);
+            return  ret;
+        };
 
-    template<class type>
-    inline flag96 operator ^ (type & right) const
-    {
-        flag96 ret(part[0] ^ right.part[0], part[1] ^ right.part[1], part[2] ^ right.part[2]);
-        return
-            ret;
-    };
+        template<class type>
+        inline flag96 operator ^ (type & right) const
+        {
+            flag96 ret(part[0] ^ right.part[0],part[1] ^ right.part[1],part[2] ^ right.part[2]);
+            return ret;
+        };
 
-    template<class type>
-    inline void operator ^= (type & right)
-    {
-        *this=*this^right;
-    };
+        template<class type>
+        inline void operator ^= (type & right)
+        {
+            *this = *this ^ right;
+        };
 
-    inline operator bool() const
-    {
-        return(
-            part[0] != 0 ||
-            part[1] != 0 ||
-            part[2] != 0);
-    };
+        inline operator bool() const
+        {
+            return(part[0] != 0 || part[1] != 0 ||  part[2] != 0);
+        };
 
-    inline operator bool()
-    {
-        return(
-            part[0] != 0 ||
-            part[1] != 0 ||
-            part[2] != 0);
-    };
+        inline operator bool()
+        {
+            return(part[0] != 0 || part[1] != 0 || part[2] != 0);
+        };
 
-    inline bool operator ! () const
-    {
-        return(
-            part[0] == 0 &&
-            part[1] == 0 &&
-            part[2] == 0);
-    };
+        inline bool operator ! () const
+        {
+            return(part[0] == 0 &&  part[1] == 0 && part[2] == 0);
+        };
 
-    inline bool operator ! ()
-    {
-        return(
-            part[0] == 0 &&
-            part[1] == 0 &&
-            part[2] == 0);
-    };
+        inline bool operator ! ()
+        {
+            return(part[0] == 0 && part[1] == 0 && part[2] == 0);
+        };
 
-    inline uint32 & operator[](uint8 el)
-    {
-        return (part[el]);
-    };
+        inline uint32 & operator[](uint8 el)
+        {
+            return (part[el]);
+        };
 
-    inline uint32 operator[](uint8 el) const
-    {
-        return (part[el]);
-    };
+        inline const uint32 & operator[](uint8 el) const
+        {
+            return (part[el]);
+        };
+
+    private:
+        uint32 part[3];
 };
 #endif

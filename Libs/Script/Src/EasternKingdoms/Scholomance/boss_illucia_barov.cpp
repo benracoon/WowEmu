@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment:
 SDCategory: Scholomance
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "scholomance.h"
 
 #define SPELL_CURSEOFAGONY      18671
@@ -37,14 +36,14 @@ class boss_illucia_barov : public CreatureScript
 public:
     boss_illucia_barov() : CreatureScript("boss_illucia_barov") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_illuciabarovAI (creature);
+        return new boss_illuciabarovAI (pCreature);
     }
 
     struct boss_illuciabarovAI : public ScriptedAI
     {
-        boss_illuciabarovAI(Creature* c) : ScriptedAI(c) {}
+        boss_illuciabarovAI(Creature *c) : ScriptedAI(c) {}
 
         uint32 CurseOfAgony_Timer;
         uint32 ShadowShock_Timer;
@@ -59,7 +58,7 @@ public:
             Fear_Timer = 30000;
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit * /*killer*/)
         {
             InstanceScript *pInstance = me->GetInstanceScript();
             if (pInstance)
@@ -71,7 +70,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit * /*who*/)
         {
         }
 
@@ -90,9 +89,9 @@ public:
             //ShadowShock_Timer
             if (ShadowShock_Timer <= diff)
             {
-                Unit* target = NULL;
-                target = SelectTarget(SELECT_TARGET_RANDOM, 0);
-                if (target) DoCast(target, SPELL_SHADOWSHOCK);
+                Unit *pTarget = NULL;
+                pTarget = SelectTarget(SELECT_TARGET_RANDOM,0);
+                if (pTarget) DoCast(pTarget, SPELL_SHADOWSHOCK);
 
                 ShadowShock_Timer = 12000;
             } else ShadowShock_Timer -= diff;

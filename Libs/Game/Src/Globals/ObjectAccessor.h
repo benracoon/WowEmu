@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -123,7 +125,7 @@ class ObjectAccessor
         // Player may be not in world while in ObjectAccessor
         static Player* GetObjectInWorld(uint64 guid, Player* /*typeSpecifier*/)
         {
-            Player* player = HashMapHolder<Player>::Find(guid);
+            Player * player = HashMapHolder<Player>::Find(guid);
             if (player && player->IsInWorld())
                 return player;
             return NULL;

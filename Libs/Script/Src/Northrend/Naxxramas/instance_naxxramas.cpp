@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -16,13 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "naxxramas.h"
 
 const DoorData doorData[] =
 {
-    {181126,    BOSS_ANUBREKHAN, DOOR_TYPE_ROOM,     BOUNDARY_S},
-    {181195,    BOSS_ANUBREKHAN, DOOR_TYPE_PASSAGE,  0},
+    {181126,    BOSS_ANUBREKHAN,DOOR_TYPE_ROOM,     BOUNDARY_S},
+    {181195,    BOSS_ANUBREKHAN,DOOR_TYPE_PASSAGE,  0},
     {194022,    BOSS_FAERLINA,  DOOR_TYPE_PASSAGE,  0},
     {181209,    BOSS_FAERLINA,  DOOR_TYPE_PASSAGE,  0},
     {181209,    BOSS_MAEXXNA,   DOOR_TYPE_ROOM,     BOUNDARY_SW},
@@ -57,7 +56,7 @@ const MinionData minionData[] =
     {16064,     BOSS_HORSEMEN},
     {16065,     BOSS_HORSEMEN},
     {30549,     BOSS_HORSEMEN},
-    {0,         0, }
+    {0,         0,}
 };
 
 enum eEnums
@@ -133,7 +132,6 @@ public:
         uint64 uiSir;
 
         uint64 uiThaddius;
-        uint64 uiHeigan;
         uint64 uiFeugen;
         uint64 uiStalagg;
 
@@ -157,7 +155,6 @@ public:
                 case 30549: uiBaron = creature->GetGUID(); return;
                 case 16063: uiSir = creature->GetGUID(); return;
                 case 15928: uiThaddius = creature->GetGUID(); return;
-                case 15936: uiHeigan = creature->GetGUID(); return;
                 case 15930: uiFeugen = creature->GetGUID(); return;
                 case 15929: uiStalagg = creature->GetGUID(); return;
                 case 15990: uiKelthuzad = creature->GetGUID(); return;
@@ -293,8 +290,6 @@ public:
                 return uiSir;
             case DATA_THADDIUS:
                 return uiThaddius;
-            case DATA_HEIGAN:
-                return uiHeigan;
             case DATA_FEUGEN:
                 return uiFeugen;
             case DATA_STALAGG:
@@ -372,7 +367,7 @@ public:
         std::string GetSaveData()
         {
             std::ostringstream saveStream;
-            saveStream << GetBossSaveData() << ' ' << gothikDoorState;
+            saveStream << GetBossSaveData() << " " << gothikDoorState;
             return saveStream.str();
         }
 

@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment:
 SDCategory: Stratholme
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 
 #define SAY_SPAWN   "TIMMY!"
 
@@ -35,14 +34,14 @@ class boss_timmy_the_cruel : public CreatureScript
 public:
     boss_timmy_the_cruel() : CreatureScript("boss_timmy_the_cruel") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_timmy_the_cruelAI (creature);
+        return new boss_timmy_the_cruelAI (pCreature);
     }
 
     struct boss_timmy_the_cruelAI : public ScriptedAI
     {
-        boss_timmy_the_cruelAI(Creature* c) : ScriptedAI(c) {}
+        boss_timmy_the_cruelAI(Creature *c) : ScriptedAI(c) {}
 
         uint32 RavenousClaw_Timer;
         bool HasYelled;
@@ -53,11 +52,11 @@ public:
             HasYelled = false;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit * /*who*/)
         {
             if (!HasYelled)
             {
-                me->MonsterYell(SAY_SPAWN, LANG_UNIVERSAL, 0);
+                me->MonsterYell(SAY_SPAWN,LANG_UNIVERSAL,NULL);
                 HasYelled = true;
             }
         }

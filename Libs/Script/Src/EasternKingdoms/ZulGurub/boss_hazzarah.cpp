@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment:
 SDCategory: Zul'Gurub
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "zulgurub.h"
 
 #define SPELL_MANABURN         26046
@@ -41,7 +40,7 @@ class boss_hazzarah : public CreatureScript
 
         struct boss_hazzarahAI : public ScriptedAI
         {
-            boss_hazzarahAI(Creature* c) : ScriptedAI(c) {}
+            boss_hazzarahAI(Creature *c) : ScriptedAI(c) {}
 
             uint32 ManaBurn_Timer;
             uint32 Sleep_Timer;
@@ -54,7 +53,7 @@ class boss_hazzarah : public CreatureScript
                 Illusions_Timer = 10000 + rand()%8000;
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit * /*who*/)
             {
             }
 
@@ -82,16 +81,16 @@ class boss_hazzarah : public CreatureScript
                 {
                     //We will summon 3 illusions that will spawn on a random gamer and attack this gamer
                     //We will just use one model for the beginning
-                    Unit* target = NULL;
+                    Unit *pTarget = NULL;
                     for (uint8 i = 0; i < 3; ++i)
                     {
-                        target = SelectTarget(SELECT_TARGET_RANDOM, 0);
-                        if (!target)
+                        pTarget = SelectTarget(SELECT_TARGET_RANDOM,0);
+                        if (!pTarget)
                             return;
 
-                        Creature* Illusion = me->SummonCreature(15163, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30000);
+                        Creature *Illusion = me->SummonCreature(15163,pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ(),0,TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN,30000);
                         if (Illusion)
-                            Illusion->AI()->AttackStart(target);
+                            Illusion->AI()->AttackStart(pTarget);
                     }
 
                     Illusions_Timer = 15000 + rand()%10000;

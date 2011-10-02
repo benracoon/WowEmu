@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment:
 SDCategory: Gruul's Lair
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "gruuls_lair.h"
 
 #define MAX_ENCOUNTER 2
@@ -101,12 +100,9 @@ public:
             {
                 case 184468:
                     MaulgarDoor = go->GetGUID();
-                    if (m_auiEncounter[0] == DONE)
-                        HandleGameObject(0, true, go);
+                    if (m_auiEncounter[0] == DONE) HandleGameObject(NULL, true, go);
                     break;
-                case 184662:
-                    GruulDoor = go->GetGUID();
-                    break;
+                case 184662: GruulDoor = go->GetGUID(); break;
             }
         }
 
@@ -163,7 +159,7 @@ public:
         {
             OUT_SAVE_INST_DATA;
             std::ostringstream stream;
-            stream << m_auiEncounter[0] << ' ' << m_auiEncounter[1];
+            stream << m_auiEncounter[0] << " " << m_auiEncounter[1];
             char* out = new char[stream.str().length() + 1];
             strcpy(out, stream.str().c_str());
             if (out)

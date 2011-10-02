@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -20,11 +19,11 @@
 /* ScriptData
 SDName: Boss_Watchkeeper_Gargolmar
 SD%Complete: 80
-SDComment: Missing adds to heal him. Surge should be used on target furthest away, not random.
+SDComment: Missing adds to heal him. Surge should be used on pTarget furthest away, not random.
 SDCategory: Hellfire Citadel, Hellfire Ramparts
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 
 enum eSays
 {
@@ -58,7 +57,7 @@ class boss_watchkeeper_gargolmar : public CreatureScript
 
         struct boss_watchkeeper_gargolmarAI : public ScriptedAI
         {
-            boss_watchkeeper_gargolmarAI(Creature* creature) : ScriptedAI(creature)
+            boss_watchkeeper_gargolmarAI(Creature* pCreature) : ScriptedAI(pCreature)
             {
             }
 
@@ -79,9 +78,9 @@ class boss_watchkeeper_gargolmar : public CreatureScript
                 YelledForHeal = false;
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit * /*who*/)
             {
-                DoScriptText(RAND(SAY_AGGRO_1, SAY_AGGRO_2, SAY_AGGRO_3), me);
+                DoScriptText(RAND(SAY_AGGRO_1,SAY_AGGRO_2,SAY_AGGRO_3), me);
             }
 
             void MoveInLineOfSight(Unit* who)
@@ -107,7 +106,7 @@ class boss_watchkeeper_gargolmar : public CreatureScript
 
             void KilledUnit(Unit* /*victim*/)
             {
-                DoScriptText(RAND(SAY_KILL_1, SAY_KILL_2), me);
+                DoScriptText(RAND(SAY_KILL_1,SAY_KILL_2), me);
             }
 
             void JustDied(Unit* /*Killer*/)
@@ -132,8 +131,8 @@ class boss_watchkeeper_gargolmar : public CreatureScript
                 {
                     DoScriptText(SAY_SURGE, me);
 
-                    if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                        DoCast(target, SPELL_SURGE);
+                    if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM,0))
+                        DoCast(pTarget, SPELL_SURGE);
 
                     Surge_Timer = 5000+rand()%8000;
                 }

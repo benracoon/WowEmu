@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -30,7 +29,7 @@ npc_prospector_remtravel
 npc_threshwackonator
 EndContentData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedFollowerAI.h"
 
@@ -71,29 +70,29 @@ class npc_kerlonian : public CreatureScript
 public:
     npc_kerlonian() : CreatureScript("npc_kerlonian") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* pQuest)
+    bool OnQuestAccept(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
     {
         if (pQuest->GetQuestId() == QUEST_SLEEPER_AWAKENED)
         {
-            if (npc_kerlonianAI* pKerlonianAI = CAST_AI(npc_kerlonian::npc_kerlonianAI, creature->AI()))
+            if (npc_kerlonianAI* pKerlonianAI = CAST_AI(npc_kerlonian::npc_kerlonianAI, pCreature->AI()))
             {
-                creature->SetStandState(UNIT_STAND_STATE_STAND);
-                DoScriptText(SAY_KER_START, creature, player);
-                pKerlonianAI->StartFollow(player, FACTION_KER_ESCORTEE, pQuest);
+                pCreature->SetStandState(UNIT_STAND_STATE_STAND);
+                DoScriptText(SAY_KER_START, pCreature, pPlayer);
+                pKerlonianAI->StartFollow(pPlayer, FACTION_KER_ESCORTEE, pQuest);
             }
         }
 
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new npc_kerlonianAI(creature);
+        return new npc_kerlonianAI(pCreature);
     }
 
     struct npc_kerlonianAI : public FollowerAI
     {
-        npc_kerlonianAI(Creature* creature) : FollowerAI(creature) { }
+        npc_kerlonianAI(Creature* pCreature) : FollowerAI(pCreature) { }
 
         uint32 m_uiFallAsleepTimer;
 
@@ -102,18 +101,18 @@ public:
             m_uiFallAsleepTimer = urand(10000, 45000);
         }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit *pWho)
         {
-            FollowerAI::MoveInLineOfSight(who);
+            FollowerAI::MoveInLineOfSight(pWho);
 
-            if (!me->getVictim() && !HasFollowState(STATE_FOLLOW_COMPLETE) && who->GetEntry() == NPC_LILADRIS)
+            if (!me->getVictim() && !HasFollowState(STATE_FOLLOW_COMPLETE) && pWho->GetEntry() == NPC_LILADRIS)
             {
-                if (me->IsWithinDistInMap(who, INTERACTION_DISTANCE*5))
+                if (me->IsWithinDistInMap(pWho, INTERACTION_DISTANCE*5))
                 {
-                    if (Player* player = GetLeaderForFollower())
+                    if (Player* pPlayer = GetLeaderForFollower())
                     {
-                        if (player->GetQuestStatus(QUEST_SLEEPER_AWAKENED) == QUEST_STATUS_INCOMPLETE)
-                            player->GroupEventHappens(QUEST_SLEEPER_AWAKENED, me);
+                        if (pPlayer->GetQuestStatus(QUEST_SLEEPER_AWAKENED) == QUEST_STATUS_INCOMPLETE)
+                            pPlayer->GroupEventHappens(QUEST_SLEEPER_AWAKENED, me);
 
                         DoScriptText(SAY_KER_END, me);
                     }
@@ -123,7 +122,7 @@ public:
             }
         }
 
-        void SpellHit(Unit* /*pCaster*/, const SpellInfo* pSpell)
+        void SpellHit(Unit* /*pCaster*/, const SpellEntry* pSpell)
         {
             if (HasFollowState(STATE_FOLLOW_INPROGRESS | STATE_FOLLOW_PAUSED) && pSpell->Id == SPELL_AWAKEN)
                 ClearSleeping();
@@ -133,9 +132,9 @@ public:
         {
             SetFollowPaused(true);
 
-            DoScriptText(RAND(EMOTE_KER_SLEEP_1, EMOTE_KER_SLEEP_2, EMOTE_KER_SLEEP_3), me);
+            DoScriptText(RAND(EMOTE_KER_SLEEP_1,EMOTE_KER_SLEEP_2,EMOTE_KER_SLEEP_3), me);
 
-            DoScriptText(RAND(SAY_KER_SLEEP_1, SAY_KER_SLEEP_2, SAY_KER_SLEEP_3, SAY_KER_SLEEP_4), me);
+            DoScriptText(RAND(SAY_KER_SLEEP_1,SAY_KER_SLEEP_2,SAY_KER_SLEEP_3,SAY_KER_SLEEP_4), me);
 
             me->SetStandState(UNIT_STAND_STATE_SLEEP);
             DoCast(me, SPELL_SLEEP_VISUAL, false);
@@ -210,72 +209,72 @@ class npc_prospector_remtravel : public CreatureScript
 public:
     npc_prospector_remtravel() : CreatureScript("npc_prospector_remtravel") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* pQuest)
+    bool OnQuestAccept(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
     {
         if (pQuest->GetQuestId() == QUEST_ABSENT_MINDED_PT2)
         {
-            if (npc_escortAI* pEscortAI = CAST_AI(npc_prospector_remtravel::npc_prospector_remtravelAI, creature->AI()))
-                pEscortAI->Start(false, false, player->GetGUID());
+            if (npc_escortAI* pEscortAI = CAST_AI(npc_prospector_remtravel::npc_prospector_remtravelAI, pCreature->AI()))
+                pEscortAI->Start(false, false, pPlayer->GetGUID());
 
-            creature->setFaction(FACTION_ESCORTEE);
+            pCreature->setFaction(FACTION_ESCORTEE);
         }
 
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new npc_prospector_remtravelAI(creature);
+        return new npc_prospector_remtravelAI(pCreature);
     }
 
     struct npc_prospector_remtravelAI : public npc_escortAI
     {
-        npc_prospector_remtravelAI(Creature* creature) : npc_escortAI(creature) {}
+        npc_prospector_remtravelAI(Creature* pCreature) : npc_escortAI(pCreature) {}
 
         void WaypointReached(uint32 i)
         {
-            Player* player = GetPlayerForEscort();
+            Player* pPlayer = GetPlayerForEscort();
 
-            if (!player)
+            if (!pPlayer)
                 return;
 
             switch(i)
             {
                 case 0:
-                    DoScriptText(SAY_REM_START, me, player);
+                    DoScriptText(SAY_REM_START, me, pPlayer);
                     break;
                 case 5:
-                    DoScriptText(SAY_REM_RAMP1_1, me, player);
+                    DoScriptText(SAY_REM_RAMP1_1, me, pPlayer);
                     break;
                 case 6:
                     DoSpawnCreature(NPC_GRAVEL_SCOUT, -10.0f, 5.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
                     DoSpawnCreature(NPC_GRAVEL_BONE, -10.0f, 7.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
                     break;
                 case 9:
-                    DoScriptText(SAY_REM_RAMP1_2, me, player);
+                    DoScriptText(SAY_REM_RAMP1_2, me, pPlayer);
                     break;
                 case 14:
                     //depend quest rewarded?
-                    DoScriptText(SAY_REM_BOOK, me, player);
+                    DoScriptText(SAY_REM_BOOK, me, pPlayer);
                     break;
                 case 15:
-                    DoScriptText(SAY_REM_TENT1_1, me, player);
+                    DoScriptText(SAY_REM_TENT1_1, me, pPlayer);
                     break;
                 case 16:
                     DoSpawnCreature(NPC_GRAVEL_SCOUT, -10.0f, 5.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
                     DoSpawnCreature(NPC_GRAVEL_BONE, -10.0f, 7.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
                     break;
                 case 17:
-                    DoScriptText(SAY_REM_TENT1_2, me, player);
+                    DoScriptText(SAY_REM_TENT1_2, me, pPlayer);
                     break;
                 case 26:
-                    DoScriptText(SAY_REM_MOSS, me, player);
+                    DoScriptText(SAY_REM_MOSS, me, pPlayer);
                     break;
                 case 27:
-                    DoScriptText(EMOTE_REM_MOSS, me, player);
+                    DoScriptText(EMOTE_REM_MOSS, me, pPlayer);
                     break;
                 case 28:
-                    DoScriptText(SAY_REM_MOSS_PROGRESS, me, player);
+                    DoScriptText(SAY_REM_MOSS_PROGRESS, me, pPlayer);
                     break;
                 case 29:
                     DoSpawnCreature(NPC_GRAVEL_SCOUT, -15.0f, 3.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
@@ -283,14 +282,14 @@ public:
                     DoSpawnCreature(NPC_GRAVEL_GEO, -15.0f, 7.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
                     break;
                 case 31:
-                    DoScriptText(SAY_REM_PROGRESS, me, player);
+                    DoScriptText(SAY_REM_PROGRESS, me, pPlayer);
                     break;
                 case 41:
-                    DoScriptText(SAY_REM_REMEMBER, me, player);
+                    DoScriptText(SAY_REM_REMEMBER, me, pPlayer);
                     break;
                 case 42:
-                    DoScriptText(EMOTE_REM_END, me, player);
-                    player->GroupEventHappens(QUEST_ABSENT_MINDED_PT2, me);
+                    DoScriptText(EMOTE_REM_END, me, pPlayer);
+                    pPlayer->GroupEventHappens(QUEST_ABSENT_MINDED_PT2, me);
                     break;
             }
         }
@@ -332,52 +331,52 @@ class npc_threshwackonator : public CreatureScript
 public:
     npc_threshwackonator() : CreatureScript("npc_threshwackonator") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction)
+    bool OnGossipSelect(Player* pPlayer, Creature* pCreature, uint32 /*uiSender*/, uint32 uiAction)
     {
-        player->PlayerTalkClass->ClearMenus();
+        pPlayer->PlayerTalkClass->ClearMenus();
         if (uiAction == GOSSIP_ACTION_INFO_DEF+1)
         {
-            player->CLOSE_GOSSIP_MENU();
+            pPlayer->CLOSE_GOSSIP_MENU();
 
-            if (npc_threshwackonatorAI* pThreshAI = CAST_AI(npc_threshwackonator::npc_threshwackonatorAI, creature->AI()))
+            if (npc_threshwackonatorAI* pThreshAI = CAST_AI(npc_threshwackonator::npc_threshwackonatorAI, pCreature->AI()))
             {
-                DoScriptText(EMOTE_START, creature);
-                pThreshAI->StartFollow(player);
+                DoScriptText(EMOTE_START, pCreature);
+                pThreshAI->StartFollow(pPlayer);
             }
         }
 
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* pPlayer, Creature* pCreature)
     {
-        if (player->GetQuestStatus(QUEST_GYROMAST_REV) == QUEST_STATUS_INCOMPLETE)
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_INSERT_KEY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
+        if (pPlayer->GetQuestStatus(QUEST_GYROMAST_REV) == QUEST_STATUS_INCOMPLETE)
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_INSERT_KEY, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
 
-        player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+        pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new npc_threshwackonatorAI(creature);
+        return new npc_threshwackonatorAI(pCreature);
     }
 
     struct npc_threshwackonatorAI : public FollowerAI
     {
-        npc_threshwackonatorAI(Creature* creature) : FollowerAI(creature) { }
+        npc_threshwackonatorAI(Creature* pCreature) : FollowerAI(pCreature) { }
 
         void Reset() { }
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* pWho)
         {
-            FollowerAI::MoveInLineOfSight(who);
+            FollowerAI::MoveInLineOfSight(pWho);
 
-            if (!me->getVictim() && !HasFollowState(STATE_FOLLOW_COMPLETE) && who->GetEntry() == NPC_GELKAK)
+            if (!me->getVictim() && !HasFollowState(STATE_FOLLOW_COMPLETE) && pWho->GetEntry() == NPC_GELKAK)
             {
-                if (me->IsWithinDistInMap(who, 10.0f))
+                if (me->IsWithinDistInMap(pWho, 10.0f))
                 {
-                    DoScriptText(SAY_AT_CLOSE, who);
+                    DoScriptText(SAY_AT_CLOSE, pWho);
                     DoAtEnd();
                 }
             }

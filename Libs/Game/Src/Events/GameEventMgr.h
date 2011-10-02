@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -52,8 +54,6 @@ struct GameEventQuestToEventConditionNum
     float num;
 };
 
-typedef std::map<uint32 /*condition id*/, GameEventFinishCondition> GameEventConditionMap;
-
 struct GameEventData
 {
     GameEventData() : start(1), end(0), nextstart(0), occurence(0), length(0), holiday_id(HOLIDAY_NONE), state(GAMEEVENT_NORMAL) {}
@@ -64,7 +64,7 @@ struct GameEventData
     uint32 length;          // length of the event (minutes) after finishing all conditions
     HolidayIds holiday_id;
     GameEventState state;   // state of the game event, these are saved into the game_event table on change!
-    GameEventConditionMap conditions;  // conditions to finish
+    std::map<uint32 /*condition id*/, GameEventFinishCondition> conditions;  // conditions to finish
     std::set<uint16 /*gameevent id*/> prerequisite_events;  // events that must be completed before starting this event
     std::string description;
 
@@ -94,12 +94,10 @@ class Creature;
 class GameEventMgr
 {
     friend class ACE_Singleton<GameEventMgr, ACE_Null_Mutex>;
-
-    private:
-        GameEventMgr();
+    GameEventMgr();
+    public:
         ~GameEventMgr() {};
 
-    public:
         typedef std::set<uint16> ActiveEvents;
         typedef std::vector<GameEventData> GameEventDataMap;
         ActiveEvents const& GetActiveEventList() const { return m_ActiveEvents; }
@@ -116,11 +114,11 @@ class GameEventMgr
         bool StartEvent(uint16 event_id, bool overwrite = false);
         void StopEvent(uint16 event_id, bool overwrite = false);
         void HandleQuestComplete(uint32 quest_id);  // called on world event type quest completions
-        void HandleWorldEventGossip(Player* plr, Creature* c);
-        uint32 GetNPCFlag(Creature* cr);
+        void HandleWorldEventGossip(Player * plr, Creature * c);
+        uint32 GetNPCFlag(Creature * cr);
         uint32 GetNpcTextId(uint32 guid);
     private:
-        void SendWorldStateUpdate(Player* plr, uint16 event_id);
+        void SendWorldStateUpdate(Player * plr, uint16 event_id);
         void AddActiveEvent(uint16 event_id) { m_ActiveEvents.insert(event_id); }
         void RemoveActiveEvent(uint16 event_id) { m_ActiveEvents.erase(event_id); }
         void ApplyNewEvent(uint16 event_id);
@@ -139,7 +137,7 @@ class GameEventMgr
         bool hasGameObjectQuestActiveEventExcept(uint32 quest_id, uint16 event_id);
         bool hasCreatureActiveEventExcept(uint32 creature_guid, uint16 event_id);
         bool hasGameObjectActiveEventExcept(uint32 go_guid, uint16 event_id);
-
+protected:
         typedef std::list<uint32> GuidList;
         typedef std::list<uint32> IdList;
         typedef std::vector<GuidList> GameEventGuidMap;

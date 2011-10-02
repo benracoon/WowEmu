@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -19,8 +21,8 @@
 
 #include "Common.h"
 #include "UpdateMask.h"
-#include "Opcodes.h"
 #include "World.h"
+#include "OpcodeHandler.h"
 #include "ObjectAccessor.h"
 #include "DatabaseEnv.h"
 #include "GridNotifiers.h"
@@ -28,8 +30,7 @@
 #include "GridNotifiersImpl.h"
 #include "ScriptMgr.h"
 
-DynamicObject::DynamicObject() : WorldObject(),
-    _aura(NULL), _removedAura(NULL), _caster(NULL), _duration(0), _isViewpoint(false)
+DynamicObject::DynamicObject() : WorldObject()
 {
     m_objectType |= TYPEMASK_DYNAMICOBJECT;
     m_objectTypeId = TYPEID_DYNAMICOBJECT;
@@ -37,15 +38,19 @@ DynamicObject::DynamicObject() : WorldObject(),
     m_updateFlag = (UPDATEFLAG_HAS_POSITION | UPDATEFLAG_POSITION);
 
     m_valuesCount = DYNAMICOBJECT_END;
+
+    m_aura = NULL;
+    m_duration = 0;
+    m_caster = NULL;
+    m_isViewpoint = false;
 }
 
 DynamicObject::~DynamicObject()
 {
     // make sure all references were properly removed
-    ASSERT(!_aura);
-    ASSERT(!_caster);
-    ASSERT(!_isViewpoint);
-    delete _removedAura;
+    ASSERT(!m_aura);
+    ASSERT(!m_caster);
+    ASSERT(!m_isViewpoint);
 }
 
 void DynamicObject::AddToWorld()
@@ -64,10 +69,10 @@ void DynamicObject::RemoveFromWorld()
     ///- Remove the dynamicObject from the accessor and from all lists of objects in world
     if (IsInWorld())
     {
-        if (_isViewpoint)
+        if (m_isViewpoint)
             RemoveCasterViewpoint();
 
-        if (_aura)
+        if (m_aura)
             RemoveAura();
 
         // dynobj could get removed in Aura::RemoveAura
@@ -80,13 +85,13 @@ void DynamicObject::RemoveFromWorld()
     }
 }
 
-bool DynamicObject::Create(uint32 guidlow, Unit* caster, uint32 spellId, Position const& pos, float radius, bool active, DynamicObjectType type)
+bool DynamicObject::Create(uint32 guidlow, Unit *caster, uint32 spellId, const Position &pos, float radius, bool active)
 {
     SetMap(caster->GetMap());
     Relocate(pos);
     if (!IsPositionValid())
     {
-        sLog->outError("DynamicObject (spell %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)", spellId, GetPositionX(), GetPositionY());
+        sLog->outError("DynamicObject (spell %u) not created. Suggested coordinates isn't valid (X: %f Y: %f)",spellId,GetPositionX(),GetPositionY());
         return false;
     }
 
@@ -101,7 +106,7 @@ bool DynamicObject::Create(uint32 guidlow, Unit* caster, uint32 spellId, Positio
     // If any other value is used, the client will _always_ use the radius provided in DYNAMICOBJECT_RADIUS, but
     // precompensation is necessary (eg radius *= 2) for many spells. Anyway, blizz sends 0x0001 for all the spells
     // I saw sniffed...
-    SetByteValue(DYNAMICOBJECT_BYTES, 0, type);
+    SetUInt32Value(DYNAMICOBJECT_BYTES, 0x00000001);
     SetUInt32Value(DYNAMICOBJECT_SPELLID, spellId);
     SetFloatValue(DYNAMICOBJECT_RADIUS, radius);
     SetUInt32Value(DYNAMICOBJECT_CASTTIME, getMSTime());
@@ -113,24 +118,24 @@ bool DynamicObject::Create(uint32 guidlow, Unit* caster, uint32 spellId, Positio
 void DynamicObject::Update(uint32 p_time)
 {
     // caster has to be always avalible and in the same map
-    ASSERT(_caster);
-    ASSERT(_caster->GetMap() == GetMap());
+    ASSERT(m_caster);
+    ASSERT(m_caster->GetMap() == GetMap());
 
     bool expired = false;
 
-    if (_aura)
+    if (m_aura)
     {
-        if (!_aura->IsRemoved())
-            _aura->UpdateOwner(p_time, this);
+        if (!m_aura->IsRemoved())
+            m_aura->UpdateOwner(p_time, this);
 
         // m_aura may be set to null in Aura::UpdateOwner call
-        if (_aura && (_aura->IsRemoved() || _aura->IsExpired()))
+        if (m_aura && (m_aura->IsRemoved() || m_aura->IsExpired()))
             expired = true;
     }
     else
     {
         if (GetDuration() > int32(p_time))
-            _duration -= p_time;
+            m_duration -= p_time;
         else
             expired = true;
     }
@@ -153,18 +158,18 @@ void DynamicObject::Remove()
 
 int32 DynamicObject::GetDuration() const
 {
-    if (!_aura)
-        return _duration;
+    if (!m_aura)
+        return m_duration;
     else
-        return _aura->GetDuration();
+        return m_aura->GetDuration();
 }
 
 void DynamicObject::SetDuration(int32 newDuration)
 {
-    if (!_aura)
-        _duration = newDuration;
+    if (!m_aura)
+        m_duration = newDuration;
     else
-        _aura->SetDuration(newDuration);
+        m_aura->SetDuration(newDuration);
 }
 
 void DynamicObject::Delay(int32 delaytime)
@@ -172,51 +177,51 @@ void DynamicObject::Delay(int32 delaytime)
     SetDuration(GetDuration() - delaytime);
 }
 
-void DynamicObject::SetAura(Aura* aura)
+void DynamicObject::SetAura(Aura * aura)
 {
-    ASSERT(!_aura && aura);
-    _aura = aura;
+    ASSERT (!m_aura && aura);
+    m_aura = aura;
 }
 
 void DynamicObject::RemoveAura()
 {
-    ASSERT(_aura && !_removedAura);
-    _removedAura = _aura;
-    _aura = NULL;
-    if (!_removedAura->IsRemoved())
-        _removedAura->_Remove(AURA_REMOVE_BY_DEFAULT);
+    ASSERT (m_aura);
+    if (!m_aura->IsRemoved())
+        m_aura->_Remove(AURA_REMOVE_BY_DEFAULT);
+    delete m_aura;
+    m_aura = NULL;
 }
 
 void DynamicObject::SetCasterViewpoint()
 {
-    if (Player* caster = _caster->ToPlayer())
+    if (Player * caster = m_caster->ToPlayer())
     {
         caster->SetViewpoint(this, true);
-        _isViewpoint = true;
+        m_isViewpoint = true;
     }
 }
 
 void DynamicObject::RemoveCasterViewpoint()
 {
-    if (Player* caster = _caster->ToPlayer())
+    if (Player * caster = m_caster->ToPlayer())
     {
         caster->SetViewpoint(this, false);
-        _isViewpoint = false;
+        m_isViewpoint = false;
     }
 }
 
 void DynamicObject::BindToCaster()
 {
-    ASSERT(!_caster);
-    _caster = ObjectAccessor::GetUnit(*this, GetCasterGUID());
-    ASSERT(_caster);
-    ASSERT(_caster->GetMap() == GetMap());
-    _caster->_RegisterDynObject(this);
+    ASSERT(!m_caster);
+    m_caster = ObjectAccessor::GetUnit(*this, GetCasterGUID());
+    ASSERT(m_caster);
+    ASSERT(m_caster->GetMap() == GetMap());
+    m_caster->_RegisterDynObject(this);
 }
 
 void DynamicObject::UnbindFromCaster()
 {
-    ASSERT(_caster);
-    _caster->_UnregisterDynObject(this);
-    _caster = NULL;
+    ASSERT(m_caster);
+    m_caster->_UnregisterDynObject(this);
+    m_caster = NULL;
 }

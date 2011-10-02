@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="Script"
 	ProjectGUID="{1DC6C4DA-A028-41F3-877D-D5400C594F88}"
 	RootNamespace="Script"
@@ -56,7 +56,7 @@
 				EnableFunctionLevelLinking="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="..\..\Src\PCH\PCH.h"
+				PrecompiledHeaderThrough="..\..\Src\PCH\ScriptPCH.h"
 				PrecompiledHeaderFile=".\script_$(PlatformName)_$(ConfigurationName)\script.pch"
 				AssemblerListingLocation=".\script_$(PlatformName)_$(ConfigurationName)\"
 				ObjectFile=".\script_$(PlatformName)_$(ConfigurationName)\"
@@ -67,7 +67,7 @@
 				DebugInformationFormat="3"
 				CallingConvention="0"
 				CompileAs="0"
-				ForcedIncludeFiles="..\..\Src\PCH\PCH.h"
+				ForcedIncludeFiles="..\..\Src\PCH\ScriptPCH.h"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -186,7 +186,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP /Zm200"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="..\..\Src\;..\..\..\..\Deps\Extern\Src\MersenneTwister;..\..\..\..\Deps\Extern\Src\MySql\extra\yassl\include;..\..\..\..\Deps\Extern\Src\ZLib;..\..\..\..\Deps\Intern\Src;..\..\..\..\Deps\Intern\Src\Configuration;..\..\..\..\Deps\Intern\Src\Cryptography;..\..\..\..\Deps\Intern\Src\Cryptography\Authentication;..\..\..\..\Deps\Intern\Src\Database;..\..\..\..\Deps\Intern\Src\DataStores;..\..\..\..\Deps\Intern\Src\Debugging;..\..\..\..\Deps\Intern\Src\Dynamic\CountedReference;..\..\..\..\Deps\Intern\Src\Dynamic\LinkedReference;..\..\..\..\Deps\Intern\Src\Dynamic;..\..\..\..\Deps\Intern\Src\Logging;..\..\..\..\Deps\Intern\Src\Packets;..\..\..\..\Deps\Intern\Src\Policies;..\..\..\..\Deps\Intern\Src\Threading;..\..\..\..\Deps\Intern\Src\Utilities;..\..\..\..\Deps\Intern\Src\Collision;..\..\..\..\Deps\Intern\Src\Collision\Management;..\..\..\Game\Src\Accounts;..\..\..\Game\Src\Achievements;..\..\..\Game\Src\Addons;..\..\..\Game\Src\AI;..\..\..\Game\Src\AI\CoreAI;..\..\..\Game\Src\AI\EventAI;..\..\..\Game\Src\AI\ScriptedAI;..\..\..\Game\Src\AI\SmartScripts;..\..\..\Game\Src\AuctionHouse;..\..\..\Game\Src\Battlegrounds;..\..\..\Game\Src\Battlegrounds\Zones;..\..\..\Game\Src\Calendar;..\..\..\Game\Src\Chat;..\..\..\Game\Src\Chat\Channels;..\..\..\Game\Src\Conditions;..\..\..\Game\Src\Combat;..\..\..\Game\Src\DataStores;..\..\..\Game\Src\DungeonFinding;..\..\..\Game\Src\Entities\Corpse;..\..\..\Game\Src\Entities\Creature;..\..\..\Game\Src\Entities\DynamicObject;..\..\..\Game\Src\Entities\Item;..\..\..\Game\Src\Entities\Item\Container;..\..\..\Game\Src\Entities\GameObject;..\..\..\Game\Src\Entities\Object;..\..\..\Game\Src\Entities\Object\Updates;..\..\..\Game\Src\Entities\Pet;..\..\..\Game\Src\Entities\Player;..\..\..\Game\Src\Entities\Transport;..\..\..\Game\Src\Entities\Unit;..\..\..\Game\Src\Entities\Vehicle;..\..\..\Game\Src\Events;..\..\..\Game\Src\Globals;..\..\..\Game\Src\Grids;..\..\..\Game\Src\Grids\Cells;..\..\..\Game\Src\Grids\Notifiers;..\..\..\Game\Src\Groups;..\..\..\Game\Src\Guilds;..\..\..\Game\Src\Instances;..\..\..\Game\Src\LookingForGroup;..\..\..\Game\Src\Loot;..\..\..\Game\Src\Mails;..\..\..\Game\Src\Miscellaneous;..\..\..\Game\Src\Maps;..\..\..\Game\Src\Movement;..\..\..\Game\Src\Movement\MovementGenerators;..\..\..\Game\Src\Movement\Waypoints;..\..\..\Game\Src\OutdoorPvP;..\..\..\Game\Src\Pools;..\..\..\Game\Src\PCH;..\..\..\Game\Src\Quests;..\..\..\Game\Src\Reputation;..\..\..\Game\Src\Scripting;..\..\..\Game\Src\Server;..\..\..\Game\Src\Server\Protocol;..\..\..\Game\Src\Server\Protocol\Handlers;..\..\..\Game\Src\Skills;..\..\..\Game\Src\Spells;..\..\..\Game\Src\Spells/Auras;..\..\..\Game\Src\Texts;..\..\..\Game\Src\Tickets;..\..\..\Game\Src\Tools;..\..\..\Game\Src\Weather;..\..\..\Game\Src\World;..\..\..\Game\Src\Server\Packets;..\..\Src\PCH;..\..\..\..\Deps\Extern\Src\Ace;..\..\..\..\Deps\Extern\Src\MySql\include"
+				AdditionalIncludeDirectories="..\..\Src\;..\..\..\..\Deps\Extern\Src\G3DLite\include;..\..\..\..\Deps\Extern\Src\Recastnavigation\Detour\Include;..\..\..\..\Deps\Extern\Src\MersenneTwister;..\..\..\..\Deps\Extern\Src\MySql\extra\yassl\include;..\..\..\..\Deps\Extern\Src\ZLib;..\..\..\..\Deps\Intern\Src;..\..\..\..\Deps\Intern\Src\Configuration;..\..\..\..\Deps\Intern\Src\Cryptography;..\..\..\..\Deps\Intern\Src\Cryptography\Authentication;..\..\..\..\Deps\Intern\Src\Database;..\..\..\..\Deps\Intern\Src\DataStores;..\..\..\..\Deps\Intern\Src\Debugging;..\..\..\..\Deps\Intern\Src\Dynamic\CountedReference;..\..\..\..\Deps\Intern\Src\Dynamic\LinkedReference;..\..\..\..\Deps\Intern\Src\Dynamic;..\..\..\..\Deps\Intern\Src\Logging;..\..\..\..\Deps\Intern\Src\Packets;..\..\..\..\Deps\Intern\Src\Policies;..\..\..\..\Deps\Intern\Src\Threading;..\..\..\..\Deps\Intern\Src\Utilities;..\..\..\..\Deps\Intern\Src\Collision;..\..\..\..\Deps\Intern\Src\Collision\Management;..\..\..\Game\Src\Accounts;..\..\..\Game\Src\Achievements;..\..\..\Game\Src\Addons;..\..\..\Game\Src\AI;..\..\..\Game\Src\AI\CoreAI;..\..\..\Game\Src\AI\EventAI;..\..\..\Game\Src\AI\ScriptedAI;..\..\..\Game\Src\AI\SmartScripts;..\..\..\Game\Src\AuctionHouse;..\..\..\Game\Src\Battlegrounds;..\..\..\Game\Src\Battlegrounds\Zones;..\..\..\Game\Src\Calendar;..\..\..\Game\Src\Chat;..\..\..\Game\Src\Chat\Channels;..\..\..\Game\Src\Conditions;..\..\..\Game\Src\Combat;..\..\..\Game\Src\DataStores;..\..\..\Game\Src\DungeonFinding;..\..\..\Game\Src\Entities\Corpse;..\..\..\Game\Src\Entities\Creature;..\..\..\Game\Src\Entities\DynamicObject;..\..\..\Game\Src\Entities\Item;..\..\..\Game\Src\Entities\Item\Container;..\..\..\Game\Src\Entities\GameObject;..\..\..\Game\Src\Entities\Object;..\..\..\Game\Src\Entities\Object\Updates;..\..\..\Game\Src\Entities\Pet;..\..\..\Game\Src\Entities\Player;..\..\..\Game\Src\Entities\Transport;..\..\..\Game\Src\Entities\Unit;..\..\..\Game\Src\Entities\Vehicle;..\..\..\Game\Src\Events;..\..\..\Game\Src\Globals;..\..\..\Game\Src\Grids;..\..\..\Game\Src\Grids\Cells;..\..\..\Game\Src\Grids\Notifiers;..\..\..\Game\Src\Groups;..\..\..\Game\Src\Guilds;..\..\..\Game\Src\Instances;..\..\..\Game\Src\LookingForGroup;..\..\..\Game\Src\Loot;..\..\..\Game\Src\Mails;..\..\..\Game\Src\Miscellaneous;..\..\..\Game\Src\Maps;..\..\..\Game\Src\Maps\MoveMaps;..\..\..\Game\Src\Movement;..\..\..\Game\Src\Movement\MovementGenerators;..\..\..\Game\Src\Movement\PathFinding;..\..\..\Game\Src\Movement\Waypoints;..\..\..\Game\Src\OutdoorPvP;..\..\..\Game\Src\Pools;..\..\..\Game\Src\PCH;..\..\..\Game\Src\Quests;..\..\..\Game\Src\Reputation;..\..\..\Game\Src\Scripting;..\..\..\Game\Src\Server;..\..\..\Game\Src\Server\Logs;..\..\..\Game\Src\Server\Sessions;..\..\..\Game\Src\Server\Sockets;..\..\..\Game\Src\Server\Protocol;..\..\..\Game\Src\Server\Protocol\Handlers;..\..\..\Game\Src\Server\Protocol\Handlers\Opcodes;..\..\..\Game\Src\Server\Protocol\Handlers\Packets;..\..\..\Game\Src\Skills;..\..\..\Game\Src\Spells;..\..\..\Game\Src\Spells/Auras;..\..\..\Game\Src\Texts;..\..\..\Game\Src\Tickets;..\..\..\Game\Src\Tools;..\..\..\Game\Src\Weather;..\..\..\Game\Src\World;..\..\Src\PCH;..\..\..\..\Deps\Extern\Src\Ace;..\..\..\..\Deps\Extern\Src\MySql\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_SECURE_SCL=0"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -194,7 +194,7 @@
 				EnableEnhancedInstructionSet="1"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="..\..\Src\PCH\PCH.h"
+				PrecompiledHeaderThrough="..\..\Src\PCH\ScriptPCH.h"
 				PrecompiledHeaderFile=".\script_$(PlatformName)_$(ConfigurationName)\script.pch"
 				AssemblerListingLocation=".\script_$(PlatformName)_$(ConfigurationName)\"
 				ObjectFile=".\script_$(PlatformName)_$(ConfigurationName)\"
@@ -205,7 +205,7 @@
 				DebugInformationFormat="3"
 				CallingConvention="0"
 				CompileAs="2"
-				ForcedIncludeFiles="..\..\Src\PCH\PCH.h"
+				ForcedIncludeFiles="..\..\Src\PCH\ScriptPCH.h"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -332,10 +332,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\Src\Commands\cs_gps.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\Src\Commands\cs_honor.cpp"
 				>
 			</File>
@@ -371,6 +367,10 @@
 				RelativePath="..\..\Src\Commands\cs_wp.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\..\Src\Commands\MoveMapCommands.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="World"
@@ -384,7 +384,19 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\Src\World\boss_emerald_dragons.cpp"
+				RelativePath="..\..\Src\World\boss_emeriss.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Src\World\boss_lethon.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Src\World\boss_taerar.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Src\World\boss_ysondre.cpp"
 				>
 			</File>
 			<File
@@ -448,11 +460,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\Src\EasternKingdoms\dun_morogh.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\Src\EasternKingdoms\duskwood.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\..\Src\EasternKingdoms\eastern_plaguelands.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Src\EasternKingdoms\elwynn_forest.cpp"
 				>
 			</File>
 			<File
@@ -2103,10 +2123,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\Src\Northrend\IcecrownCitadel\boss_valithria_dreamwalker.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\..\Src\Northrend\IcecrownCitadel\icecrown_citadel.cpp"
 					>
 				</File>
@@ -2279,54 +2295,6 @@
 					</File>
 					<File
 						RelativePath="..\..\Src\Northrend\Nexus\Oculus\oculus.h"
-						>
-					</File>
-				</Filter>
-			</Filter>
-			<Filter
-				Name="ChamberOfAspects"
-				>
-				<Filter
-					Name="ObsidianSanctum"
-					>
-					<File
-						RelativePath="..\..\Src\Northrend\ChamberOfAspects\ObsidianSanctum\boss_sartharion.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Northrend\ChamberOfAspects\ObsidianSanctum\instance_obsidian_sanctum.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Northrend\ChamberOfAspects\ObsidianSanctum\obsidian_sanctum.h"
-						>
-					</File>
-				</Filter>
-				<Filter
-					Name="RubySanctum"
-					>
-					<File
-						RelativePath="..\..\Src\Northrend\ChamberOfAspects\RubySanctum\boss_baltharus_the_warborn.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Northrend\ChamberOfAspects\RubySanctum\boss_general_zarithrian.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Northrend\ChamberOfAspects\RubySanctum\boss_saviana_ragefire.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Northrend\ChamberOfAspects\RubySanctum\instance_ruby_sanctum.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Northrend\ChamberOfAspects\RubySanctum\ruby_sanctum.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\Src\Northrend\ChamberOfAspects\RubySanctum\ruby_sanctum.h"
 						>
 					</File>
 				</Filter>
@@ -2592,6 +2560,22 @@
 				</File>
 				<File
 					RelativePath="..\..\Src\Northrend\VioletHold\violet_hold.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="ObsidianSanctum"
+				>
+				<File
+					RelativePath="..\..\Src\Northrend\ObsidianSanctum\boss_sartharion.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Src\Northrend\ObsidianSanctum\instance_obsidian_sanctum.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Src\Northrend\ObsidianSanctum\obsidian_sanctum.h"
 					>
 				</File>
 			</Filter>
@@ -3165,7 +3149,7 @@
 			</File>
 		</Filter>
 		<File
-			RelativePath="..\..\Src\PCH\PCH.cpp"
+			RelativePath="..\..\Src\PCH\ScriptPCH.cpp"
 			>
 			<FileConfiguration
 				Name="Debug|Win32"
@@ -3173,7 +3157,7 @@
 				<Tool
 					Name="VCCLCompilerTool"
 					UsePrecompiledHeader="1"
-					PrecompiledHeaderThrough="..\..\Src\PCH\PCH.h"
+					PrecompiledHeaderThrough="..\..\Src\PCH\ScriptPCH.h"
 				/>
 			</FileConfiguration>
 			<FileConfiguration
@@ -3182,7 +3166,7 @@
 				<Tool
 					Name="VCCLCompilerTool"
 					UsePrecompiledHeader="1"
-					PrecompiledHeaderThrough="..\..\Src\PCH\PCH.h"
+					PrecompiledHeaderThrough="..\..\Src\PCH\ScriptPCH.h"
 				/>
 			</FileConfiguration>
 		</File>

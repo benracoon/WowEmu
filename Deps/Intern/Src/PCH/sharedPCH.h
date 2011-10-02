@@ -6,3 +6,11 @@
 #include "SQLOperation.h"
 #include "Errors.h"
 #include "TypeList.h"
+
+// Collision
+#include "Define.h"
+#include "VMapDefinitions.h"
+#include "MapTree.h"
+#include "WorldModel.h"
+#include "ModelInstance.h"
+#include "BoundingIntervalHierarchy.h"

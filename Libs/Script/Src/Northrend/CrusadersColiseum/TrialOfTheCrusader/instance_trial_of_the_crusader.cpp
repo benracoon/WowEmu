@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment: by /dev/rsa
 SDCategory: Trial of the Crusader
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "trial_of_the_crusader.h"
 
 class instance_trial_of_the_crusader : public InstanceMapScript
@@ -620,7 +619,7 @@ class instance_trial_of_the_crusader : public InstanceMapScript
                 std::ostringstream saveStream;
 
                 for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
-                    saveStream << EncounterStatus[i] << ' ';
+                    saveStream << EncounterStatus[i] << " ";
 
                 saveStream << TrialCounter;
                 SaveDataBuffer = saveStream.str();

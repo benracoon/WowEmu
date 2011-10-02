@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -22,13 +21,14 @@
 #include "Common.h"
 #include "Creature.h"
 
+//struct CreatureData;
+class Creature;
 class GameObject;
 
 class ZoneScript
 {
     public:
-        ZoneScript() {}
-        virtual ~ZoneScript() {}
+        explicit ZoneScript() {}
 
         virtual uint32 GetCreatureEntry(uint32 /*guidlow*/, CreatureData const* data) { return data->id; }
         virtual uint32 GetGameObjectEntry(uint32 /*guidlow*/, uint32 entry) { return entry; }
@@ -48,7 +48,8 @@ class ZoneScript
         virtual uint32 GetData(uint32 /*DataId*/) { return 0; }
         virtual void SetData(uint32 /*DataId*/, uint32 /*Value*/) {}
 
-        virtual void ProcessEvent(WorldObject* /*obj*/, uint32 /*eventId*/) {}
+        virtual void ProcessEvent(GameObject* /*obj*/, uint32 /*eventId*/) {}
+        virtual void ProcessEvent(Unit* /*unit*/, uint32 /*eventId*/) {}
 };
 
 #endif

@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -23,6 +25,7 @@
 #include "CreatureAI.h"
 #include "DestinationHolderImp.h"
 #include "World.h"
+#include "PathFinder.h"
 
 //----- Point Movement Generator
 template<class T>
@@ -30,13 +33,26 @@ void PointMovementGenerator<T>::Initialize(T &unit)
 {
     unit.StopMoving();
     Traveller<T> traveller(unit);
-    // OLD: knockback effect has UNIT_STAT_JUMPING set, so if here we disable sentmonstermove there will be creature position sync problem between client and server
-    // NEW: reactivated this check - UNIT_STAT_JUMPING is only used in MoveJump, which sends its own packet
-    i_destinationHolder.SetDestination(traveller, i_x, i_y, i_z, /*true*/ !unit.HasUnitState(UNIT_STAT_JUMPING));
+    // knockback effect has UNIT_STAT_JUMPING set,so if here we disable sentmonstermove there will be creature position sync problem between client and server
+    if(m_usePathfinding)
+    {
+        PathFinder path(&unit, i_x, i_y, i_z);
+        PointPath pointPath = path.getFullPath();
+
+        float speed = traveller.Speed() * 0.001f; // in ms
+        uint32 traveltime = uint32(pointPath.GetTotalLength() / speed);
+        uint32 flags = (unit.GetTypeId() == TYPEID_UNIT) ? ((Creature*)&unit)->GetUnitMovementFlags() : MOVEMENTFLAG_WALKING;
+        unit.SendMonsterMoveByPath(pointPath, 1, pointPath.size(), flags, traveltime);
+
+        PathNode p = pointPath[pointPath.size()-1];
+        i_destinationHolder.SetDestination(traveller, p.x, p.y, p.z, false);
+    }
+    else
+        i_destinationHolder.SetDestination(traveller, i_x, i_y, i_z, true);
 }
 
 template<class T>
-bool PointMovementGenerator<T>::Update(T &unit, const uint32 diff)
+bool PointMovementGenerator<T>::Update(T &unit, const uint32 &diff)
 {
     if (!&unit)
         return false;
@@ -73,6 +89,12 @@ void PointMovementGenerator<T>:: Finalize(T &unit)
 }
 
 template<class T>
+void PointMovementGenerator<T>::Interrupt(T &unit)
+{
+    unit.ClearUnitState(UNIT_STAT_ROAMING|UNIT_STAT_ROAMING);
+}
+
+template<class T>
 void PointMovementGenerator<T>::MovementInform(T & /*unit*/)
 {
 }
@@ -88,12 +110,13 @@ template <> void PointMovementGenerator<Creature>::MovementInform(Creature &unit
 }
 
 template void PointMovementGenerator<Player>::Initialize(Player&);
-template bool PointMovementGenerator<Player>::Update(Player &, const uint32 diff);
+template bool PointMovementGenerator<Player>::Update(Player &, const uint32 &diff);
 template void PointMovementGenerator<Player>::MovementInform(Player&);
 template void PointMovementGenerator<Player>::Finalize(Player&);
-
+template void PointMovementGenerator<Player>::Interrupt(Player&);
+template void PointMovementGenerator<Creature>::Interrupt(Creature&);
 template void PointMovementGenerator<Creature>::Initialize(Creature&);
-template bool PointMovementGenerator<Creature>::Update(Creature&, const uint32 diff);
+template bool PointMovementGenerator<Creature>::Update(Creature&, const uint32 &diff);
 template void PointMovementGenerator<Creature>::Finalize(Creature&);
 
 void AssistanceMovementGenerator::Finalize(Unit &unit)

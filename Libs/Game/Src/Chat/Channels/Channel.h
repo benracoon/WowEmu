@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -25,8 +27,6 @@
 #include <string>
 
 #include "Common.h"
-
-#include "Opcodes.h"
 #include "Player.h"
 #include "WorldPacket.h"
 
@@ -86,6 +86,7 @@ enum ChannelFlags
     // General                  0x18 = 0x10 | 0x08
     // Trade                    0x3C = 0x20 | 0x10 | 0x08 | 0x04
     // LocalDefence             0x18 = 0x10 | 0x08
+    // WorldDefense             0x18 = 0x10 | 0x08 - ???
     // GuildRecruitment         0x38 = 0x20 | 0x10 | 0x08
     // LookingForGroup          0x50 = 0x40 | 0x10
 };

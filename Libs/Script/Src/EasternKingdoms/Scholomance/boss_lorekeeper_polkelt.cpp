@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment:
 SDCategory: Scholomance
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "scholomance.h"
 
 #define SPELL_VOLATILEINFECTION      24928
@@ -37,14 +36,14 @@ class boss_lorekeeper_polkelt : public CreatureScript
 public:
     boss_lorekeeper_polkelt() : CreatureScript("boss_lorekeeper_polkelt") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_lorekeeperpolkeltAI (creature);
+        return new boss_lorekeeperpolkeltAI (pCreature);
     }
 
     struct boss_lorekeeperpolkeltAI : public ScriptedAI
     {
-        boss_lorekeeperpolkeltAI(Creature* c) : ScriptedAI(c) {}
+        boss_lorekeeperpolkeltAI(Creature *c) : ScriptedAI(c) {}
 
         uint32 VolatileInfection_Timer;
         uint32 Darkplague_Timer;
@@ -59,7 +58,7 @@ public:
             NoxiousCatalyst_Timer = 35000;
         }
 
-        void JustDied(Unit* /*killer*/)
+        void JustDied(Unit * /*killer*/)
         {
             InstanceScript *pInstance = me->GetInstanceScript();
             if (pInstance)
@@ -71,7 +70,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit * /*who*/)
         {
         }
 

@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -58,7 +57,7 @@ public:
         if (!*args)
             return false;
 
-        Player* target = handler->getSelectedPlayer();
+        Player *target = handler->getSelectedPlayer();
         if (!target)
         {
             handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
@@ -76,7 +75,7 @@ public:
     }
     static bool HandleHonorAddKillCommand(ChatHandler* handler, const char* /*args*/)
     {
-        Unit* target = handler->getSelectedUnit();
+        Unit *target = handler->getSelectedUnit();
         if (!target)
         {
             handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
@@ -93,7 +92,7 @@ public:
     }
     static bool HandleHonorUpdateCommand(ChatHandler* handler, const char* /*args*/)
     {
-        Player* target = handler->getSelectedPlayer();
+        Player *target = handler->getSelectedPlayer();
         if (!target)
         {
             handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);

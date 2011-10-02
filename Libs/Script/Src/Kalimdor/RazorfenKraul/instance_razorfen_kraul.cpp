@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment:
 SDCategory: Razorfen Kraul
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "razorfen_kraul.h"
 
 #define WARD_KEEPERS_NR 2
@@ -44,11 +43,13 @@ public:
         instance_razorfen_kraul_InstanceMapScript(Map* pMap) : InstanceScript(pMap) {}
 
         uint64 DoorWardGUID;
-        int WardKeeperDeath;
+        uint32 WardCheck_Timer;
+        int WardKeeperAlive;
 
         void Initialize()
         {
-            WardKeeperDeath = 0;
+            WardKeeperAlive = 1;
+            WardCheck_Timer = 4000;
             DoorWardGUID = 0;
         }
 
@@ -60,11 +61,11 @@ public:
             {
                 for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                 {
-                    if (Player* player = itr->getSource())
-                        return player;
+                    if (Player* plr = itr->getSource())
+                        return plr;
                 }
             }
-            sLog->outDebug(LOG_FILTER_TSCR, "TSCR: Instance Razorfen Kraul: GetPlayerInMap, but PlayerList is empty!");
+            sLog->outDebug(LOG_FILTER_SSCR, "SCR: Instance Razorfen Kraul: GetPlayerInMap, but PlayerList is empty!");
             return NULL;
         }
 
@@ -72,25 +73,29 @@ public:
         {
             switch(go->GetEntry())
             {
-                case 21099: DoorWardGUID = go->GetGUID(); break;
+            case 21099: DoorWardGUID = go->GetGUID(); break;
             }
         }
 
-        void Update(uint32 /*diff*/)
+        void Update(uint32 diff)
         {
-            if (WardKeeperDeath == WARD_KEEPERS_NR)
-                if(GameObject* pGo = instance->GetGameObject(DoorWardGUID))
-                {
-                    pGo->SetUInt32Value(GAMEOBJECT_FLAGS, 33);
-                    pGo->SetGoState(GO_STATE_ACTIVE);
-                }
+            if (WardCheck_Timer <= diff)
+            {
+                HandleGameObject(DoorWardGUID, WardKeeperAlive);
+                WardKeeperAlive = 0;
+                WardCheck_Timer = 4000;
+            }else
+                WardCheck_Timer -= diff;
         }
 
-        void SetData(uint32 type, uint32 /*data*/)
+        void SetData(uint32 type, uint32 data)
         {
             switch(type)
             {
-                case EVENT_WARD_KEEPER: WardKeeperDeath++; break;
+                case TYPE_WARD_KEEPERS:
+                    if (data == NOT_STARTED)
+                        WardKeeperAlive = 1;
+                    break;
             }
         }
 

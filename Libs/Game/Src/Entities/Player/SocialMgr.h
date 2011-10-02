@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -17,8 +19,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __STRAWBERRY_SOCIALMGR_H
-#define __STRAWBERRY_SOCIALMGR_H
+#ifndef STRAWBERRY_SOCIALMGR_H
+#define STRAWBERRY_SOCIALMGR_H
 
 #include <ace/Singleton.h>
 #include "DatabaseEnv.h"
@@ -31,11 +33,11 @@ class WorldPacket;
 
 enum FriendStatus
 {
-    FRIEND_STATUS_OFFLINE   = 0x00,
-    FRIEND_STATUS_ONLINE    = 0x01,
-    FRIEND_STATUS_AFK       = 0x02,
-    FRIEND_STATUS_DND       = 0x04,
-    FRIEND_STATUS_RAF       = 0x08
+    FRIEND_STATUS_OFFLINE   = 0,
+    FRIEND_STATUS_ONLINE    = 1,
+    FRIEND_STATUS_AFK       = 2,
+    FRIEND_STATUS_UNK3      = 3,
+    FRIEND_STATUS_DND       = 4
 };
 
 enum SocialFlag
@@ -146,11 +148,11 @@ class SocialMgr
         // Misc
         void RemovePlayerSocial(uint32 guid) { m_socialMap.erase(guid); }
 
-        void GetFriendInfo(Player* player, uint32 friendGUID, FriendInfo &friendInfo);
+        void GetFriendInfo(Player *player, uint32 friendGUID, FriendInfo &friendInfo);
         // Packet management
         void MakeFriendStatusPacket(FriendsResult result, uint32 friend_guid, WorldPacket *data);
-        void SendFriendStatus(Player* player, FriendsResult result, uint32 friend_guid, bool broadcast);
-        void BroadcastToFriendListers(Player* player, WorldPacket* packet);
+        void SendFriendStatus(Player *player, FriendsResult result, uint32 friend_guid, bool broadcast);
+        void BroadcastToFriendListers(Player *player, WorldPacket *packet);
         // Loading
         PlayerSocial *LoadFromDB(PreparedQueryResult result, uint32 guid);
     private:

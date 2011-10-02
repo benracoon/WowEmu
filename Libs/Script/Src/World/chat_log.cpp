@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -16,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "Channel.h"
 #include "Guild.h"
 #include "Group.h"
@@ -56,28 +55,20 @@ public:
         }
     }
 
-    void OnChat(Player* player, uint32 /*type*/, uint32 lang, std::string& msg, Player* receiver)
+    void OnChat(Player *player, uint32 /*type*/, uint32 /*lang*/, std::string& msg, Player *receiver)
     {
-        if (lang != LANG_ADDON && sWorld->getBoolConfig(CONFIG_CHATLOG_WHISPER))
+        if (sWorld->getBoolConfig(CONFIG_CHATLOG_WHISPER))
             sLog->outChat("[WHISPER] Player %s tells %s: %s",
-                player->GetName(), receiver ? receiver->GetName() : "<unknown>", msg.c_str());
-        else if (lang == LANG_ADDON && sWorld->getBoolConfig(CONFIG_CHATLOG_ADDON))
-            sLog->outChat("[ADDON] Player %s tells %s: %s",
                 player->GetName(), receiver ? receiver->GetName() : "<unknown>", msg.c_str());
     }
 
-    void OnChat(Player* player, uint32 type, uint32 lang, std::string& msg, Group* group)
+    void OnChat(Player *player, uint32 type, uint32 /*lang*/, std::string& msg, Group *group)
     {
-        //! NOTE:
-        //! LANG_ADDON can only be sent by client in "PARTY", "RAID", "GUILD", "BATTLEGROUND", "WHISPER" 
         switch (type)
         {
             case CHAT_MSG_PARTY:
-                if (lang != LANG_ADDON && sWorld->getBoolConfig(CONFIG_CHATLOG_PARTY))
+                if (sWorld->getBoolConfig(CONFIG_CHATLOG_PARTY))
                     sLog->outChat("[PARTY] Player %s tells group with leader %s: %s",
-                        player->GetName(), group ? group->GetLeaderName() : "<unknown>", msg.c_str());
-                else if (lang == LANG_ADDON && sWorld->getBoolConfig(CONFIG_CHATLOG_ADDON))
-                    sLog->outChat("[ADDON] Player %s tells group with leader %s: %s",
                         player->GetName(), group ? group->GetLeaderName() : "<unknown>", msg.c_str());
                 break;
 
@@ -88,11 +79,8 @@ public:
                 break;
 
             case CHAT_MSG_RAID:
-                if (lang != LANG_ADDON && sWorld->getBoolConfig(CONFIG_CHATLOG_RAID))
+                if (sWorld->getBoolConfig(CONFIG_CHATLOG_RAID))
                     sLog->outChat("[RAID] Player %s tells raid with leader %s: %s",
-                        player->GetName(), group ? group->GetLeaderName() : "<unknown>", msg.c_str());
-                else if (lang == LANG_ADDON && sWorld->getBoolConfig(CONFIG_CHATLOG_ADDON))
-                    sLog->outChat("[ADDON] Player %s tells raid with leader %s: %s",
                         player->GetName(), group ? group->GetLeaderName() : "<unknown>", msg.c_str());
                 break;
 
@@ -109,11 +97,8 @@ public:
                 break;
 
             case CHAT_MSG_BATTLEGROUND:
-                if (lang != LANG_ADDON && sWorld->getBoolConfig(CONFIG_CHATLOG_BGROUND))
+                if (sWorld->getBoolConfig(CONFIG_CHATLOG_BGROUND))
                     sLog->outChat("[BATTLEGROUND] Player %s tells battleground with leader %s: %s",
-                        player->GetName(), group ? group->GetLeaderName() : "<unknown>", msg.c_str());
-                else if (lang == LANG_ADDON && sWorld->getBoolConfig(CONFIG_CHATLOG_ADDON))
-                    sLog->outChat("[ADDON] Player %s tells battleground with leader %s: %s",
                         player->GetName(), group ? group->GetLeaderName() : "<unknown>", msg.c_str());
                 break;
 
@@ -125,7 +110,7 @@ public:
         }
     }
 
-    void OnChat(Player* player, uint32 type, uint32 lang, std::string& msg, Guild* guild)
+    void OnChat(Player *player, uint32 type, uint32 lang, std::string& msg, Guild *guild)
     {
         switch(type)
         {
@@ -146,7 +131,7 @@ public:
         }
     }
 
-    void OnChat(Player* player, uint32 /*type*/, uint32 /*lang*/, std::string& msg, Channel* channel)
+    void OnChat(Player *player, uint32 /*type*/, uint32 /*lang*/, std::string& msg, Channel *channel)
     {
         bool isSystem = channel &&
                         (channel->HasFlag(CHANNEL_FLAG_TRADE) ||

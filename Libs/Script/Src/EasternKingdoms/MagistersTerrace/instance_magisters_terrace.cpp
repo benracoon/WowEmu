@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment:  Designed only for Selin Fireheart
 SDCategory: Magister's Terrace
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "magisters_terrace.h"
 
 #define MAX_ENCOUNTER      4
@@ -182,7 +181,7 @@ public:
                 {
                     if (FelCrystals.empty())
                     {
-                        sLog->outError("TSCR: Magisters Terrace: No Fel Crystals loaded in Inst Data");
+                        sLog->outError("SCR: Magisters Terrace: No Fel Crystals loaded in Inst Data");
                         return 0;
                     }
 

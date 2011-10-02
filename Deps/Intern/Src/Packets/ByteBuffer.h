@@ -84,18 +84,6 @@ public:
         append((uint8 *)&value, sizeof(value));
     }
 
-    template <typename T> ByteBuffer& Put(T value)
-    {
-        append<T>(value);
-        return *this;
-    }
-
-    template <typename T> ByteBuffer& Get(T& value)
-    {
-        value = read<T>();
-        return *this;
-    }
-
     void flushBits()
     {
         if (_bitpos == 8)

@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment: Shadow of Ebonroc needs core support
 SDCategory: Blackwing Lair
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 
 #define SPELL_SHADOWFLAME           22539
 #define SPELL_WINGBUFFET            18500
@@ -36,14 +35,14 @@ class boss_ebonroc : public CreatureScript
 public:
     boss_ebonroc() : CreatureScript("boss_ebonroc") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_ebonrocAI (creature);
+        return new boss_ebonrocAI (pCreature);
     }
 
     struct boss_ebonrocAI : public ScriptedAI
     {
-        boss_ebonrocAI(Creature* c) : ScriptedAI(c) {}
+        boss_ebonrocAI(Creature *c) : ScriptedAI(c) {}
 
         uint32 ShadowFlame_Timer;
         uint32 WingBuffet_Timer;
@@ -58,7 +57,7 @@ public:
             Heal_Timer = 1000;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit * /*who*/)
         {
             DoZoneInCombat();
         }
@@ -72,7 +71,7 @@ public:
             if (ShadowFlame_Timer <= diff)
             {
                 DoCast(me->getVictim(), SPELL_SHADOWFLAME);
-                ShadowFlame_Timer = urand(12000, 15000);
+                ShadowFlame_Timer = urand(12000,15000);
             } else ShadowFlame_Timer -= diff;
 
             //Wing Buffet Timer
@@ -86,7 +85,7 @@ public:
             if (ShadowOfEbonroc_Timer <= diff)
             {
                 DoCast(me->getVictim(), SPELL_SHADOWOFEBONROC);
-                ShadowOfEbonroc_Timer = urand(25000, 350000);
+                ShadowOfEbonroc_Timer = urand(25000,350000);
             } else ShadowOfEbonroc_Timer -= diff;
 
             if (me->getVictim()->HasAura(SPELL_SHADOWOFEBONROC))
@@ -94,7 +93,7 @@ public:
                 if (Heal_Timer <= diff)
                 {
                     DoCast(me, SPELL_HEAL);
-                    Heal_Timer = urand(1000, 3000);
+                    Heal_Timer = urand(1000,3000);
                 } else Heal_Timer -= diff;
             }
 

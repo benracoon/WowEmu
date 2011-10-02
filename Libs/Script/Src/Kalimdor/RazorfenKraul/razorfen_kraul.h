@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -20,5 +19,5 @@
 #ifndef DEF_RAZORFEN_KRAUL_H
 #define DEF_RAZORFEN_KRAUL_H
 
-#define EVENT_WARD_KEEPER 1
+#define TYPE_WARD_KEEPERS       1
 #endif

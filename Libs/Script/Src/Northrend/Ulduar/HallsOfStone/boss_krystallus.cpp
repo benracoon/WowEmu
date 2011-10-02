@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -24,7 +23,7 @@ SDComment:
 SDCategory:
 Script Data End */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "halls_of_stone.h"
 
 enum Spells
@@ -55,14 +54,14 @@ class boss_krystallus : public CreatureScript
 public:
     boss_krystallus() : CreatureScript("boss_krystallus") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_krystallusAI (creature);
+        return new boss_krystallusAI (pCreature);
     }
 
     struct boss_krystallusAI : public ScriptedAI
     {
-        boss_krystallusAI(Creature* c) : ScriptedAI(c)
+        boss_krystallusAI(Creature *c) : ScriptedAI(c)
         {
             pInstance = c->GetInstanceScript();
         }
@@ -106,15 +105,15 @@ public:
 
             if (uiBoulderTossTimer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                    DoCast(target, SPELL_BOULDER_TOSS);
+                if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                    DoCast(pTarget, SPELL_BOULDER_TOSS);
                 uiBoulderTossTimer = 9000 + rand()%6000;
             } else uiBoulderTossTimer -= diff;
 
             if (uiGroundSpikeTimer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                    DoCast(target, SPELL_GROUND_SPIKE);
+                if (Unit* pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                    DoCast(pTarget, SPELL_GROUND_SPIKE);
                 uiGroundSpikeTimer = 12000 + rand()%5000;
             } else uiGroundSpikeTimer -= diff;
 
@@ -151,23 +150,23 @@ public:
                 pInstance->SetData(DATA_KRYSTALLUS_EVENT, DONE);
         }
 
-        void KilledUnit(Unit* victim)
+        void KilledUnit(Unit * victim)
         {
             if (victim == me)
                 return;
             DoScriptText(SAY_KILL, me);
         }
 
-        void SpellHitTarget(Unit* target, const SpellInfo* pSpell)
+        void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell)
         {
             //this part should be in the core
             if (pSpell->Id == SPELL_SHATTER || pSpell->Id == H_SPELL_SHATTER)
             {
                 //this spell must have custom handling in the core, dealing damage based on distance
-                target->CastSpell(target, DUNGEON_MODE(SPELL_SHATTER_EFFECT, H_SPELL_SHATTER_EFFECT), true);
+                pTarget->CastSpell(pTarget, DUNGEON_MODE(SPELL_SHATTER_EFFECT, H_SPELL_SHATTER_EFFECT), true);
 
-                if (target->HasAura(SPELL_STONED))
-                    target->RemoveAurasDueToSpell(SPELL_STONED);
+                if (pTarget->HasAura(SPELL_STONED))
+                    pTarget->RemoveAurasDueToSpell(SPELL_STONED);
 
                 //clear this, if we are still performing
                 if (bIsSlam)

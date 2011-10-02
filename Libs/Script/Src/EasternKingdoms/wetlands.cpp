@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -29,7 +28,7 @@ npc_mikhail
 npc_tapoke_slim_jahn
 EndContentData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "ScriptedEscortAI.h"
 
 /*######
@@ -51,14 +50,14 @@ class npc_tapoke_slim_jahn : public CreatureScript
 public:
     npc_tapoke_slim_jahn() : CreatureScript("npc_tapoke_slim_jahn") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new npc_tapoke_slim_jahnAI(creature);
+        return new npc_tapoke_slim_jahnAI(pCreature);
     }
 
     struct npc_tapoke_slim_jahnAI : public npc_escortAI
     {
-        npc_tapoke_slim_jahnAI(Creature* creature) : npc_escortAI(creature) { }
+        npc_tapoke_slim_jahnAI(Creature* pCreature) : npc_escortAI(pCreature) { }
 
         bool m_bFriendSummoned;
 
@@ -82,11 +81,11 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*pWho*/)
         {
-            Player* player = GetPlayerForEscort();
+            Player* pPlayer = GetPlayerForEscort();
 
-            if (HasEscortState(STATE_ESCORT_ESCORTING) && !m_bFriendSummoned && player)
+            if (HasEscortState(STATE_ESCORT_ESCORTING) && !m_bFriendSummoned && pPlayer)
             {
                 for (uint8 i = 0; i < 3; ++i)
                     DoCast(me, SPELL_CALL_FRIENDS, true);
@@ -95,10 +94,10 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summoned)
+        void JustSummoned(Creature* pSummoned)
         {
-            if (Player* player = GetPlayerForEscort())
-                summoned->AI()->AttackStart(player);
+            if (Player* pPlayer = GetPlayerForEscort())
+                pSummoned->AI()->AttackStart(pPlayer);
         }
 
         void AttackedBy(Unit* pAttacker)
@@ -116,10 +115,10 @@ public:
         {
             if (HealthBelowPct(20))
             {
-                if (Player* player = GetPlayerForEscort())
+                if (Player* pPlayer = GetPlayerForEscort())
                 {
-                    if (player->GetTypeId() == TYPEID_PLAYER)
-                        CAST_PLR(player)->GroupEventHappens(QUEST_MISSING_DIPLO_PT11, me);
+                    if (pPlayer->GetTypeId() == TYPEID_PLAYER)
+                        CAST_PLR(pPlayer)->GroupEventHappens(QUEST_MISSING_DIPLO_PT11, me);
 
                     uiDamage = 0;
 
@@ -145,11 +144,11 @@ class npc_mikhail : public CreatureScript
 public:
     npc_mikhail() : CreatureScript("npc_mikhail") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* pQuest)
+    bool OnQuestAccept(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
     {
         if (pQuest->GetQuestId() == QUEST_MISSING_DIPLO_PT11)
         {
-            Creature* pSlim = creature->FindNearestCreature(NPC_TAPOKE_SLIM_JAHN, 25.0f);
+            Creature* pSlim = pCreature->FindNearestCreature(NPC_TAPOKE_SLIM_JAHN, 25.0f);
 
             if (!pSlim)
                 return false;
@@ -158,7 +157,7 @@ public:
                 pSlim->CastSpell(pSlim, SPELL_STEALTH, true);
 
             if (npc_tapoke_slim_jahn::npc_tapoke_slim_jahnAI* pEscortAI = CAST_AI(npc_tapoke_slim_jahn::npc_tapoke_slim_jahnAI, pSlim->AI()))
-                pEscortAI->Start(false, false, player->GetGUID(), pQuest);
+                pEscortAI->Start(false, false, pPlayer->GetGUID(), pQuest);
         }
         return false;
     }

@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -16,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "BattlegroundIC.h"
 
 // TO-DO: This should be done with SmartAI, but yet it does not correctly support vehicles's AIs.
@@ -29,7 +28,7 @@ class npc_four_car_garage : public CreatureScript
 
         struct npc_four_car_garageAI : public NullCreatureAI
         {
-            npc_four_car_garageAI(Creature* creature) : NullCreatureAI(creature) { }
+            npc_four_car_garageAI(Creature* pCreature) : NullCreatureAI(pCreature) { }
 
             void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply)
             {
@@ -57,7 +56,7 @@ class npc_four_car_garage : public CreatureScript
                             return;
                     }
 
-                    me->CastSpell(who, spellId, true);
+                    me->CastSpell(who,spellId,true);
                 }
             }
         };

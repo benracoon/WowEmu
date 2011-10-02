@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -30,7 +29,7 @@ npc_kyle_frenzied
 npc_plains_vision
 EndContentData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "ScriptedEscortAI.h"
 
 /*######
@@ -44,24 +43,24 @@ class npc_skorn_whitecloud : public CreatureScript
 public:
     npc_skorn_whitecloud() : CreatureScript("npc_skorn_whitecloud") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction)
+    bool OnGossipSelect(Player* pPlayer, Creature* pCreature, uint32 /*uiSender*/, uint32 uiAction)
     {
-        player->PlayerTalkClass->ClearMenus();
+        pPlayer->PlayerTalkClass->ClearMenus();
         if (uiAction == GOSSIP_ACTION_INFO_DEF)
-            player->SEND_GOSSIP_MENU(523, creature->GetGUID());
+            pPlayer->SEND_GOSSIP_MENU(523, pCreature->GetGUID());
 
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* pPlayer, Creature* pCreature)
     {
-        if (creature->isQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
+        if (pCreature->isQuestGiver())
+            pPlayer->PrepareQuestMenu(pCreature->GetGUID());
 
-        if (!player->GetQuestRewardStatus(770))
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_SW, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+        if (!pPlayer->GetQuestRewardStatus(770))
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_SW, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
 
-        player->SEND_GOSSIP_MENU(522, creature->GetGUID());
+        pPlayer->SEND_GOSSIP_MENU(522, pCreature->GetGUID());
 
         return true;
     }
@@ -90,14 +89,14 @@ class npc_kyle_frenzied : public CreatureScript
 public:
     npc_kyle_frenzied() : CreatureScript("npc_kyle_frenzied") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new npc_kyle_frenziedAI (creature);
+        return new npc_kyle_frenziedAI (pCreature);
     }
 
     struct npc_kyle_frenziedAI : public ScriptedAI
     {
-        npc_kyle_frenziedAI(Creature* c) : ScriptedAI(c) {}
+        npc_kyle_frenziedAI(Creature *c) : ScriptedAI(c) {}
 
         bool bEvent;
         bool m_bIsMovingToLunch;
@@ -117,7 +116,7 @@ public:
                 me->UpdateEntry(NPC_KYLE_FRENZIED);
         }
 
-        void SpellHit(Unit* pCaster, SpellInfo const* pSpell)
+        void SpellHit(Unit* pCaster, SpellEntry const* pSpell)
         {
             if (!me->getVictim() && !bEvent && pSpell->Id == SPELL_LUNCH)
             {
@@ -161,7 +160,7 @@ public:
                     switch(uiEventPhase)
                     {
                         case 1:
-                            if (Unit* pUnit = Unit::GetUnit(*me, uiPlayerGUID))
+                            if (Unit* pUnit = Unit::GetUnit(*me,uiPlayerGUID))
                             {
                                 if (GameObject* pGo = pUnit->GetGameObject(SPELL_LUNCH))
                                 {
@@ -263,14 +262,14 @@ class npc_plains_vision : public CreatureScript
 public:
     npc_plains_vision() : CreatureScript("npc_plains_vision") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-          return new npc_plains_visionAI (creature);
+          return new npc_plains_visionAI (pCreature);
     }
 
     struct npc_plains_visionAI  : public ScriptedAI
     {
-        npc_plains_visionAI(Creature* c) : ScriptedAI(c) {}
+        npc_plains_visionAI(Creature *c) : ScriptedAI(c) {}
 
         bool newWaypoint;
         uint8 WayPointId;

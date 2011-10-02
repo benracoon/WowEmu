@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -22,20 +21,19 @@
 #include "DatabaseWorkerPool.h"
 #include "MySQLConnection.h"
 
-class LoginDatabaseConnection : public MySQLConnection
+class RealmDBConnection : public MySQLConnection
 {
     public:
         //- Constructors for sync and async connections
-        LoginDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo) {}
-        LoginDatabaseConnection(ACE_Activation_Queue* q, MySQLConnectionInfo& connInfo) : MySQLConnection(q, connInfo) {}
+        RealmDBConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo) {}
 
-        //- Loads database type specific prepared statements
-        void DoPrepareStatements();
+        //- Loads databasetype specific prepared statements
+        bool Open();
 };
 
-typedef DatabaseWorkerPool<LoginDatabaseConnection> RealmDBWorkerPool;
+typedef DatabaseWorkerPool<RealmDBConnection> RealmDBWorkerPool;
 
-enum LoginDatabaseStatements
+enum RealmDBStatements
 {
     /*  Naming standard for defines:
         {DB}_{SET/DEL/ADD/REP}_{Summary of data changed}
@@ -63,9 +61,6 @@ enum LoginDatabaseStatements
     LOGIN_SET_IP_NOT_BANNED,
     LOGIN_SET_ACCOUNT_BANNED,
     LOGIN_SET_ACCOUNT_NOT_BANNED,
-    LOGIN_DEL_REALMCHARACTERS,
-    LOGIN_ADD_REALMCHARACTERS,
-    LOGIN_GET_SUM_REALMCHARS,
 
     MAX_LOGINDATABASE_STATEMENTS,
 };

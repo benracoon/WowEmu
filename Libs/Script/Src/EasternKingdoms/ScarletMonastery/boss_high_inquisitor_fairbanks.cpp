@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment: TODO: if this guy not involved in some special event, remove (and let
 SDCategory: Scarlet Monastery
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 
 enum eSpells
 {
@@ -41,14 +40,14 @@ class boss_high_inquisitor_fairbanks : public CreatureScript
 public:
     boss_high_inquisitor_fairbanks() : CreatureScript("boss_high_inquisitor_fairbanks") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_high_inquisitor_fairbanksAI (creature);
+        return new boss_high_inquisitor_fairbanksAI (pCreature);
     }
 
     struct boss_high_inquisitor_fairbanksAI : public ScriptedAI
     {
-        boss_high_inquisitor_fairbanksAI(Creature* c) : ScriptedAI(c) {}
+        boss_high_inquisitor_fairbanksAI(Creature *c) : ScriptedAI(c) {}
 
         uint32 CurseOfBlood_Timer;
         uint32 DispelMagic_Timer;
@@ -69,7 +68,7 @@ public:
             PowerWordShield = false;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit * /*who*/)
         {
         }
 
@@ -88,8 +87,8 @@ public:
             //Fear_Timer
             if (Fear_Timer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
-                    DoCast(target, SPELL_FEAR);
+                if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM,1))
+                    DoCast(pTarget, SPELL_FEAR);
 
                 Fear_Timer = 40000;
             } else Fear_Timer -= diff;
@@ -97,8 +96,8 @@ public:
             //Sleep_Timer
             if (Sleep_Timer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_TOPAGGRO, 0))
-                    DoCast(target, SPELL_SLEEP);
+                if (Unit *pTarget = SelectTarget(SELECT_TARGET_TOPAGGRO,0))
+                    DoCast(pTarget, SPELL_SLEEP);
 
                 Sleep_Timer = 30000;
             } else Sleep_Timer -= diff;
@@ -113,8 +112,8 @@ public:
             //Dispel_Timer
             if (Dispel_Timer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0))
-                    DoCast(target, SPELL_DISPELMAGIC);
+                if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM,0))
+                    DoCast(pTarget, SPELL_DISPELMAGIC);
 
                 DispelMagic_Timer = 30000;
             } else DispelMagic_Timer -= diff;

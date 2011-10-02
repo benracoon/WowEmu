@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -34,11 +33,9 @@ at_warsong_grainery
 at_torp_farm
 at_warsong_farms                q11686
 at_stormwright_shelf            q12741
-at_last_rites                   q12019
-at_sholazar_waygate             q12548
 EndContentData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 
 /*######
 ## AreaTrigger_at_aldurthar_gate
@@ -269,7 +266,7 @@ class AreaTrigger_at_scent_larkorwi : public AreaTriggerScript
         {
             if (!player->isDead() && player->GetQuestStatus(QUEST_SCENT_OF_LARKORWI) == QUEST_STATUS_INCOMPLETE)
             {
-                if (!player->FindNearestCreature(NPC_LARKORWI_MATE, 15))
+                if (!player->FindNearestCreature(NPC_LARKORWI_MATE,15))
                     player->SummonCreature(NPC_LARKORWI_MATE, player->GetPositionX()+5, player->GetPositionY(), player->GetPositionZ(), 3.3f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 100000);
             }
 
@@ -310,60 +307,19 @@ class AreaTrigger_at_last_rites : public AreaTriggerScript
             {
                 case 5332:
                 case 5338:
-                    pPosition = WorldLocation(571, 3733.68f, 3563.25f, 290.812f, 3.665192f);
+                    pPosition = WorldLocation(571,3733.68f,3563.25f,290.812f,3.665192f);
                     break;
                 case 5334:
-                    pPosition = WorldLocation(571, 3802.38f, 3585.95f, 49.5765f, 0.0f);
+                    pPosition = WorldLocation(571,3802.38f,3585.95f,49.5765f,0.0f);
                     break;
                 case 5340:
-                    pPosition = WorldLocation(571, 3687.91f, 3577.28f, 473.342f, 0.0f);
+                    pPosition = WorldLocation(571,3687.91f,3577.28f,473.342f,0.0f);
                     break;
                 default:
                     return false;
             }
 
             player->TeleportTo(pPosition);
-
-            return false;
-        }
-};
-
-/*######
-## at_sholazar_waygate
-######*/
-
-enum eWaygate
-{
-    SPELL_SHOLAZAR_TO_UNGORO_TELEPORT           = 52056,
-    SPELL_UNGORO_TO_SHOLAZAR_TELEPORT           = 52057,
-
-    AT_SHOLAZAR                                 = 5046,
-    AT_UNGORO                                   = 5047,
-
-    QUEST_THE_MAKERS_OVERLOOK                   = 12613,
-    QUEST_THE_MAKERS_PERCH                      = 12559,
-};
-
-class AreaTrigger_at_sholazar_waygate : public AreaTriggerScript
-{
-    public:
-
-        AreaTrigger_at_sholazar_waygate()
-            : AreaTriggerScript("at_sholazar_waygate")
-        {
-        }
-
-        bool OnTrigger(Player* player, AreaTriggerEntry const* trigger)
-        {
-            if (player->GetQuestStatus(QUEST_THE_MAKERS_OVERLOOK) == QUEST_STATUS_REWARDED && !player->isDead() &&
-                player->GetQuestStatus(QUEST_THE_MAKERS_PERCH)    == QUEST_STATUS_REWARDED)
-            {
-                switch(trigger->id)
-                {
-                    case AT_SHOLAZAR: player->CastSpell(player, SPELL_SHOLAZAR_TO_UNGORO_TELEPORT, false); break;
-                    case AT_UNGORO:   player->CastSpell(player, SPELL_UNGORO_TO_SHOLAZAR_TELEPORT, false); break;
-                }
-            }
 
             return false;
         }
@@ -379,5 +335,4 @@ void AddSC_areatrigger_scripts()
     new AreaTrigger_at_stormwright_shelf();
     new AreaTrigger_at_scent_larkorwi();
     new AreaTrigger_at_last_rites();
-    new AreaTrigger_at_sholazar_waygate();
 }

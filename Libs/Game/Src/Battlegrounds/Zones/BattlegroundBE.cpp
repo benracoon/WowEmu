@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -45,6 +47,20 @@ BattlegroundBE::~BattlegroundBE()
 
 }
 
+void BattlegroundBE::Update(uint32 diff)
+{
+    Battleground::Update(diff);
+
+    if (GetStatus() == STATUS_IN_PROGRESS)
+    {
+        if (GetStartTime() >= 47*MINUTE*IN_MILLISECONDS)    // after 47 minutes without one team losing, the arena closes with no winner and no rating change
+        {
+            UpdateArenaWorldState();
+            CheckArenaAfterTimerConditions();
+        }
+    }
+}
+
 void BattlegroundBE::StartingEventCloseDoors()
 {
     for (uint32 i = BG_BE_OBJECT_DOOR_1; i <= BG_BE_OBJECT_DOOR_4; ++i)
@@ -74,7 +90,7 @@ void BattlegroundBE::AddPlayer(Player *plr)
     UpdateArenaWorldState();
 }
 
-void BattlegroundBE::RemovePlayer(Player* /*plr*/, uint64 /*guid*/, uint32 /*team*/)
+void BattlegroundBE::RemovePlayer(Player* /*plr*/, uint64 /*guid*/)
 {
     if (GetStatus() == STATUS_WAIT_LEAVE)
         return;
@@ -83,7 +99,7 @@ void BattlegroundBE::RemovePlayer(Player* /*plr*/, uint64 /*guid*/, uint32 /*tea
     CheckArenaWinConditions();
 }
 
-void BattlegroundBE::HandleKillPlayer(Player* player, Player* killer)
+void BattlegroundBE::HandleKillPlayer(Player *player, Player *killer)
 {
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
@@ -94,15 +110,15 @@ void BattlegroundBE::HandleKillPlayer(Player* player, Player* killer)
         return;
     }
 
-    Battleground::HandleKillPlayer(player, killer);
+    Battleground::HandleKillPlayer(player,killer);
 
     UpdateArenaWorldState();
     CheckArenaWinConditions();
 }
 
-bool BattlegroundBE::HandlePlayerUnderMap(Player* player)
+bool BattlegroundBE::HandlePlayerUnderMap(Player *player)
 {
-    player->TeleportTo(GetMapId(), 6238.930176f, 262.963470f, 0.889519f, player->GetOrientation(), false);
+    player->TeleportTo(GetMapId(),6238.930176f,262.963470f,0.889519f,player->GetOrientation(),false);
     return true;
 }
 
@@ -114,7 +130,7 @@ void BattlegroundBE::HandleAreaTrigger(Player *Source, uint32 Trigger)
 
     //uint32 SpellId = 0;
     //uint64 buff_guid = 0;
-    switch (Trigger)
+    switch(Trigger)
     {
         case 4538:                                          // buff trigger?
             //buff_guid = m_BgObjects[BG_BE_OBJECT_BUFF_1];
@@ -129,7 +145,7 @@ void BattlegroundBE::HandleAreaTrigger(Player *Source, uint32 Trigger)
     }
 
     //if (buff_guid)
-    //    HandleTriggerBuff(buff_guid, Source);
+    //    HandleTriggerBuff(buff_guid,Source);
 }
 
 void BattlegroundBE::FillInitialWorldStates(WorldPacket &data)
@@ -170,7 +186,7 @@ void BattlegroundBE::UpdatePlayerScore(Player* Source, uint32 type, uint32 value
         return;
 
     //there is nothing special in this score
-    Battleground::UpdatePlayerScore(Source, type, value, doAddHonor);
+    Battleground::UpdatePlayerScore(Source,type,value, doAddHonor);
 
 }
 

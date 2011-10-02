@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -28,6 +27,7 @@ template<> struct BoundsTrait<VMAP::GroupModel>
 {
     static void getBounds(const VMAP::GroupModel& obj, G3D::AABox& out) { out = obj.GetBound(); }
 };
+
 
 namespace VMAP
 {
@@ -305,12 +305,11 @@ namespace VMAP
     {
         char chunk[8];
         bool result = true;
-        uint32 chunkSize = 0;
-        uint32 count = 0;
+        uint32 chunkSize, count;
         triangles.clear();
         vertices.clear();
         delete iLiquid;
-        iLiquid = NULL;
+        iLiquid = 0;
 
         if (result && fread(&iBound, sizeof(G3D::AABox), 1, rf) != 1) result = false;
         if (result && fread(&iMogpFlags, sizeof(uint32), 1, rf) != 1) result = false;
@@ -361,7 +360,7 @@ namespace VMAP
 
     bool GroupModel::IntersectRay(const G3D::Ray &ray, float &distance, bool stopAtFirstHit) const
     {
-        if (triangles.empty())
+        if (!triangles.size())
             return false;
         GModelRayCallback callback(triangles, vertices);
         meshTree.intersectRay(ray, callback, distance, stopAtFirstHit);
@@ -370,7 +369,7 @@ namespace VMAP
 
     bool GroupModel::IsInsideObject(const Vector3 &pos, const Vector3 &down, float &z_dist) const
     {
-        if (triangles.empty() || !iBound.contains(pos))
+        if (!triangles.size() || !iBound.contains(pos))
             return false;
         GModelRayCallback callback(triangles, vertices);
         Vector3 rPos = pos - 0.1f * down;
@@ -457,7 +456,7 @@ namespace VMAP
                         }
 #ifdef VMAP_DEBUG
                         const GroupModel &gm = prims[entry];
-                        printf("%10u %8X %7.3f, %7.3f, %7.3f | %7.3f, %7.3f, %7.3f | z=%f, p_z=%f\n", gm.GetWmoID(), gm.GetMogpFlags(),
+                        printf("%10u %8X %7.3f,%7.3f,%7.3f | %7.3f,%7.3f,%7.3f | z=%f, p_z=%f\n", gm.GetWmoID(), gm.GetMogpFlags(),
                         gm.GetBound().low().x, gm.GetBound().low().y, gm.GetBound().low().z,
                         gm.GetBound().high().x, gm.GetBound().high().y, gm.GetBound().high().z, group_Z, point.z);
 #endif
@@ -469,7 +468,7 @@ namespace VMAP
 
     bool WorldModel::IntersectPoint(const G3D::Vector3 &p, const G3D::Vector3 &down, float &dist, AreaInfo &info) const
     {
-        if (groupModels.empty())
+        if (!groupModels.size())
             return false;
         WModelAreaCallback callback(groupModels, down);
         groupTree.intersectPoint(p, callback);
@@ -487,7 +486,7 @@ namespace VMAP
 
     bool WorldModel::GetLocationInfo(const G3D::Vector3 &p, const G3D::Vector3 &down, float &dist, LocationInfo &info) const
     {
-        if (groupModels.empty())
+        if (!groupModels.size())
             return false;
         WModelAreaCallback callback(groupModels, down);
         groupTree.intersectPoint(p, callback);
@@ -508,7 +507,7 @@ namespace VMAP
 
         bool result = true;
         uint32 chunkSize, count;
-        result = fwrite(VMAP_MAGIC, 1, 8, wf) == 8;
+        result = fwrite(VMAP_MAGIC,1,8,wf) == 8;
         if (result && fwrite("WMOD", 1, 4, wf) != 4) result = false;
         chunkSize = sizeof(uint32) + sizeof(uint32);
         if (result && fwrite(&chunkSize, sizeof(uint32), 1, wf) != 1) result = false;
@@ -541,8 +540,7 @@ namespace VMAP
             return false;
 
         bool result = true;
-        uint32 chunkSize = 0;
-        uint32 count = 0;
+        uint32 chunkSize, count;
         char chunk[8];                          // Ignore the added magic header
         if (!readChunk(rf, chunk, VMAP_MAGIC, 8)) result = false;
 

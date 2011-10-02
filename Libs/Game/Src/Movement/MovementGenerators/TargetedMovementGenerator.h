@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -24,6 +26,7 @@
 #include "DestinationHolder.h"
 #include "Traveller.h"
 #include "FollowerReference.h"
+#include "PathFinder.h"
 
 class TargetedMovementGeneratorBase
 {
@@ -39,13 +42,17 @@ class TargetedMovementGenerator
 : public MovementGeneratorMedium< T, TargetedMovementGenerator<T> >, public TargetedMovementGeneratorBase
 {
     public:
-        TargetedMovementGenerator(Unit &target, float offset = 0, float angle = 0);
+        TargetedMovementGenerator(Unit &target, float offset = 0, float angle = 0)
+            : TargetedMovementGeneratorBase(target), i_offset(offset), i_angle(angle), i_recalculateTravel(false),
+            i_path(NULL), m_pathPointsSent(0) {}
+
         ~TargetedMovementGenerator() {}
 
         void Initialize(T &);
         void Finalize(T &);
+        void Interrupt(T &);
         void Reset(T &);
-        bool Update(T &, const uint32);
+        bool Update(T &, const uint32 &);
         MovementGeneratorType GetMovementGeneratorType() { return TARGETED_MOTION_TYPE; }
 
         void MovementInform(T &);
@@ -55,8 +62,13 @@ class TargetedMovementGenerator
         bool GetDestination(float &x, float &y, float &z) const
         {
             if (i_destinationHolder.HasArrived() || !i_destinationHolder.HasDestination()) return false;
-            i_destinationHolder.GetDestination(x, y, z);
+            i_destinationHolder.GetDestination(x,y,z);
             return true;
+        }
+
+         bool IsReachable() const
+        {
+            return (i_path) ? (i_path->getPathType() & PATHFIND_NORMAL) : true;
         }
 
         void unitSpeedChanged() { i_recalculateTravel=true; }
@@ -68,7 +80,10 @@ class TargetedMovementGenerator
         float i_angle;
         DestinationHolder< Traveller<T> > i_destinationHolder;
         bool i_recalculateTravel;
+        PathFinder* i_path;
+        uint32 m_pathPointsSent;
         float i_targetX, i_targetY, i_targetZ;
 };
 #endif
+
 

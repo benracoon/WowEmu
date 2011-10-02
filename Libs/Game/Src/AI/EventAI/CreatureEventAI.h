@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -37,7 +39,7 @@ enum EventAI_Type
     EVENT_T_TIMER                   = 0,                    // InitialMin, InitialMax, RepeatMin, RepeatMax
     EVENT_T_TIMER_OOC               = 1,                    // InitialMin, InitialMax, RepeatMin, RepeatMax
     EVENT_T_HP                      = 2,                    // HPMax%, HPMin%, RepeatMin, RepeatMax
-    EVENT_T_MANA                    = 3,                    // ManaMax%, ManaMin% RepeatMin, RepeatMax
+    EVENT_T_MANA                    = 3,                    // ManaMax%,ManaMin% RepeatMin, RepeatMax
     EVENT_T_AGGRO                   = 4,                    // NONE
     EVENT_T_KILL                    = 5,                    // RepeatMin, RepeatMax
     EVENT_T_DEATH                   = 6,                    // NONE
@@ -106,9 +108,9 @@ enum EventAI_ActionType
     ACTION_T_DIE                        = 37,               // No Params
     ACTION_T_ZONE_COMBAT_PULSE          = 38,               // No Params
     ACTION_T_CALL_FOR_HELP              = 39,               // Radius
-    ACTION_T_SET_SHEATH                 = 40,               // Sheath (0-passive, 1-melee, 2-ranged)
+    ACTION_T_SET_SHEATH                 = 40,               // Sheath (0-passive,1-melee,2-ranged)
     ACTION_T_FORCE_DESPAWN              = 41,               // No Params
-    ACTION_T_SET_INVINCIBILITY_HP_LEVEL = 42,               // MinHpValue, format(0-flat, 1-percent from max health)
+    ACTION_T_SET_INVINCIBILITY_HP_LEVEL = 42,               // MinHpValue, format(0-flat,1-percent from max health)
     ACTION_T_MOUNT_TO_ENTRY_OR_MODEL    = 43,               // Creature_template entry(param1) OR ModelId (param2) (or 0 for both to unmount)
 
     ACTION_T_SET_PHASE_MASK             = 97,
@@ -578,7 +580,7 @@ typedef UNORDERED_MAP<uint32, CreatureEventAI_Summon> CreatureEventAI_Summon_Map
 
 struct CreatureEventAIHolder
 {
-    CreatureEventAIHolder(CreatureEventAI_Event const& p) : Event(p), Time(0), Enabled(true){}
+    CreatureEventAIHolder(CreatureEventAI_Event p) : Event(p), Time(0), Enabled(true){}
 
     CreatureEventAI_Event Event;
     uint32 Time;
@@ -607,7 +609,7 @@ class CreatureEventAI : public CreatureAI
         void JustSummoned(Creature* pUnit);
         void AttackStart(Unit *who);
         void MoveInLineOfSight(Unit *who);
-        void SpellHit(Unit* pUnit, const SpellInfo* pSpell);
+        void SpellHit(Unit* pUnit, const SpellEntry* pSpell);
         void DamageTaken(Unit* done_by, uint32& damage);
         void HealReceived(Unit* /*done_by*/, uint32& /*addhealth*/) {}
         void UpdateAI(const uint32 diff);
@@ -621,7 +623,7 @@ class CreatureEventAI : public CreatureAI
         inline Unit* GetTargetByType(uint32 Target, Unit* pActionInvoker);
 
         void DoScriptText(int32 textEntry, WorldObject* pSource, Unit* target);
-        bool CanCast(Unit* Target, SpellInfo const *Spell, bool Triggered);
+        bool CanCast(Unit* Target, SpellEntry const *Spell, bool Triggered);
 
         bool SpawnedEventConditionsCheck(CreatureEventAI_Event const& event);
 

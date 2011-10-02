@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment:
 SDCategory: Scarlet Monastery
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 
 enum eEnums
 {
@@ -43,14 +42,14 @@ class boss_arcanist_doan : public CreatureScript
 public:
     boss_arcanist_doan() : CreatureScript("boss_arcanist_doan") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_arcanist_doanAI (creature);
+        return new boss_arcanist_doanAI (pCreature);
     }
 
     struct boss_arcanist_doanAI : public ScriptedAI
     {
-        boss_arcanist_doanAI(Creature* c) : ScriptedAI(c) {}
+        boss_arcanist_doanAI(Creature *c) : ScriptedAI(c) {}
 
         uint32 Polymorph_Timer;
         uint32 AoESilence_Timer;
@@ -67,7 +66,7 @@ public:
             bShielded = false;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit * /*who*/)
         {
             DoScriptText(SAY_AGGRO, me);
         }
@@ -102,8 +101,8 @@ public:
 
             if (Polymorph_Timer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 1))
-                    DoCast(target, SPELL_POLYMORPH);
+                if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM,1))
+                    DoCast(pTarget, SPELL_POLYMORPH);
 
                 Polymorph_Timer = 20000;
             } else Polymorph_Timer -= diff;

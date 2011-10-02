@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment:
 SDCategory: Scarlet Monastery
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "scarlet_monastery.h"
 
 enum eEnums
@@ -59,16 +58,16 @@ class boss_scarlet_commander_mograine : public CreatureScript
 public:
     boss_scarlet_commander_mograine() : CreatureScript("boss_scarlet_commander_mograine") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_scarlet_commander_mograineAI (creature);
+        return new boss_scarlet_commander_mograineAI (pCreature);
     }
 
     struct boss_scarlet_commander_mograineAI : public ScriptedAI
     {
-        boss_scarlet_commander_mograineAI(Creature* creature) : ScriptedAI(creature)
+        boss_scarlet_commander_mograineAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
-            m_pInstance = creature->GetInstanceScript();
+            m_pInstance = pCreature->GetInstanceScript();
         }
 
         InstanceScript* m_pInstance;
@@ -92,7 +91,7 @@ public:
 
             if (m_pInstance)
                 if (me->isAlive())
-                    m_pInstance->SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, NOT_STARTED);
+                    m_pInstance->SetData(TYPE_MOGRAINE_AND_WHITE_EVENT,NOT_STARTED);
 
             m_bHasDied = false;
             m_bHeal = false;
@@ -108,7 +107,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*pWho*/)
         {
             DoScriptText(SAY_MO_AGGRO, me);
             DoCast(me, SPELL_RETRIBUTIONAURA);
@@ -116,7 +115,7 @@ public:
             me->CallForHelp(VISIBLE_RANGE);
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*pVictim*/)
         {
             DoScriptText(SAY_MO_KILL, me);
         }
@@ -134,7 +133,7 @@ public:
             {
                 m_pInstance->SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, IN_PROGRESS);
 
-                Whitemane->GetMotionMaster()->MovePoint(1, 1163.113370f, 1398.856812f, 32.527786f);
+                Whitemane->GetMotionMaster()->MovePoint(1,1163.113370f,1398.856812f,32.527786f);
 
                 me->GetMotionMaster()->MovementExpired();
                 me->GetMotionMaster()->MoveIdle();
@@ -158,7 +157,7 @@ public:
             }
         }
 
-        void SpellHit(Unit* /*who*/, const SpellInfo* pSpell)
+        void SpellHit(Unit* /*pWho*/, const SpellEntry* pSpell)
         {
             //When hit with ressurection say text
             if (pSpell->Id == SPELL_SCARLETRESURRECTION)
@@ -224,16 +223,16 @@ class boss_high_inquisitor_whitemane : public CreatureScript
 public:
     boss_high_inquisitor_whitemane() : CreatureScript("boss_high_inquisitor_whitemane") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_high_inquisitor_whitemaneAI (creature);
+        return new boss_high_inquisitor_whitemaneAI (pCreature);
     }
 
     struct boss_high_inquisitor_whitemaneAI : public ScriptedAI
     {
-        boss_high_inquisitor_whitemaneAI(Creature* creature) : ScriptedAI(creature)
+        boss_high_inquisitor_whitemaneAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
-            m_pInstance = creature->GetInstanceScript();
+            m_pInstance = pCreature->GetInstanceScript();
         }
 
         InstanceScript* m_pInstance;
@@ -261,20 +260,20 @@ public:
                     m_pInstance->SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, NOT_STARTED);
         }
 
-        void AttackStart(Unit* who)
+        void AttackStart(Unit* pWho)
         {
             if (m_pInstance && m_pInstance->GetData(TYPE_MOGRAINE_AND_WHITE_EVENT) == NOT_STARTED)
                 return;
 
-            ScriptedAI::AttackStart(who);
+            ScriptedAI::AttackStart(pWho);
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit* /*pWho*/)
         {
             DoScriptText(SAY_WH_INTRO, me);
         }
 
-        void KilledUnit(Unit* /*victim*/)
+        void KilledUnit(Unit* /*pVictim*/)
         {
             DoScriptText(SAY_WH_KILL, me);
         }
@@ -318,10 +317,10 @@ public:
             //If we are <75% hp cast healing spells at self or Mograine
             if (m_uiHeal_Timer <= uiDiff)
             {
-                Creature* target = NULL;
+                Creature* pTarget = NULL;
 
                 if (!HealthAbovePct(75))
-                    target = me;
+                    pTarget = me;
 
                 if (m_pInstance)
                 {
@@ -329,12 +328,12 @@ public:
                     {
                         // checking m_bCanResurrectCheck prevents her healing Mograine while he is "faking death"
                         if (m_bCanResurrectCheck && pMograine->isAlive() && !pMograine->HealthAbovePct(75))
-                            target = pMograine;
+                            pTarget = pMograine;
                     }
                 }
 
-                if (target)
-                    DoCast(target, SPELL_HEAL);
+                if (pTarget)
+                    DoCast(pTarget, SPELL_HEAL);
 
                 m_uiHeal_Timer = 13000;
             } else m_uiHeal_Timer -= uiDiff;

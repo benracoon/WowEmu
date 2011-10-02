@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -23,16 +25,15 @@
 #include "SpellAuras.h"
 #include "SpellAuraEffects.h"
 #include "SpellMgr.h"
-#include "SpellInfo.h"
 #include "CreatureAIImpl.h"
 
-void UnitAI::AttackStart(Unit* victim)
+void UnitAI::AttackStart(Unit *victim)
 {
     if (victim && me->Attack(victim, true))
         me->GetMotionMaster()->MoveChase(victim);
 }
 
-void UnitAI::AttackStartCaster(Unit* victim, float dist)
+void UnitAI::AttackStartCaster(Unit *victim, float dist)
 {
     if (victim && me->Attack(victim, false))
         me->GetMotionMaster()->MoveChase(victim, dist);
@@ -71,15 +72,10 @@ bool UnitAI::DoSpellAttackIfReady(uint32 spell)
 
     if (me->isAttackReady())
     {
-        if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell))
+        if (me->IsWithinCombatRange(me->getVictim(), GetSpellMaxRange(spell, false)))
         {
-            if (me->IsWithinCombatRange(me->getVictim(), spellInfo->GetMaxRange(false)))
-            {
-                me->CastSpell(me->getVictim(), spell, false);
-                me->resetAttackTimer();
-            }
-            else
-                return false;
+            me->CastSpell(me->getVictim(), spell, false);
+            me->resetAttackTimer();
         }
         else
             return false;
@@ -99,8 +95,7 @@ void UnitAI::SelectTargetList(std::list<Unit*> &targetList, uint32 num, SelectAg
 
 float UnitAI::DoGetSpellMaxRange(uint32 spellId, bool positive)
 {
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-    return spellInfo ? spellInfo->GetMaxRange(positive) : 0;
+    return GetSpellMaxRange(spellId, positive);
 }
 
 void UnitAI::DoAddAuraToAllHostilePlayers(uint32 spellid)
@@ -110,7 +105,7 @@ void UnitAI::DoAddAuraToAllHostilePlayers(uint32 spellid)
         std::list<HostileReference*>& threatlist = me->getThreatManager().getThreatList();
         for (std::list<HostileReference*>::iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
         {
-            if (Unit *pTemp = Unit::GetUnit(*me, (*itr)->getUnitGuid()))
+            if (Unit *pTemp = Unit::GetUnit(*me,(*itr)->getUnitGuid()))
                 if (pTemp->GetTypeId() == TYPEID_PLAYER)
                     me->AddAura(spellid, pTemp);
         }
@@ -125,7 +120,7 @@ void UnitAI::DoCastToAllHostilePlayers(uint32 spellid, bool triggered)
         std::list<HostileReference*>& threatlist = me->getThreatManager().getThreatList();
         for (std::list<HostileReference*>::iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
         {
-            if (Unit *pTemp = Unit::GetUnit(*me, (*itr)->getUnitGuid()))
+            if (Unit *pTemp = Unit::GetUnit(*me,(*itr)->getUnitGuid()))
                 if (pTemp->GetTypeId() == TYPEID_PLAYER)
                     me->CastSpell(pTemp, spellid, triggered);
         }
@@ -135,7 +130,7 @@ void UnitAI::DoCastToAllHostilePlayers(uint32 spellid, bool triggered)
 
 void UnitAI::DoCast(uint32 spellId)
 {
-    Unit* target = NULL;
+    Unit *target = NULL;
     //sLog->outError("aggre %u %u", spellId, (uint32)AISpellInfo[spellId].target);
     switch(AISpellInfo[spellId].target)
     {
@@ -144,23 +139,23 @@ void UnitAI::DoCast(uint32 spellId)
         case AITARGET_VICTIM:   target = me->getVictim(); break;
         case AITARGET_ENEMY:
         {
-            const SpellInfo * spellInfo = sSpellMgr->GetSpellInfo(spellId);
-            bool playerOnly = spellInfo->AttributesEx3 & SPELL_ATTR3_ONLY_TARGET_PLAYERS;
+            const SpellEntry * spellInfo = GetSpellStore()->LookupEntry(spellId);
+            bool playerOnly = spellInfo->AttributesEx3 & SPELL_ATTR_EX3_PLAYERS_ONLY;
             //float range = GetSpellMaxRange(spellInfo, false);
-            target = SelectTarget(SELECT_TARGET_RANDOM, 0, spellInfo->GetMaxRange(false), playerOnly);
+            target = SelectTarget(SELECT_TARGET_RANDOM, 0, GetSpellMaxRange(spellInfo, false), playerOnly);
             break;
         }
         case AITARGET_ALLY:     target = me; break;
         case AITARGET_BUFF:     target = me; break;
         case AITARGET_DEBUFF:
         {
-            const SpellInfo * spellInfo = sSpellMgr->GetSpellInfo(spellId);
-            bool playerOnly = spellInfo->AttributesEx3 & SPELL_ATTR3_ONLY_TARGET_PLAYERS;
-            float range = spellInfo->GetMaxRange(false);
+            const SpellEntry * spellInfo = GetSpellStore()->LookupEntry(spellId);
+            bool playerOnly = spellInfo->AttributesEx3 & SPELL_ATTR_EX3_PLAYERS_ONLY;
+            float range = GetSpellMaxRange(spellInfo, false);
 
             DefaultTargetSelector targetSelector(me, range, playerOnly, -(int32)spellId);
-            if (!(spellInfo->Attributes & SPELL_ATTR0_BREAKABLE_BY_DAMAGE)
-                && !(spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_VICTIM)
+            if (!(spellInfo->Attributes & SPELL_ATTR_BREAKABLE_BY_DAMAGE)
+                && !(spellInfo->GetAuraInterruptFlags() & AURA_INTERRUPT_FLAG_NOT_VICTIM)
                 && targetSelector(me->getVictim()))
                 target = me->getVictim();
             else
@@ -177,34 +172,38 @@ void UnitAI::DoCast(uint32 spellId)
 
 void UnitAI::FillAISpellInfo()
 {
-    AISpellInfo = new AISpellInfoType[sSpellMgr->GetSpellInfoStoreSize()];
+    AISpellInfo = new AISpellInfoType[GetSpellStore()->GetNumRows()];
 
     AISpellInfoType *AIInfo = AISpellInfo;
-    const SpellInfo * spellInfo;
+    const SpellEntry * spellInfo;
 
-    for (uint32 i = 0; i < sSpellMgr->GetSpellInfoStoreSize(); ++i, ++AIInfo)
+    for (uint32 i = 0; i < GetSpellStore()->GetNumRows(); ++i, ++AIInfo)
     {
-        spellInfo = sSpellMgr->GetSpellInfo(i);
+        spellInfo = GetSpellStore()->LookupEntry(i);
         if (!spellInfo)
             continue;
 
-        if (spellInfo->Attributes & SPELL_ATTR0_CASTABLE_WHILE_DEAD)
+        if (spellInfo->Attributes & SPELL_ATTR_CASTABLE_WHILE_DEAD)
             AIInfo->condition = AICOND_DIE;
-        else if (spellInfo->IsPassive() || spellInfo->GetDuration() == -1)
+        else if (IsPassiveSpell(i) || GetSpellDuration(spellInfo) == -1)
             AIInfo->condition = AICOND_AGGRO;
         else
             AIInfo->condition = AICOND_COMBAT;
 
-        if (AIInfo->cooldown < spellInfo->RecoveryTime)
-            AIInfo->cooldown = spellInfo->RecoveryTime;
+        if (AIInfo->cooldown < spellInfo->GetRecoveryTime())
+            AIInfo->cooldown = spellInfo->GetRecoveryTime();
 
-        if (!spellInfo->GetMaxRange(false))
+        if (!GetSpellMaxRange(spellInfo, false))
             UPDATE_TARGET(AITARGET_SELF)
         else
         {
             for (uint32 j = 0; j < MAX_SPELL_EFFECTS; ++j)
             {
-                uint32 targetType = spellInfo->Effects[j].TargetA.GetTarget();
+                SpellEffectEntry const* spellEffect = spellInfo->GetSpellEffect(SpellEffIndex(j));
+                if (!spellEffect)
+                    continue;
+
+                uint32 targetType = spellEffect->EffectImplicitTargetA;
 
                 if (targetType == TARGET_UNIT_TARGET_ENEMY
                     || targetType == TARGET_DST_TARGET_ENEMY)
@@ -212,17 +211,19 @@ void UnitAI::FillAISpellInfo()
                 else if (targetType == TARGET_UNIT_AREA_ENEMY_DST)
                     UPDATE_TARGET(AITARGET_ENEMY)
 
-                if (spellInfo->Effects[j].Effect == SPELL_EFFECT_APPLY_AURA)
+                if (spellEffect->Effect == SPELL_EFFECT_APPLY_AURA)
                 {
                     if (targetType == TARGET_UNIT_TARGET_ENEMY)
                         UPDATE_TARGET(AITARGET_DEBUFF)
-                    else if (spellInfo->IsPositive())
+                    else if (IsPositiveSpell(i))
                         UPDATE_TARGET(AITARGET_BUFF)
                 }
             }
         }
-        AIInfo->realCooldown = spellInfo->RecoveryTime + spellInfo->StartRecoveryTime;
-        AIInfo->maxRange = spellInfo->GetMaxRange(false) * 3 / 4;
+        AIInfo->realCooldown = spellInfo->GetRecoveryTime() + spellInfo->GetStartRecoveryTime();
+        SpellRangeEntry const* srange = sSpellRangeStore.LookupEntry(spellInfo->rangeIndex);
+        if (srange)
+            AIInfo->maxRange = srange->maxRangeHostile * 3 / 4;
     }
 }
 
@@ -248,7 +249,7 @@ void SimpleCharmedAI::UpdateAI(const uint32 /*diff*/)
     if (!charmer->isInCombat())
         me->GetMotionMaster()->MoveFollow(charmer, PET_FOLLOW_DIST, me->GetFollowAngle());
 
-    Unit* target = me->getVictim();
+    Unit *target = me->getVictim();
     if (!target || !charmer->canAttack(target))
         AttackStart(charmer->SelectNearestTargetInAttackDistance());
 }

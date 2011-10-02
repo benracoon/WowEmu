@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -16,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "blackfathom_deeps.h"
 
 enum Spells
@@ -38,14 +37,14 @@ class boss_kelris : public CreatureScript
 public:
     boss_kelris() : CreatureScript("boss_kelris") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_kelrisAI (creature);
+        return new boss_kelrisAI (pCreature);
     }
 
     struct boss_kelrisAI : public ScriptedAI
     {
-        boss_kelrisAI(Creature* c) : ScriptedAI(c)
+        boss_kelrisAI(Creature *c) : ScriptedAI(c)
         {
             pInstance = c->GetInstanceScript();
         }
@@ -57,8 +56,8 @@ public:
 
         void Reset()
         {
-            uiMindBlastTimer = urand(2000, 5000);
-            uiSleepTimer = urand(9000, 12000);
+            uiMindBlastTimer = urand(2000,5000);
+            uiSleepTimer = urand(9000,12000);
             if (pInstance)
                 pInstance->SetData(TYPE_KELRIS, NOT_STARTED);
         }
@@ -85,17 +84,17 @@ public:
             if (uiMindBlastTimer < diff)
             {
                 DoCastVictim(SPELL_MIND_BLAST);
-                uiMindBlastTimer = urand(7000, 9000);
+                uiMindBlastTimer = urand(7000,9000);
             } else uiMindBlastTimer -= diff;
 
             if (uiSleepTimer < diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
                 {
                     DoScriptText(SAY_SLEEP, me);
-                    DoCast(target, SPELL_SLEEP);
+                    DoCast(pTarget, SPELL_SLEEP);
                 }
-                uiSleepTimer = urand(15000, 20000);
+                uiSleepTimer = urand(15000,20000);
             } else uiSleepTimer -= diff;
 
             DoMeleeAttackIfReady();

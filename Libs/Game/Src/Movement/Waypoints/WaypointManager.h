@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -27,23 +29,30 @@
 struct WaypointData
 {
     uint32 id;
-    float x, y, z;
+    float x,y,z;
     bool run;
     uint32 delay;
     uint32 event_id;
     uint8 event_chance;
+
 };
 
 typedef std::vector<WaypointData*> WaypointPath;
 typedef UNORDERED_MAP<uint32, WaypointPath> WaypointPathContainer;
 
-class WaypointMgr
+class WaypointStore
 {
-        friend class ACE_Singleton<WaypointMgr, ACE_Null_Mutex>;
+    friend class ACE_Singleton<WaypointStore, ACE_Null_Mutex>;
 
     public:
+        WaypointStore();
+        ~WaypointStore();
+
+        // Null Mutex is OK because WaypointMgr is initialized in the World thread before World is initialized
+        static WaypointStore* instance() { return ACE_Singleton<WaypointStore, ACE_Null_Mutex>::instance(); }
+
         // Attempts to reload a single path from database
-        void ReloadPath(uint32 id);
+        void UpdatePath(uint32 id);
 
         // Loads all paths from database, should only run on startup
         void Load();
@@ -58,15 +67,14 @@ class WaypointMgr
             return NULL;
         }
 
-    private:
-        // Only allow instantiation from ACE_Singleton
-        WaypointMgr();
-        ~WaypointMgr();
+        inline uint32 GetRecordsCount() const { return records; }
 
-        WaypointPathContainer _waypointStore;
+        private:
+            uint32  records;
+            WaypointPathContainer _waypointStore;
 };
 
-#define sWaypointMgr ACE_Singleton<WaypointMgr, ACE_Null_Mutex>::instance()
+#define sWaypointMgr WaypointStore::instance()
 
 #endif
 

@@ -1,5 +1,4 @@
  /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment: Instance Data Scripts and functions to acquire mobs and set encounter
 SDCategory: Caverns of Time, Mount Hyjal
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "hyjal.h"
 #include "hyjal_trash.h"
 
@@ -192,7 +191,7 @@ public:
                             Creature* creature = instance->GetCreature(Azgalor);
                             if (creature)
                             {
-                                Creature* pUnit = creature->SummonCreature(21987, creature->GetPositionX(), creature->GetPositionY(), creature->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                                Creature* pUnit = creature->SummonCreature(21987,creature->GetPositionX(),creature->GetPositionY(),creature->GetPositionZ(),0,TEMPSUMMON_TIMED_DESPAWN,10000);
 
                                 Map* pMap = creature->GetMap();
                                 if (pMap->IsDungeon() && pUnit)
@@ -207,7 +206,7 @@ public:
                                          if (i->getSource())
                                          {
                                             WorldPacket data(SMSG_MESSAGECHAT, 200);
-                                            pUnit->BuildMonsterChat(&data, CHAT_MSG_MONSTER_YELL, YELL_EFFORTS, 0, YELL_EFFORTS_NAME, i->getSource()->GetGUID());
+                                            pUnit->BuildMonsterChat(&data,CHAT_MSG_MONSTER_YELL,YELL_EFFORTS,0,YELL_EFFORTS_NAME,i->getSource()->GetGUID());
                                             i->getSource()->GetSession()->SendPacket(&data);
 
                                             WorldPacket data2(SMSG_PLAY_SOUND, 4);
@@ -236,7 +235,7 @@ public:
                             for (std::list<uint64>::const_iterator itr = m_uiAncientGemGUID.begin(); itr != m_uiAncientGemGUID.end(); ++itr)
                             {
                                 //don't know how long it expected
-                                DoRespawnGameObject(*itr, DAY);
+                                DoRespawnGameObject(*itr,DAY);
                             }
                         }
                     }
@@ -261,17 +260,17 @@ public:
                     break;
             }
 
-             sLog->outDebug(LOG_FILTER_TSCR, "TSCR: Instance Hyjal: Instance data updated for event %u (Data=%u)", type, data);
+             sLog->outDebug(LOG_FILTER_SSCR, "SCR: Instance Hyjal: Instance data updated for event %u (Data=%u)",type,data);
 
             if (data == DONE)
             {
                 OUT_SAVE_INST_DATA;
 
                 std::ostringstream saveStream;
-                saveStream << m_auiEncounter[0] << ' ' << m_auiEncounter[1] << ' ' << m_auiEncounter[2] << ' '
-                    << m_auiEncounter[3] << ' ' << m_auiEncounter[4]
-                    << ' ' << allianceRetreat << ' ' << hordeRetreat
-                    << ' ' << RaidDamage;
+                saveStream << m_auiEncounter[0] << " " << m_auiEncounter[1] << " " << m_auiEncounter[2] << " "
+                    << m_auiEncounter[3] << " " << m_auiEncounter[4]
+                    << " " << allianceRetreat << " " << hordeRetreat
+                    << " " << RaidDamage;
 
                 str_data = saveStream.str();
 

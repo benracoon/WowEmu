@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment:
 SDCategory: Stratholme
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "stratholme.h"
 
 #define SPELL_ENCASINGWEBS          4962
@@ -37,14 +36,14 @@ class boss_nerubenkan : public CreatureScript
 public:
     boss_nerubenkan() : CreatureScript("boss_nerubenkan") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_nerubenkanAI (creature);
+        return new boss_nerubenkanAI (pCreature);
     }
 
     struct boss_nerubenkanAI : public ScriptedAI
     {
-        boss_nerubenkanAI(Creature* c) : ScriptedAI(c)
+        boss_nerubenkanAI(Creature *c) : ScriptedAI(c)
         {
             pInstance = me->GetInstanceScript();
         }
@@ -64,21 +63,21 @@ public:
             RaiseUndeadScarab_Timer = 3000;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit * /*who*/)
         {
         }
 
         void JustDied(Unit* /*Killer*/)
         {
             if (pInstance)
-                pInstance->SetData(TYPE_NERUB, IN_PROGRESS);
+                pInstance->SetData(TYPE_NERUB,IN_PROGRESS);
         }
 
-        void RaiseUndeadScarab(Unit* victim)
+        void RaiseUndeadScarab(Unit* pVictim)
         {
-            if (Creature* pUndeadScarab = DoSpawnCreature(10876, float(irand(-9, 9)), float(irand(-9, 9)), 0, 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 180000))
+            if (Creature* pUndeadScarab = DoSpawnCreature(10876, float(irand(-9,9)), float(irand(-9,9)), 0, 0, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 180000))
                 if (pUndeadScarab->AI())
-                    pUndeadScarab->AI()->AttackStart(victim);
+                    pUndeadScarab->AI()->AttackStart(pVictim);
         }
 
         void UpdateAI(const uint32 diff)
@@ -96,7 +95,7 @@ public:
             //PierceArmor
             if (PierceArmor_Timer <= diff)
             {
-                if (urand(0, 3) < 2)
+                if (urand(0,3) < 2)
                     DoCast(me->getVictim(), SPELL_PIERCEARMOR);
                 PierceArmor_Timer = 35000;
             } else PierceArmor_Timer -= diff;

@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -22,6 +24,7 @@
 
 #include "SharedDefines.h"
 #include "Player.h"
+#include "G3D/stringutils.h"
 
 #include <vector>
 
@@ -50,7 +53,7 @@ class ChatHandler
         WorldSession * GetSession() { return m_session; }
         explicit ChatHandler(WorldSession* session) : m_session(session) {}
         explicit ChatHandler(Player* player) : m_session(player->GetSession()) {}
-        virtual ~ChatHandler() {}
+         ~ChatHandler() {}
 
         static void FillMessageData(WorldPacket *data, WorldSession* session, uint8 type, uint32 language, const char *channelName, uint64 target_guid, const char *message, Unit *speaker);
 
@@ -64,16 +67,16 @@ class ChatHandler
             FillMessageData(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, 0, message);
         }
 
-        static char* LineFromMessage(char*& pos) { char* start = strtok(pos, "\n"); pos = NULL; return start; }
+        static char* LineFromMessage(char*& pos) { char* start = strtok(pos,"\n"); pos = NULL; return start; }
 
         // function with different implementation for chat/console
-        virtual const char *GetStrings(int32 entry) const;
+        virtual const char *GetString(int32 entry) const;
         virtual void SendSysMessage(const char *str);
 
         void SendSysMessage(int32     entry);
-        void PSendSysMessage(const char *format, ...) ATTR_PRINTF(2, 3);
+        void PSendSysMessage(const char *format, ...) ATTR_PRINTF(2,3);
         void PSendSysMessage(int32     entry, ...);
-        std::string PGetParseString(int32 entry, ...) const;
+        std::string PGetParseString(int32 entry, ...);
 
         int ParseCommands(const char* text);
 
@@ -90,6 +93,9 @@ class ChatHandler
         virtual bool needReportToTarget(Player* chr) const;
         virtual LocaleConstant GetSessionDbcLocale() const;
         virtual int GetSessionDbLocaleIndex() const;
+
+        void SkipWhiteSpaces(char** args);
+        bool ExtractFloat(char** args, float& val);
 
         bool HasLowerSecurity(Player* target, uint64 guid, bool strong = false);
         bool HasLowerSecurityAccount(WorldSession* target, uint32 account, bool strong = false);
@@ -119,7 +125,7 @@ class ChatHandler
         std::string GetNameLink(Player* chr) const { return playerLink(chr->GetName()); }
 
         GameObject* GetNearbyGameObject();
-        GameObject* GetObjectGlobalyWithGuidOrNearWithDbGuid(uint32 lowguid, uint32 entry);
+        GameObject* GetObjectGlobalyWithGuidOrNearWithDbGuid(uint32 lowguid,uint32 entry);
         bool HasSentErrorMessage() { return sentErrorMessage;}
         void SetSentErrorMessage(bool val){ sentErrorMessage = val;};
         static bool LoadCommandTable() { return load_command_table;}
@@ -153,7 +159,6 @@ class ChatHandler
         bool HandleCastDistCommand(const char *args);
         bool HandleCastSelfCommand(const char *args);
         bool HandleCastTargetCommand(const char *args);
-        bool HandleCastDestCommand(const char *args);
 
         bool HandleCharacterCustomizeCommand(const char * args);
         bool HandleCharacterChangeFactionCommand(const char * args);
@@ -260,6 +265,7 @@ class ChatHandler
         bool HandleRecallCommand(const char* args);
         bool HandleAnnounceCommand(const char* args);
         bool HandleNotifyCommand(const char* args);
+        bool HandleGPSCommand(const char* args);
         bool HandleTaxiCheatCommand(const char* args);
         bool HandleWhispersCommand(const char* args);
 
@@ -294,6 +300,7 @@ class ChatHandler
         bool HandleHideAreaCommand(const char* args);
         bool HandleAddItemCommand(const char* args);
         bool HandleAddItemSetCommand(const char* args);
+        bool HandlePetTpCommand(const char* args);
         bool HandlePetUnlearnCommand(const char* args);
         bool HandlePetLearnCommand(const char* args);
         bool HandleCreatePetCommand(const char* args);
@@ -334,6 +341,7 @@ class ChatHandler
         /*bool HandleCharDeleteCommand(const char *args);
         bool HandleSendMessageCommand(const char * args);*/
 
+        bool HandleFlushArenaPointsCommand(const char *args);
         bool HandlePlayAllCommand(const char* args);
         bool HandleRepairitemsCommand(const char* args);
 
@@ -351,11 +359,11 @@ class ChatHandler
         // Utility methods for commands
         bool LookupPlayerSearchCommand(QueryResult result, int32 limit);
         bool HandleBanListHelper(QueryResult result);
-        bool HandleBanHelper(BanMode mode, char const* args);
+        bool HandleBanHelper(BanMode mode,char const* args);
         bool HandleBanInfoHelper(uint32 accountid, char const* accountname);
-        bool HandleUnBanHelper(BanMode mode, char const* args);
+        bool HandleUnBanHelper(BanMode mode,char const* args);
         void HandleCharacterLevel(Player* player, uint64 player_guid, uint32 oldlevel, uint32 newlevel);
-        void HandleLearnSkillRecipesHelper(Player* player, uint32 skill_id);
+        void HandleLearnSkillRecipesHelper(Player* player,uint32 skill_id);
 
         // Stores informations about a deleted character
         struct DeletedInfo
@@ -373,9 +381,8 @@ class ChatHandler
         void HandleCharacterDeletedListHelper(DeletedInfoList const& foundList);
         void HandleCharacterDeletedRestoreHelper(DeletedInfo const& delInfo);
 
+        uint32 _ReadUInt32(std::istringstream& reader) const;
     private:
-        bool _HandleGMTicketResponseAppendCommand(const char* args, bool newLine);
-
         WorldSession * m_session;                           // != NULL for chat command call and NULL for CLI command
 
         // common global flag
@@ -390,7 +397,7 @@ class CliHandler : public ChatHandler
         explicit CliHandler(void* callbackArg, Print* zprint) : m_callbackArg(callbackArg), m_print(zprint) {}
 
         // overwrite functions
-        const char *GetStrings(int32 entry) const;
+        const char *GetString(int32 entry) const;
         bool isAvailable(ChatCommand const& cmd) const;
         void SendSysMessage(const char *str);
         std::string GetNameLink() const;

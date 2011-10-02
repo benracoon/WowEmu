@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -22,7 +21,7 @@
  * Scriptnames of files in this file should be prefixed with "spell_pri_".
  */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "SpellAuraEffects.h"
 
 enum PriestSpells
@@ -47,18 +46,18 @@ class spell_pri_guardian_spirit : public SpellScriptLoader
 
             uint32 healPct;
 
-            bool Validate(SpellInfo const* /*spellEntry*/)
+            bool Validate(SpellEntry const * /*spellEntry*/)
             {
-                return sSpellMgr->GetSpellInfo(PRIEST_SPELL_GUARDIAN_SPIRIT_HEAL) != NULL;
+                return sSpellStore.LookupEntry(PRIEST_SPELL_GUARDIAN_SPIRIT_HEAL) != NULL;
             }
 
             bool Load()
             {
-                healPct = GetSpellInfo()->Effects[EFFECT_1].CalcValue();
+                healPct = SpellMgr::CalculateSpellEffectAmount(GetSpellProto(), EFFECT_1);
                 return true;
             }
 
-            void CalculateAmount(AuraEffect const* /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
+            void CalculateAmount(AuraEffect const * /*aurEff*/, int32 & amount, bool & /*canBeRecalculated*/)
             {
                 // Set absorbtion amount to unlimited
                 amount = -1;
@@ -66,7 +65,7 @@ class spell_pri_guardian_spirit : public SpellScriptLoader
 
             void Absorb(AuraEffect * /*aurEff*/, DamageInfo & dmgInfo, uint32 & absorbAmount)
             {
-                Unit* target = GetTarget();
+                Unit * target = GetTarget();
                 if (dmgInfo.GetDamage() < target->GetHealth())
                     return;
 
@@ -159,7 +158,7 @@ class spell_pri_pain_and_suffering_proc : public SpellScriptLoader
             void HandleEffectScriptEffect(SpellEffIndex /*effIndex*/)
             {
                 // Refresh Shadow Word: Pain on target
-                if (Unit* unitTarget = GetHitUnit())
+                if (Unit *unitTarget = GetHitUnit())
                     if (AuraEffect* aur = unitTarget->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_PRIEST, 0x8000, 0, 0, GetCaster()->GetGUID()))
                         aur->GetBase()->RefreshDuration();
             }
@@ -185,9 +184,9 @@ class spell_pri_penance : public SpellScriptLoader
         {
             PrepareSpellScript(spell_pri_penance_SpellScript);
 
-            bool Validate(SpellInfo const* spellEntry)
+            bool Validate(SpellEntry const * spellEntry)
             {
-                if (!sSpellMgr->GetSpellInfo(PRIEST_SPELL_PENANCE_R1))
+                if (!sSpellStore.LookupEntry(PRIEST_SPELL_PENANCE_R1))
                     return false;
                 // can't use other spell than this penance due to spell_ranks dependency
                 if (sSpellMgr->GetFirstSpellInChain(PRIEST_SPELL_PENANCE_R1) != sSpellMgr->GetFirstSpellInChain(spellEntry->Id))
@@ -204,11 +203,11 @@ class spell_pri_penance : public SpellScriptLoader
 
             void HandleDummy(SpellEffIndex /*effIndex*/)
             {
-                Unit* unitTarget = GetHitUnit();
+                Unit *unitTarget = GetHitUnit();
                 if (!unitTarget || !unitTarget->isAlive())
                     return;
 
-                Unit* caster = GetCaster();
+                Unit *caster = GetCaster();
 
                 uint8 rank = sSpellMgr->GetSpellRank(GetSpellInfo()->Id);
 
@@ -241,17 +240,17 @@ class spell_pri_reflective_shield_trigger : public SpellScriptLoader
         {
             PrepareAuraScript(spell_pri_reflective_shield_trigger_AuraScript);
 
-            bool Validate(SpellInfo const* /*spellEntry*/)
+            bool Validate(SpellEntry const * /*spellEntry*/)
             {
-                return sSpellMgr->GetSpellInfo(PRIEST_SPELL_REFLECTIVE_SHIELD_TRIGGERED) && sSpellMgr->GetSpellInfo(PRIEST_SPELL_REFLECTIVE_SHIELD_R1);
+                return sSpellStore.LookupEntry(PRIEST_SPELL_REFLECTIVE_SHIELD_TRIGGERED) && sSpellStore.LookupEntry(PRIEST_SPELL_REFLECTIVE_SHIELD_R1);
             }
 
             void Trigger(AuraEffect * aurEff, DamageInfo & dmgInfo, uint32 & absorbAmount)
             {
-                Unit* target = GetTarget();
+                Unit * target = GetTarget();
                 if (dmgInfo.GetAttacker() == target)
                     return;
-                Unit* caster = GetCaster();
+                Unit * caster = GetCaster();
                 if (!caster)
                     return;
                 if (AuraEffect * talentAurEff = target->GetAuraEffectOfRankedSpell(PRIEST_SPELL_REFLECTIVE_SHIELD_R1, EFFECT_0))

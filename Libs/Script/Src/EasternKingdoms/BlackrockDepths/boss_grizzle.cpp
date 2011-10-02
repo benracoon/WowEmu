@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment:
 SDCategory: Blackrock Depths
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 
 enum Spells
 {
@@ -37,14 +36,14 @@ class boss_grizzle : public CreatureScript
 public:
     boss_grizzle() : CreatureScript("boss_grizzle") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_grizzleAI (creature);
+        return new boss_grizzleAI (pCreature);
     }
 
     struct boss_grizzleAI : public ScriptedAI
     {
-        boss_grizzleAI(Creature* c) : ScriptedAI(c) {}
+        boss_grizzleAI(Creature *c) : ScriptedAI(c) {}
 
         uint32 GroundTremor_Timer;
         uint32 Frenzy_Timer;
@@ -55,7 +54,7 @@ public:
             Frenzy_Timer =0;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit * /*who*/)
         {
         }
 

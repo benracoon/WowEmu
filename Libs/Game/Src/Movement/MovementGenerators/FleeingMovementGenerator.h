@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -33,8 +35,9 @@ class FleeingMovementGenerator
 
         void Initialize(T &);
         void Finalize(T &);
+        void Interrupt(T &);
         void Reset(T &);
-        bool Update(T &, const uint32);
+        bool Update(T &, const uint32 &);
         bool GetDestination(float &x, float &y, float &z) const;
 
         MovementGeneratorType GetMovementGeneratorType() { return FLEEING_MOTION_TYPE; }
@@ -42,22 +45,10 @@ class FleeingMovementGenerator
     private:
         void _setTargetLocation(T &owner);
         bool _getPoint(T &owner, float &x, float &y, float &z);
-        bool _setMoveData(T &owner);
-        void _Init(T &);
-
-        bool is_water_ok   :1;
-        bool is_land_ok    :1;
-        bool i_only_forward:1;
-
-        float i_caster_x;
-        float i_caster_y;
-        float i_caster_z;
-        float i_last_distance_from_caster;
-        float i_to_distance_from_caster;
-        float i_cur_angle;
+        
         uint64 i_frightGUID;
-        TimeTracker i_nextCheckTime;
 
+        TimeTracker i_nextCheckTime;
         DestinationHolder< Traveller<T> > i_destinationHolder;
 };
 
@@ -70,7 +61,7 @@ class TimedFleeingMovementGenerator
             i_totalFleeTime(time) {}
 
         MovementGeneratorType GetMovementGeneratorType() { return TIMED_FLEEING_MOTION_TYPE; }
-        bool Update(Unit &, const uint32);
+        bool Update(Unit &, const uint32 &);
         void Finalize(Unit &);
 
     private:
@@ -78,4 +69,5 @@ class TimedFleeingMovementGenerator
 };
 
 #endif
+
 

@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment: Some cleanup left along with save
 SDCategory: Auchindoun, Shadow Labyrinth
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "shadow_labyrinth.h"
 
 #define MAX_ENCOUNTER 5
@@ -109,7 +108,7 @@ public:
                     if (creature->isAlive())
                     {
                         ++m_uiFelOverseerCount;
-                        sLog->outDebug(LOG_FILTER_TSCR, "TSCR: Shadow Labyrinth: counting %u Fel Overseers.", m_uiFelOverseerCount);
+                        sLog->outDebug(LOG_FILTER_SSCR, "SCR: Shadow Labyrinth: counting %u Fel Overseers.",m_uiFelOverseerCount);
                     }
                     break;
             }
@@ -126,7 +125,7 @@ public:
                 case TYPE_OVERSEER:
                     if (uiData != DONE)
                     {
-                        sLog->outError("TSCR: Shadow Labyrinth: TYPE_OVERSEER did not expect other data than DONE");
+                        sLog->outError("SCR: Shadow Labyrinth: TYPE_OVERSEER did not expect other data than DONE");
                         return;
                     }
                     if (m_uiFelOverseerCount)
@@ -134,11 +133,11 @@ public:
                         --m_uiFelOverseerCount;
 
                         if (m_uiFelOverseerCount)
-                            sLog->outDebug(LOG_FILTER_TSCR, "TSCR: Shadow Labyrinth: %u Fel Overseers left to kill.", m_uiFelOverseerCount);
+                            sLog->outDebug(LOG_FILTER_SSCR, "SCR: Shadow Labyrinth: %u Fel Overseers left to kill.",m_uiFelOverseerCount);
                         else
                         {
                             m_auiEncounter[1] = DONE;
-                            sLog->outDebug(LOG_FILTER_TSCR, "TSCR: Shadow Labyrinth: TYPE_OVERSEER == DONE");
+                            sLog->outDebug(LOG_FILTER_SSCR, "SCR: Shadow Labyrinth: TYPE_OVERSEER == DONE");
                         }
                     }
                     break;
@@ -168,8 +167,8 @@ public:
                 OUT_SAVE_INST_DATA;
 
                 std::ostringstream saveStream;
-                saveStream << m_auiEncounter[0] << ' ' << m_auiEncounter[1] << ' '
-                    << m_auiEncounter[2] << ' ' << m_auiEncounter[3] << ' ' << m_auiEncounter[4];
+                saveStream << m_auiEncounter[0] << " " << m_auiEncounter[1] << " "
+                    << m_auiEncounter[2] << " " << m_auiEncounter[3] << " " << m_auiEncounter[4];
 
                 str_data = saveStream.str();
 

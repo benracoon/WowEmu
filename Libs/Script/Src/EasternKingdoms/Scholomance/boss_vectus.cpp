@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment:
 SDCategory: Scholomance
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 
 enum eEnums
 {
@@ -39,14 +38,14 @@ class boss_vectus : public CreatureScript
 public:
     boss_vectus() : CreatureScript("boss_vectus") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_vectusAI (creature);
+        return new boss_vectusAI (pCreature);
     }
 
     struct boss_vectusAI : public ScriptedAI
     {
-        boss_vectusAI(Creature* c) : ScriptedAI(c) {}
+        boss_vectusAI(Creature *c) : ScriptedAI(c) {}
 
         uint32 m_uiFireShield_Timer;
         uint32 m_uiBlastWave_Timer;

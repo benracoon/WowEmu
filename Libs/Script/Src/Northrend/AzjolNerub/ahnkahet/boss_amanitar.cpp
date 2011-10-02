@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -20,7 +19,7 @@
  * Comment:  Find correct mushrooms spell to make them visible - buffs of the mushrooms not ever applied to the users...
  */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "ahnkahet.h"
 
 enum Spells
@@ -49,7 +48,7 @@ public:
 
     struct boss_amanitarAI : public ScriptedAI
     {
-        boss_amanitarAI(Creature* c) : ScriptedAI(c)
+        boss_amanitarAI(Creature *c) : ScriptedAI(c)
         {
             pInstance = c->GetInstanceScript();
             bFirstTime = true;
@@ -66,9 +65,9 @@ public:
 
         void Reset()
         {
-            uiRootTimer = urand(5*IN_MILLISECONDS, 9*IN_MILLISECONDS);
-            uiBashTimer = urand(10*IN_MILLISECONDS, 14*IN_MILLISECONDS);
-            uiBoltTimer = urand(15*IN_MILLISECONDS, 30*IN_MILLISECONDS);
+            uiRootTimer = urand(5*IN_MILLISECONDS,9*IN_MILLISECONDS);
+            uiBashTimer = urand(10*IN_MILLISECONDS,14*IN_MILLISECONDS);
+            uiBoltTimer = urand(15*IN_MILLISECONDS,30*IN_MILLISECONDS);
             uiSpawnTimer = 0;
 
             me->SetMeleeDamageSchool(SPELL_SCHOOL_NATURE);
@@ -84,7 +83,7 @@ public:
             }
         }
 
-        void JustDied(Unit* /*Killer*/)
+        void JustDied(Unit * /*Killer*/)
         {
             if (pInstance)
             {
@@ -93,7 +92,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit * /*who*/)
         {
             if (pInstance)
                 pInstance->SetData(DATA_AMANITAR_EVENT, IN_PROGRESS);
@@ -111,9 +110,9 @@ public:
                 {
                     Position pos;
                     victim->GetPosition(&pos);
-                    me->GetRandomNearPosition(pos, float(urand(5, 80)));
+                    me->GetRandomNearPosition(pos, float(urand(5,80)));
                     me->SummonCreature(NPC_POISONOUS_MUSHROOM, pos, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30*IN_MILLISECONDS);
-                    me->GetRandomNearPosition(pos, float(urand(5, 80)));
+                    me->GetRandomNearPosition(pos, float(urand(5,80)));
                     me->SummonCreature(NPC_HEALTHY_MUSHROOM, pos, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30*IN_MILLISECONDS);
                 }
             }
@@ -128,34 +127,34 @@ public:
             if (uiSpawnTimer <= diff)
             {
                 SpawnAdds();
-                uiSpawnTimer = urand(35*IN_MILLISECONDS, 40*IN_MILLISECONDS);
+                uiSpawnTimer = urand(35*IN_MILLISECONDS,40*IN_MILLISECONDS);
             } else uiSpawnTimer -= diff;
 
             if (uiRootTimer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                    DoCast(target, SPELL_ENTANGLING_ROOTS);
-                uiRootTimer = urand(15*IN_MILLISECONDS, 30*IN_MILLISECONDS);
+                if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                    DoCast(pTarget, SPELL_ENTANGLING_ROOTS);
+                uiRootTimer = urand(15*IN_MILLISECONDS,30*IN_MILLISECONDS);
             } else uiRootTimer -= diff;
 
             if (uiBashTimer <= diff)
             {
                 DoCastVictim(SPELL_BASH);
-                uiBashTimer = urand(15*IN_MILLISECONDS, 30*IN_MILLISECONDS);
+                uiBashTimer = urand(15*IN_MILLISECONDS,30*IN_MILLISECONDS);
             } else uiBashTimer -= diff;
 
             if (uiBoltTimer <= diff)
             {
-                if (Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
-                    DoCast(target, SPELL_VENOM_BOLT_VOLLEY);
-                uiBoltTimer = urand(15*IN_MILLISECONDS, 30*IN_MILLISECONDS);
+                if (Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM, 0, 100, true))
+                    DoCast(pTarget, SPELL_VENOM_BOLT_VOLLEY);
+                uiBoltTimer = urand(15*IN_MILLISECONDS,30*IN_MILLISECONDS);
             } else uiBoltTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
     };
 
-    CreatureAI *GetAI(Creature* creature) const
+    CreatureAI *GetAI(Creature *creature) const
     {
         return new boss_amanitarAI(creature);
     }
@@ -184,7 +183,7 @@ public:
             uiDeathTimer = 30*IN_MILLISECONDS;
         }
 
-        void JustDied(Unit* killer)
+        void JustDied(Unit *killer)
         {
             if (!killer)
                 return;
@@ -196,8 +195,8 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) {}
-        void AttackStart(Unit* /*victim*/) {}
+        void EnterCombat(Unit * /*who*/) {}
+        void AttackStart(Unit * /*victim*/) {}
 
         void UpdateAI(const uint32 diff)
         {
@@ -216,7 +215,7 @@ public:
         }
     };
 
-    CreatureAI *GetAI(Creature* creature) const
+    CreatureAI *GetAI(Creature *creature) const
     {
         return new mob_amanitar_mushroomsAI(creature);
     }

@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -43,10 +42,12 @@ class icecrown_citadel_teleport : public GameObjectScript
                 if (instance->GetData(DATA_COLDFLAME_JETS) == DONE)
                     player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Teleport to the Upper Spire.", GOSSIP_SENDER_ICC_PORT, UPPER_SPIRE_TELEPORT);
                 if (instance->GetBossState(DATA_VALITHRIA_DREAMWALKER) == DONE)
-                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Teleport to Sindragosa's Lair", GOSSIP_SENDER_ICC_PORT, SINDRAGOSA_S_LAIR_TELEPORT);
+                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Teleport to the Sindragosa's Lair", GOSSIP_SENDER_ICC_PORT, SINDRAGOSA_S_LAIR_TELEPORT);
+                if (instance->GetBossState(DATA_PROFESSOR_PUTRICIDE) == DONE && instance->GetBossState(DATA_BLOOD_QUEEN_LANA_THEL) == DONE && instance->GetBossState(DATA_SINDRAGOSA) == DONE)
+                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Teleport to The Frozen Throne", GOSSIP_SENDER_ICC_PORT, FROZEN_THRONE_TELEPORT);
             }
 
-            player->SEND_GOSSIP_MENU(player->GetGossipTextId(go), go->GetGUID());
+            player->SEND_GOSSIP_MENU(go->GetGOInfo()->GetGossipMenuId(), go->GetGUID());
             return true;
         }
 
@@ -54,7 +55,7 @@ class icecrown_citadel_teleport : public GameObjectScript
         {
             player->PlayerTalkClass->ClearMenus();
             player->CLOSE_GOSSIP_MENU();
-            SpellInfo const* spell = sSpellMgr->GetSpellInfo(action);
+            SpellEntry const* spell = sSpellStore.LookupEntry(action);
             if (!spell)
                 return false;
 
@@ -71,26 +72,7 @@ class icecrown_citadel_teleport : public GameObjectScript
         }
 };
 
-class at_frozen_throne_teleport : public AreaTriggerScript
-{
-    public:
-        at_frozen_throne_teleport() : AreaTriggerScript("at_frozen_throne_teleport") { }
-
-        bool OnTrigger(Player* player, AreaTriggerEntry const* /*areaTrigger*/)
-        {
-            if (InstanceScript* instance = player->GetInstanceScript())
-                if (instance->GetBossState(DATA_PROFESSOR_PUTRICIDE) == DONE &&
-                    instance->GetBossState(DATA_BLOOD_QUEEN_LANA_THEL) == DONE &&
-                    instance->GetBossState(DATA_SINDRAGOSA) == DONE &&
-                    instance->GetBossState(DATA_THE_LICH_KING) != IN_PROGRESS)
-                    player->CastSpell(player, FROZEN_THRONE_TELEPORT, true);
-
-            return true;
-        }
-};
-
 void AddSC_icecrown_citadel_teleport()
 {
     new icecrown_citadel_teleport();
-    new at_frozen_throne_teleport();
 }

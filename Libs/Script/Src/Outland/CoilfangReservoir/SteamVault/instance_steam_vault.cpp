@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment:  Instance script and access panel GO
 SDCategory: Coilfang Resevoir, The Steamvault
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "steam_vault.h"
 
 #define MAX_ENCOUNTER 4
@@ -44,7 +43,7 @@ class go_main_chambers_access_panel : public GameObjectScript
 public:
     go_main_chambers_access_panel() : GameObjectScript("go_main_chambers_access_panel") { }
 
-    bool OnGossipHello(Player* /*player*/, GameObject* go)
+    bool OnGossipHello(Player* /*pPlayer*/, GameObject* go)
     {
         InstanceScript* pInstance = go->GetInstanceScript();
 
@@ -52,10 +51,10 @@ public:
             return false;
 
         if (go->GetEntry() == ACCESS_PANEL_HYDRO && (pInstance->GetData(TYPE_HYDROMANCER_THESPIA) == DONE || pInstance->GetData(TYPE_HYDROMANCER_THESPIA) == SPECIAL))
-            pInstance->SetData(TYPE_HYDROMANCER_THESPIA, SPECIAL);
+            pInstance->SetData(TYPE_HYDROMANCER_THESPIA,SPECIAL);
 
         if (go->GetEntry() == ACCESS_PANEL_MEK && (pInstance->GetData(TYPE_MEKGINEER_STEAMRIGGER) == DONE || pInstance->GetData(TYPE_MEKGINEER_STEAMRIGGER) == SPECIAL))
-            pInstance->SetData(TYPE_MEKGINEER_STEAMRIGGER, SPECIAL);
+            pInstance->SetData(TYPE_MEKGINEER_STEAMRIGGER,SPECIAL);
 
         return true;
     }
@@ -139,7 +138,7 @@ public:
                         if (GetData(TYPE_MEKGINEER_STEAMRIGGER) == SPECIAL)
                             HandleGameObject(MainChambersDoor, true);
 
-                        sLog->outDebug(LOG_FILTER_TSCR, "TSCR: Instance Steamvault: Access panel used.");
+                        sLog->outDebug(LOG_FILTER_SSCR, "SCR: Instance Steamvault: Access panel used.");
                     }
                     m_auiEncounter[0] = data;
                     break;
@@ -151,7 +150,7 @@ public:
                         if (GetData(TYPE_HYDROMANCER_THESPIA) == SPECIAL)
                             HandleGameObject(MainChambersDoor, true);
 
-                        sLog->outDebug(LOG_FILTER_TSCR, "TSCR: Instance Steamvault: Access panel used.");
+                        sLog->outDebug(LOG_FILTER_SSCR, "SCR: Instance Steamvault: Access panel used.");
                     }
                     m_auiEncounter[1] = data;
                     break;
@@ -201,7 +200,7 @@ public:
         {
             OUT_SAVE_INST_DATA;
             std::ostringstream stream;
-            stream << m_auiEncounter[0] << ' ' << m_auiEncounter[1] << ' ' << m_auiEncounter[2] << ' ' << m_auiEncounter[3];
+            stream << m_auiEncounter[0] << " " << m_auiEncounter[1] << " " << m_auiEncounter[2] << " " << m_auiEncounter[3];
             char* out = new char[stream.str().length() + 1];
             strcpy(out, stream.str().c_str());
             if (out)

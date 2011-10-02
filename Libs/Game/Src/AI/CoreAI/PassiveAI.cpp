@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2010-2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
+ *
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
+ *
  * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -31,7 +33,7 @@ void PassiveAI::UpdateAI(const uint32)
         EnterEvadeMode();
 }
 
-void PossessedAI::AttackStart(Unit* target)
+void PossessedAI::AttackStart(Unit *target)
 {
     me->Attack(target, true);
 }
@@ -47,7 +49,7 @@ void PossessedAI::UpdateAI(const uint32 /*diff*/)
     }
 }
 
-void PossessedAI::JustDied(Unit* /*u*/)
+void PossessedAI::JustDied(Unit * /*u*/)
 {
     // We died while possessed, disable our loot
     me->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
@@ -60,7 +62,7 @@ void PossessedAI::KilledUnit(Unit* victim)
         victim->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
 }
 
-void CritterAI::DamageTaken(Unit* /*done_by*/, uint32 &)
+void CritterAI::DamageTaken(Unit * /*done_by*/, uint32 &)
 {
     if (!me->HasUnitState(UNIT_STAT_FLEEING))
         me->SetControlled(true, UNIT_STAT_FLEEING);

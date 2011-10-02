@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment:
 SDCategory: Zul'Gurub
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "zulgurub.h"
 
 #define SPELL_AVARTAR                24646                  //The Enrage Spell
@@ -41,7 +40,7 @@ class boss_grilek : public CreatureScript
 
         struct boss_grilekAI : public ScriptedAI
         {
-            boss_grilekAI(Creature* c) : ScriptedAI(c) {}
+            boss_grilekAI(Creature *c) : ScriptedAI(c) {}
 
             uint32 Avartar_Timer;
             uint32 GroundTremor_Timer;
@@ -52,7 +51,7 @@ class boss_grilek : public CreatureScript
                 GroundTremor_Timer = 8000 + rand()%8000;
             }
 
-            void EnterCombat(Unit* /*who*/)
+            void EnterCombat(Unit * /*who*/)
             {
             }
 
@@ -67,14 +66,14 @@ class boss_grilek : public CreatureScript
                 {
 
                     DoCast(me, SPELL_AVARTAR);
-                    Unit* target = NULL;
+                    Unit *pTarget = NULL;
 
-                    target = SelectTarget(SELECT_TARGET_RANDOM, 1);
+                    pTarget = SelectTarget(SELECT_TARGET_RANDOM,1);
 
                     if (DoGetThreat(me->getVictim()))
-                        DoModifyThreatPercent(me->getVictim(), -50);
-                    if (target)
-                        AttackStart(target);
+                        DoModifyThreatPercent(me->getVictim(),-50);
+                    if (pTarget)
+                        AttackStart(pTarget);
 
                     Avartar_Timer = 25000 + rand()%10000;
                 } else Avartar_Timer -= diff;

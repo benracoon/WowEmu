@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -57,6 +56,7 @@ namespace VMAP
             // temp?
             const G3D::AABox& getBounds() const { return iBound; }
 
+
             static bool readFromFile(FILE *rf, ModelSpawn &spawn);
             static bool writeToFile(FILE *rw, const ModelSpawn &spawn);
     };
@@ -75,6 +75,11 @@ namespace VMAP
             G3D::Matrix3 iInvRot;
             float iInvScale;
             WorldModel *iModel;
+
+            #ifdef MMAP_GENERATOR
+            public:
+                WorldModel* const getWorldModel();
+            #endif
     };
 } // namespace VMAP
 

@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment: Heroic and Normal Support. Needs further testing.
 SDCategory: Magister's Terrace
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "magisters_terrace.h"
 
 #define SAY_AGGRO                       -1585000
@@ -57,9 +56,9 @@ class boss_selin_fireheart : public CreatureScript
 public:
     boss_selin_fireheart() : CreatureScript("boss_selin_fireheart") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_selin_fireheartAI (creature);
+        return new boss_selin_fireheartAI (pCreature);
     };
 
     struct boss_selin_fireheartAI : public ScriptedAI
@@ -76,7 +75,7 @@ public:
                 for (uint8 i = 0; i < size; ++i)
                 {
                     uint64 guid = pInstance->GetData64(DATA_FEL_CRYSTAL);
-                    sLog->outDebug(LOG_FILTER_TSCR, "TSCR: Selin: Adding Fel Crystal " UI64FMTD " to list", guid);
+                    sLog->outDebug(LOG_FILTER_SSCR, "SCR: Selin: Adding Fel Crystal " UI64FMTD " to list", guid);
                     Crystals.push_back(guid);
                 }
             }
@@ -204,7 +203,7 @@ public:
 
         void KilledUnit(Unit* /*victim*/)
         {
-            DoScriptText(RAND(SAY_KILL_1, SAY_KILL_2), me);
+            DoScriptText(RAND(SAY_KILL_1,SAY_KILL_2), me);
         }
 
         void MovementInform(uint32 type, uint32 id)
@@ -223,7 +222,7 @@ public:
                 else
                 {
                     // Make an error message in case something weird happened here
-                    sLog->outError("TSCR: Selin Fireheart unable to drain crystal as the crystal is either dead or despawned");
+                    sLog->outError("SCR: Selin Fireheart unable to drain crystal as the crystal is either dead or despawned");
                     DrainingCrystal = false;
                 }
             }
@@ -327,14 +326,14 @@ class mob_fel_crystal : public CreatureScript
 public:
     mob_fel_crystal() : CreatureScript("mob_fel_crystal") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new mob_fel_crystalAI (creature);
+        return new mob_fel_crystalAI (pCreature);
     };
 
     struct mob_fel_crystalAI : public ScriptedAI
     {
-        mob_fel_crystalAI(Creature* c) : ScriptedAI(c) {}
+        mob_fel_crystalAI(Creature *c) : ScriptedAI(c) {}
 
         void Reset() {}
         void EnterCombat(Unit* /*who*/) {}

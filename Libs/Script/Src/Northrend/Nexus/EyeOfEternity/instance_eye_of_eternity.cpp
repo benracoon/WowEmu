@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -16,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "eye_of_eternity.h"
 
 class instance_eye_of_eternity : public InstanceMapScript
@@ -31,7 +30,7 @@ public:
 
     struct instance_eye_of_eternity_InstanceMapScript : public InstanceScript
     {
-        instance_eye_of_eternity_InstanceMapScript(Map* map) : InstanceScript(map)
+        instance_eye_of_eternity_InstanceMapScript(Map* map) : InstanceScript(map) 
         {
             SetBossNumber(MAX_ENCOUNTER);
 
@@ -63,25 +62,24 @@ public:
                         }
                     }
 
-                    SpawnGameObject(GO_FOCUSING_IRIS, focusingIrisPosition);
-                    SpawnGameObject(GO_EXIT_PORTAL, exitPortalPosition);
+                    SpawnGameObject(GO_FOCUSING_IRIS,focusingIrisPosition);
+                    SpawnGameObject(GO_EXIT_PORTAL,exitPortalPosition);
 
                     if (GameObject* platform = instance->GetGameObject(platformGUID))
                         platform->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_DESTROYED);
-                }
-                else if (state == DONE)
+                } else if (state == DONE)
                 {
                     if (Creature* malygos = instance->GetCreature(malygosGUID))
-                        malygos->SummonCreature(NPC_ALEXSTRASZA, 829.0679f, 1244.77f, 279.7453f, 2.32f);
+                        malygos->SummonCreature(NPC_ALEXSTRASZA,829.0679f,1244.77f,279.7453f,2.32f);
 
-                    SpawnGameObject(GO_EXIT_PORTAL, exitPortalPosition);
+                    SpawnGameObject(GO_EXIT_PORTAL,exitPortalPosition);
 
                     // we make the platform appear again because at the moment we don't support looting using a vehicle
                     if (GameObject* platform = instance->GetGameObject(platformGUID))
                         platform->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_DESTROYED);
 
                     if (GameObject* chest = instance->GetGameObject(chestGUID))
-                        chest->SetRespawnTime(7*DAY);
+                        chest->SetRespawnTime(chest->GetRespawnDelay());
                 }
             }
             return true;
@@ -91,9 +89,9 @@ public:
         void SpawnGameObject(uint32 entry, Position& pos)
         {
             GameObject* go = new GameObject;
-            if (!go->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT), entry, instance,
-                PHASEMASK_NORMAL, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(),
-                0, 0, 0, 0, 120, GO_STATE_READY))
+            if (!go->Create(sObjectMgr->GenerateLowGuid(HIGHGUID_GAMEOBJECT),entry, instance,
+                PHASEMASK_NORMAL, pos.GetPositionX(),pos.GetPositionY(),pos.GetPositionZ(),pos.GetOrientation(),
+                0,0,0,0,120,GO_STATE_READY))
             {
                 delete go;
                 return;
@@ -139,15 +137,13 @@ public:
             }
         }
 
-        void ProcessEvent(WorldObject* obj, uint32 eventId)
+        void ProcessEvent(GameObject* go, uint32 eventId)
         {
             if (eventId == EVENT_FOCUSING_IRIS)
             {
-                if (GameObject* go = obj->ToGameObject())
-                    go->Delete(); // this is not the best way.
-
+                go->Delete(); // this is not the best way.
                 if (Creature* malygos = instance->GetCreature(malygosGUID))
-                    malygos->GetMotionMaster()->MovePoint(4, 770.10f, 1275.33f, 267.23f); // MOVE_INIT_PHASE_ONE
+                    malygos->GetMotionMaster()->MovePoint(4,770.10f, 1275.33f, 267.23f); // MOVE_INIT_PHASE_ONE
 
                 if (GameObject* exitPortal = instance->GetGameObject(exitPortalGUID))
                     exitPortal->Delete();
@@ -180,7 +176,7 @@ public:
                                 if (!player || player->isGameMaster() || player->HasAura(SPELL_VORTEX_4))
                                     continue;
 
-                                player->CastSpell(trigger, SPELL_VORTEX_4, true);
+                                player->CastSpell(trigger,SPELL_VORTEX_4,true);
                                 counter++;
                             }
                         }
@@ -200,7 +196,7 @@ public:
                     if (Creature* trigger = instance->GetCreature(*itr_trigger))
                     {
                         lastPortalGUID = trigger->GetGUID();
-                        trigger->CastSpell(trigger, SPELL_PORTAL_OPENED, true);
+                        trigger->CastSpell(trigger,SPELL_PORTAL_OPENED,true);
                         return;
                     }
                 }
@@ -210,7 +206,7 @@ public:
             }
         }
 
-        void SetData(uint32 data, uint32 /*value*/)
+        void SetData(uint32 data,uint32 /*value*/)
         {
             switch (data)
             {

@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -17,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "ScriptedEscortAI.h"
 
 /*######
@@ -45,25 +44,25 @@ public:
 
     npc_galen_goodward() : CreatureScript("npc_galen_goodward") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, Quest const *quest)
+    bool OnQuestAccept(Player* pPlayer, Creature* pCreature, Quest const *quest)
     {
         if (quest->GetQuestId() == QUEST_GALENS_ESCAPE)
         {
-            CAST_AI(npc_galen_goodward::npc_galen_goodwardAI, creature->AI())->Start(false, false, player->GetGUID());
-            creature->setFaction(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
-            DoScriptText(SAY_QUEST_ACCEPTED, creature);
+            CAST_AI(npc_galen_goodward::npc_galen_goodwardAI, pCreature->AI())->Start(false, false, pPlayer->GetGUID());
+            pCreature->setFaction(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
+            DoScriptText(SAY_QUEST_ACCEPTED, pCreature);
         }
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new npc_galen_goodwardAI(creature);
+        return new npc_galen_goodwardAI(pCreature);
     }
 
     struct npc_galen_goodwardAI : public npc_escortAI
     {
-        npc_galen_goodwardAI(Creature* creature) : npc_escortAI(creature)
+        npc_galen_goodwardAI(Creature* pCreature) : npc_escortAI(pCreature)
         {
             m_uiGalensCageGUID = 0;
             Reset();
@@ -77,10 +76,10 @@ public:
             m_uiPeriodicSay = 6000;
         }
 
-        void EnterCombat(Unit* who)
+        void EnterCombat(Unit* pWho)
         {
             if (HasEscortState(STATE_ESCORT_ESCORTING))
-                DoScriptText(RAND(SAY_ATTACKED_1, SAY_ATTACKED_2), me, who);
+                DoScriptText(RAND(SAY_ATTACKED_1, SAY_ATTACKED_2), me, pWho);
         }
 
         void WaypointStart(uint32 uiPointId)
@@ -116,12 +115,12 @@ public:
                     pCage->ResetDoorOrButton();
                 break;
             case 20:
-                if (Player* player = GetPlayerForEscort())
+                if (Player* pPlayer = GetPlayerForEscort())
                 {
-                    me->SetFacingToObject(player);
-                    DoScriptText(SAY_QUEST_COMPLETE, me, player);
-                    DoScriptText(EMOTE_WHISPER, me, player);
-                    player->GroupEventHappens(QUEST_GALENS_ESCAPE, me);
+                    me->SetFacingToObject(pPlayer);
+                    DoScriptText(SAY_QUEST_COMPLETE, me, pPlayer);
+                    DoScriptText(EMOTE_WHISPER, me, pPlayer);
+                    pPlayer->GroupEventHappens(QUEST_GALENS_ESCAPE, me);
                 }
                 SetRun(true);
                 break;

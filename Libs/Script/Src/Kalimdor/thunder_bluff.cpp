@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment: Quest support: 925
 SDCategory: Thunder Bluff
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 
 /*#####
 # npc_cairne_bloodhoof
@@ -43,33 +42,33 @@ class npc_cairne_bloodhoof : public CreatureScript
 public:
     npc_cairne_bloodhoof() : CreatureScript("npc_cairne_bloodhoof") { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction)
+    bool OnGossipSelect(Player* pPlayer, Creature* pCreature, uint32 /*uiSender*/, uint32 uiAction)
     {
-        player->PlayerTalkClass->ClearMenus();
+        pPlayer->PlayerTalkClass->ClearMenus();
         if (uiAction == GOSSIP_SENDER_INFO)
         {
-            player->CastSpell(player, 23123, false);
-            player->SEND_GOSSIP_MENU(7014, creature->GetGUID());
+            pPlayer->CastSpell(pPlayer, 23123, false);
+            pPlayer->SEND_GOSSIP_MENU(7014, pCreature->GetGUID());
         }
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* pPlayer, Creature* pCreature)
     {
-        if (creature->isQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
+        if (pCreature->isQuestGiver())
+            pPlayer->PrepareQuestMenu(pCreature->GetGUID());
 
-        if (player->GetQuestStatus(925) == QUEST_STATUS_INCOMPLETE)
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HCB, GOSSIP_SENDER_MAIN, GOSSIP_SENDER_INFO);
+        if (pPlayer->GetQuestStatus(925) == QUEST_STATUS_INCOMPLETE)
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_HCB, GOSSIP_SENDER_MAIN, GOSSIP_SENDER_INFO);
 
-        player->SEND_GOSSIP_MENU(7013, creature->GetGUID());
+        pPlayer->SEND_GOSSIP_MENU(7013, pCreature->GetGUID());
 
         return true;
     }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new npc_cairne_bloodhoofAI (creature);
+        return new npc_cairne_bloodhoofAI (pCreature);
     }
 
     struct npc_cairne_bloodhoofAI : public ScriptedAI
@@ -91,7 +90,7 @@ public:
             Uppercut_Timer = 10000;
         }
 
-        void EnterCombat(Unit* /*who*/) {}
+        void EnterCombat(Unit * /*who*/) {}
 
         void UpdateAI(const uint32 diff)
         {
@@ -100,9 +99,9 @@ public:
 
             if (BerserkerCharge_Timer <= diff)
             {
-                Unit* target = SelectTarget(SELECT_TARGET_RANDOM, 0);
-                if (target)
-                    DoCast(target, SPELL_BERSERKER_CHARGE);
+                Unit *pTarget = SelectTarget(SELECT_TARGET_RANDOM,0);
+                if (pTarget)
+                    DoCast(pTarget, SPELL_BERSERKER_CHARGE);
                 BerserkerCharge_Timer = 25000;
             } else BerserkerCharge_Timer -= diff;
 

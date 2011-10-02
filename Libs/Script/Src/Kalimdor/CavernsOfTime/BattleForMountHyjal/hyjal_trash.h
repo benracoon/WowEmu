@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -26,13 +25,13 @@
 
 struct hyjal_trashAI : public npc_escortAI
 {
-    hyjal_trashAI(Creature* c);
+    hyjal_trashAI(Creature *c);
 
     void UpdateAI(const uint32 diff);
 
     void JustDied(Unit* /*killer*/);
 
-    void DamageTaken(Unit* done_by, uint32 &damage);
+    void DamageTaken(Unit *done_by, uint32 &damage);
 
     public:
         InstanceScript* pInstance;

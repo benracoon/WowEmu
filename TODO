@@ -2,9 +2,6 @@
 
 Our ToDo list:
 
-- New Spellsystem, almost done
-- Update structs for World login
-- Other opcode structs
-
-- Implent new Guild, Currency,... systems
+- Implent python scripts
+- Update / Merge C++ scripts from trinity
 - DataDB system

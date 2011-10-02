@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -16,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 
 enum Spells
 {
@@ -40,7 +39,7 @@ public:
 
     struct boss_galvangarAI : public ScriptedAI
     {
-        boss_galvangarAI(Creature* c) : ScriptedAI(c) {}
+        boss_galvangarAI(Creature *c) : ScriptedAI(c) {}
 
         uint32 uiCleaveTimer;
         uint32 uiFrighteningShoutTimer;
@@ -51,15 +50,15 @@ public:
 
         void Reset()
         {
-            uiCleaveTimer                     = urand(1*IN_MILLISECONDS, 9*IN_MILLISECONDS);
-            uiFrighteningShoutTimer           = urand(2*IN_MILLISECONDS, 19*IN_MILLISECONDS);
-            uiWhirlwind1Timer                 = urand(1*IN_MILLISECONDS, 13*IN_MILLISECONDS);
-            uiWhirlwind2Timer                 = urand(5*IN_MILLISECONDS, 20*IN_MILLISECONDS);
-            uiMortalStrikeTimer               = urand(5*IN_MILLISECONDS, 20*IN_MILLISECONDS);
+            uiCleaveTimer                     = urand(1*IN_MILLISECONDS,9*IN_MILLISECONDS);
+            uiFrighteningShoutTimer           = urand(2*IN_MILLISECONDS,19*IN_MILLISECONDS);
+            uiWhirlwind1Timer                 = urand(1*IN_MILLISECONDS,13*IN_MILLISECONDS);
+            uiWhirlwind2Timer                 = urand(5*IN_MILLISECONDS,20*IN_MILLISECONDS);
+            uiMortalStrikeTimer               = urand(5*IN_MILLISECONDS,20*IN_MILLISECONDS);
             uiResetTimer                      = 5*IN_MILLISECONDS;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit * /*who*/)
         {
             DoScriptText(YELL_AGGRO, me);
         }
@@ -77,31 +76,31 @@ public:
             if (uiCleaveTimer <= diff)
             {
                 DoCast(me->getVictim(), SPELL_CLEAVE);
-                uiCleaveTimer =  urand(10*IN_MILLISECONDS, 16*IN_MILLISECONDS);
+                uiCleaveTimer =  urand(10*IN_MILLISECONDS,16*IN_MILLISECONDS);
             } else uiCleaveTimer -= diff;
 
             if (uiFrighteningShoutTimer <= diff)
             {
                 DoCast(me->getVictim(), SPELL_FRIGHTENING_SHOUT);
-                uiFrighteningShoutTimer = urand(10*IN_MILLISECONDS, 15*IN_MILLISECONDS);
+                uiFrighteningShoutTimer = urand(10*IN_MILLISECONDS,15*IN_MILLISECONDS);
             } else uiFrighteningShoutTimer -= diff;
 
             if (uiWhirlwind1Timer <= diff)
             {
                 DoCast(me->getVictim(), SPELL_WHIRLWIND1);
-                uiWhirlwind1Timer = urand(6*IN_MILLISECONDS, 10*IN_MILLISECONDS);
+                uiWhirlwind1Timer = urand(6*IN_MILLISECONDS,10*IN_MILLISECONDS);
             } else uiWhirlwind1Timer -= diff;
 
             if (uiWhirlwind2Timer <= diff)
             {
                 DoCast(me->getVictim(), SPELL_WHIRLWIND2);
-                uiWhirlwind2Timer = urand(10*IN_MILLISECONDS, 25*IN_MILLISECONDS);
+                uiWhirlwind2Timer = urand(10*IN_MILLISECONDS,25*IN_MILLISECONDS);
             } else uiWhirlwind2Timer -= diff;
 
             if (uiMortalStrikeTimer <= diff)
             {
                 DoCast(me->getVictim(), SPELL_MORTAL_STRIKE);
-                uiMortalStrikeTimer = urand(10*IN_MILLISECONDS, 30*IN_MILLISECONDS);
+                uiMortalStrikeTimer = urand(10*IN_MILLISECONDS,30*IN_MILLISECONDS);
             } else uiMortalStrikeTimer -= diff;
 
             // check if creature is not outside of building
@@ -119,7 +118,7 @@ public:
         }
     };
 
-    CreatureAI *GetAI(Creature* creature) const
+    CreatureAI *GetAI(Creature *creature) const
     {
         return new boss_galvangarAI(creature);
     }

@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -25,7 +24,7 @@ void Transaction::Append(const char* sql)
     SQLElementData data;
     data.type = SQL_ELEMENT_RAW;
     data.element.query = strdup(sql);
-    m_queries.push_back(data);
+    m_queries.push(data);
 }
 
 void Transaction::PAppend(const char* sql, ...)
@@ -45,18 +44,14 @@ void Transaction::Append(PreparedStatement* stmt)
     SQLElementData data;
     data.type = SQL_ELEMENT_PREPARED;
     data.element.stmt = stmt;
-    m_queries.push_back(data);
+    m_queries.push(data);
 }
 
 void Transaction::Cleanup()
 {
-    // This might be called by explicit calls to Cleanup or by the auto-destructor
-    if (_cleanedUp)
-        return;
-
     while (!m_queries.empty())
     {
-        SQLElementData const &data = m_queries.front();
+        SQLElementData data = m_queries.front();
         switch (data.type)
         {
             case SQL_ELEMENT_PREPARED:
@@ -66,28 +61,51 @@ void Transaction::Cleanup()
                 free((void*)(data.element.query));
             break;
         }
-
-        m_queries.pop_front();
+        m_queries.pop();
     }
-
-    _cleanedUp = true;
 }
 
 bool TransactionTask::Execute()
 {
-    if (m_conn->ExecuteTransaction(m_trans))
-        return true;
+    std::queue<SQLElementData> &queries = m_trans->m_queries;
+    if (queries.empty())
+        return false;
 
-    if (m_conn->GetLastError() == 1213)
+    m_conn->BeginTransaction();
+    while (!queries.empty())
     {
-        uint8 loopBreaker = 5;  // Handle MySQL Errno 1213 without extending deadlock to the core itself
-        for (uint8 i = 0; i < loopBreaker; ++i)
-            if (m_conn->ExecuteTransaction(m_trans))
-                return true;
+        SQLElementData data = queries.front();
+        switch (data.type)
+        {
+            case SQL_ELEMENT_PREPARED:
+            {
+                PreparedStatement* stmt = data.element.stmt;
+                ASSERT(stmt);
+                if (!m_conn->Execute(stmt))
+                {
+                    sLog->outSQLDriver("[Warning] Transaction aborted. %u queries not executed.", (uint32)queries.size());
+                    m_conn->RollbackTransaction();
+                    return false;
+                }
+                delete data.element.stmt;
+            }
+            break;
+            case SQL_ELEMENT_RAW:
+            {
+                const char* sql = data.element.query;
+                ASSERT(sql);
+                if (!m_conn->Execute(sql))
+                {
+                    sLog->outSQLDriver("[Warning] Transaction aborted. %u queries not executed.", (uint32)queries.size());
+                    m_conn->RollbackTransaction();
+                    return false;
+                }
+                free((void*)const_cast<char*>(sql));
+            }
+            break;
+        }
+        queries.pop();
     }
-
-    // Clean up now.
-    m_trans->Cleanup();
-
-    return false;
+    m_conn->CommitTransaction();
+    return true;
 }

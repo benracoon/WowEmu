@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -16,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 #include "oculus.h"
 
 enum Spells
@@ -76,9 +75,9 @@ public:
         {
             _Reset();
 
-            events.ScheduleEvent(EVENT_MAGIC_PULL, 15000);
-            events.ScheduleEvent(EVENT_STOMP, 17000);
-            events.ScheduleEvent(EVENT_BOMB_SUMMON, 2000);
+            events.ScheduleEvent(EVENT_MAGIC_PULL,15000);
+            events.ScheduleEvent(EVENT_STOMP,17000);
+            events.ScheduleEvent(EVENT_BOMB_SUMMON,2000);
 
             postPull = false;
         }
@@ -111,21 +110,21 @@ public:
 
                             for (uint8 i = 0; i <= (postPull ? 3 : 0); i++)
                             {
-                                me->GetRandomNearPosition(pPosition, float(urand(0, 10)));
+                                me->GetRandomNearPosition(pPosition, float(urand(0,10)));
                                 me->SummonCreature(NPC_UNSTABLE_SPHERE, pPosition);
                             }
                         }
-                        events.ScheduleEvent(EVENT_BOMB_SUMMON, 2000);
+                        events.ScheduleEvent(EVENT_BOMB_SUMMON,2000);
                         break;
                     case EVENT_MAGIC_PULL:
                         DoCast(SPELL_MAGIC_PULL);
                         postPull = true;
-                        events.ScheduleEvent(EVENT_MAGIC_PULL, 15000);
+                        events.ScheduleEvent(EVENT_MAGIC_PULL,15000);
                         break;
                     case EVENT_STOMP:
-                        DoScriptText(RAND(SAY_STOMP_1, SAY_STOMP_2, SAY_STOMP_3), me);
+                        DoScriptText(RAND(SAY_STOMP_1,SAY_STOMP_2,SAY_STOMP_3), me);
                         DoCast(SPELL_THUNDERING_STOMP);
-                        events.ScheduleEvent(EVENT_STOMP, 17000);
+                        events.ScheduleEvent(EVENT_STOMP,17000);
                         break;
                 }
             }
@@ -145,7 +144,7 @@ public:
 
         void KilledUnit(Unit* /*victim*/)
         {
-            DoScriptText(RAND(SAY_KILL_1, SAY_KILL_2, SAY_KILL_3), me);
+            DoScriptText(RAND(SAY_KILL_1,SAY_KILL_2,SAY_KILL_3), me);
         }
     private:
         bool postPull;
@@ -157,9 +156,9 @@ class npc_unstable_sphere : public CreatureScript
 public:
     npc_unstable_sphere() : CreatureScript("npc_unstable_sphere") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new npc_unstable_sphereAI (creature);
+        return new npc_unstable_sphereAI (pCreature);
     }
 
     struct npc_unstable_sphereAI : public ScriptedAI

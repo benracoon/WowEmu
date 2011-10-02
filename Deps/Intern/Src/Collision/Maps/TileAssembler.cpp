@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2005-2010 MaNGOS <http://getmangos.com/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -113,7 +112,7 @@ namespace VMAP
 
             // write map tree file
             std::stringstream mapfilename;
-            mapfilename << iDestDir << '/' << std::setfill('0') << std::setw(3) << map_iter->first << ".vmtree";
+            mapfilename << iDestDir << "/" << std::setfill('0') << std::setw(3) << map_iter->first << ".vmtree";
             FILE *mapfile = fopen(mapfilename.str().c_str(), "wb");
             if (!mapfile)
             {
@@ -154,10 +153,10 @@ namespace VMAP
                 uint32 nSpawns = tileEntries.count(tile->first);
                 std::stringstream tilefilename;
                 tilefilename.fill('0');
-                tilefilename << iDestDir << '/' << std::setw(3) << map_iter->first << '_';
+                tilefilename << iDestDir << "/" << std::setw(3) << map_iter->first << "_";
                 uint32 x, y;
                 StaticMapTree::unpackTileID(tile->first, x, y);
-                tilefilename << std::setw(2) << x << '_' << std::setw(2) << y << ".vmtile";
+                tilefilename << std::setw(2) << x << "_" << std::setw(2) << y << ".vmtile";
                 FILE *tilefile = fopen(tilefilename.str().c_str(), "wb");
                 // file header
                 if (success && fwrite(VMAP_MAGIC, 1, 8, tilefile) != 8) success = false;
@@ -243,10 +242,7 @@ namespace VMAP
 
     bool TileAssembler::calculateTransformedBound(ModelSpawn &spawn)
     {
-        std::string modelFilename(iSrcDir);
-        modelFilename.push_back('/');
-        modelFilename.append(spawn.name);
-
+        std::string modelFilename = iSrcDir + "/" + spawn.name;
         ModelPosition modelPosition;
         modelPosition.iDir = spawn.iRot;
         modelPosition.iScale = spawn.iScale;
@@ -266,13 +262,12 @@ namespace VMAP
         int readOperation = 1;
 
         // temporary use defines to simplify read/check code (close file and return at fail)
-        #define READ_OR_RETURN(V, S) if(fread((V), (S), 1, rf) != 1) { \
+        #define READ_OR_RETURN(V,S) if(fread((V), (S), 1, rf) != 1) { \
                                         fclose(rf); printf("readfail, op = %i\n", readOperation); return(false); }readOperation++;
-        // only use this for array deletes
-        #define READ_OR_RETURN_WITH_DELETE(V, S) if(fread((V), (S), 1, rf) != 1) { \
-                                        fclose(rf); printf("readfail, op = %i\n", readOperation); delete[] V; return(false); }readOperation++;
+        #define READ_OR_RETURN_WITH_DELETE(V,S) if(fread((V), (S), 1, rf) != 1) { \
+                                        fclose(rf); printf("readfail, op = %i\n", readOperation); delete V; return(false); }readOperation++;
 
-        #define CMP_OR_RETURN(V, S)  if(strcmp((V), (S)) != 0)        { \
+        #define CMP_OR_RETURN(V,S)  if(strcmp((V),(S)) != 0)        { \
                                         fclose(rf); printf("cmpfail, %s!=%s\n", V, S);return(false); }
 
         READ_OR_RETURN(&ident, 8);
@@ -339,7 +334,6 @@ namespace VMAP
             delete[] vectorarray;
             // drop of temporary use defines
             #undef READ_OR_RETURN
-            #undef READ_OR_RETURN_WITH_DELETE
             #undef CMP_OR_RETURN
         }
         spawn.iBound = modelBound + spawn.iPos;
@@ -362,14 +356,14 @@ namespace VMAP
         bool success = true;
         std::string filename = iSrcDir;
         if (filename.length() >0)
-            filename.push_back('/');
+            filename.append("/");
         filename.append(pModelFilename);
         FILE *rf = fopen(filename.c_str(), "rb");
 
         if (!rf)
         {
-            printf("ERROR: Can't open model file in form: %s", pModelFilename.c_str());
-            printf("...                          or form: %s", filename.c_str() );
+            printf("ERROR: Can't open model file in form: %s",pModelFilename.c_str());
+            printf("...                          or form: %s",filename.c_str() );
             return false;
         }
 
@@ -378,11 +372,11 @@ namespace VMAP
         int readOperation = 1;
 
         // temporary use defines to simplify read/check code (close file and return at fail)
-        #define READ_OR_RETURN(V, S) if(fread((V), (S), 1, rf) != 1) { \
+        #define READ_OR_RETURN(V,S) if(fread((V), (S), 1, rf) != 1) { \
                                         fclose(rf); printf("readfail, op = %i\n", readOperation); return(false); }readOperation++;
-        #define READ_OR_RETURN_WITH_DELETE(V, S) if(fread((V), (S), 1, rf) != 1) { \
-                                        fclose(rf); printf("readfail, op = %i\n", readOperation); delete[] V; return(false); }readOperation++;
-        #define CMP_OR_RETURN(V, S)  if(strcmp((V), (S)) != 0)        { \
+        #define READ_OR_RETURN_WITH_DELETE(V,S) if(fread((V), (S), 1, rf) != 1) { \
+                                        fclose(rf); printf("readfail, op = %i\n", readOperation); delete V; return(false); }readOperation++;
+        #define CMP_OR_RETURN(V,S)  if(strcmp((V),(S)) != 0)        { \
                                         fclose(rf); printf("cmpfail, %s!=%s\n", V, S);return(false); }
 
         READ_OR_RETURN(&ident, 8);
@@ -488,7 +482,6 @@ namespace VMAP
 
             // drop of temporary use defines
             #undef READ_OR_RETURN
-            #undef READ_OR_RETURN_WITH_DELETE
             #undef CMP_OR_RETURN
 
         }
@@ -497,14 +490,10 @@ namespace VMAP
         // write WorldModel
         WorldModel model;
         model.setRootWmoID(RootWMOID);
-        if (!groupsArray.empty())
+        if (groupsArray.size())
         {
             model.setGroupModels(groupsArray);
-
-            std::string filename(iSrcDir);
-            filename.push_back('/');
-            filename.append(pModelFilename).append(".vmo");
-            success = model.writeFile(filename);
+            success = model.writeFile(iDestDir + "/" + pModelFilename + ".vmo");
         }
 
         //std::cout << "readRawFile2: '" << pModelFilename << "' tris: " << nElements << " nodes: " << nNodes << std::endl;

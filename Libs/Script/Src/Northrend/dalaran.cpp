@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -24,7 +23,7 @@ SDComment: For what is 63990+63991? Same function but don't work correct...
 SDCategory: Dalaran
 Script Data End */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 
 /*******************************************************
  * npc_mageguard_dalaran
@@ -49,56 +48,56 @@ public:
 
     struct npc_mageguard_dalaranAI : public Scripted_NoMovementAI
     {
-        npc_mageguard_dalaranAI(Creature* creature) : Scripted_NoMovementAI(creature)
+        npc_mageguard_dalaranAI(Creature* pCreature) : Scripted_NoMovementAI(pCreature)
         {
-            creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_NORMAL, true);
-            creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_MAGIC, true);
+            pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            pCreature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_NORMAL, true);
+            pCreature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_MAGIC, true);
         }
 
         void Reset(){}
 
-        void EnterCombat(Unit* /*who*/){}
+        void EnterCombat(Unit* /*pWho*/){}
 
-        void AttackStart(Unit* /*who*/){}
+        void AttackStart(Unit* /*pWho*/){}
 
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit *pWho)
         {
-            if (!who || !who->IsInWorld() || who->GetZoneId() != 4395)
+            if (!pWho || !pWho->IsInWorld() || pWho->GetZoneId() != 4395)
                 return;
 
-            if (!me->IsWithinDist(who, 65.0f, false))
+            if (!me->IsWithinDist(pWho, 65.0f, false))
                 return;
 
-            Player* player = who->GetCharmerOrOwnerPlayerOrPlayerItself();
+            Player *pPlayer = pWho->GetCharmerOrOwnerPlayerOrPlayerItself();
 
-            if (!player || player->isGameMaster() || player->IsBeingTeleported())
+            if (!pPlayer || pPlayer->isGameMaster() || pPlayer->IsBeingTeleported())
                 return;
 
             switch (me->GetEntry())
             {
                 case 29254:
-                    if (player->GetTeam() == HORDE)              // Horde unit found in Alliance area
+                    if (pPlayer->GetTeam() == HORDE)              // Horde unit found in Alliance area
                     {
                         if (GetClosestCreatureWithEntry(me, NPC_APPLEBOUGH_A, 32.0f))
                         {
-                            if (me->isInBackInMap(who, 12.0f))   // In my line of sight, "outdoors", and behind me
-                                DoCast(who, SPELL_TRESPASSER_A); // Teleport the Horde unit out
+                            if (me->isInBackInMap(pWho, 12.0f))   // In my line of sight, "outdoors", and behind me
+                                DoCast(pWho, SPELL_TRESPASSER_A); // Teleport the Horde unit out
                         }
                         else                                      // In my line of sight, and "indoors"
-                            DoCast(who, SPELL_TRESPASSER_A);     // Teleport the Horde unit out
+                            DoCast(pWho, SPELL_TRESPASSER_A);     // Teleport the Horde unit out
                     }
                     break;
                 case 29255:
-                    if (player->GetTeam() == ALLIANCE)           // Alliance unit found in Horde area
+                    if (pPlayer->GetTeam() == ALLIANCE)           // Alliance unit found in Horde area
                     {
                         if (GetClosestCreatureWithEntry(me, NPC_SWEETBERRY_H, 32.0f))
                         {
-                            if (me->isInBackInMap(who, 12.0f))   // In my line of sight, "outdoors", and behind me
-                                DoCast(who, SPELL_TRESPASSER_H); // Teleport the Alliance unit out
+                            if (me->isInBackInMap(pWho, 12.0f))   // In my line of sight, "outdoors", and behind me
+                                DoCast(pWho, SPELL_TRESPASSER_H); // Teleport the Alliance unit out
                         }
                         else                                      // In my line of sight, and "indoors"
-                            DoCast(who, SPELL_TRESPASSER_H);     // Teleport the Alliance unit out
+                            DoCast(pWho, SPELL_TRESPASSER_H);     // Teleport the Alliance unit out
                     }
                     break;
             }
@@ -109,7 +108,7 @@ public:
         void UpdateAI(const uint32 /*diff*/){}
     };
 
-    CreatureAI *GetAI(Creature* creature) const
+    CreatureAI *GetAI(Creature *creature) const
     {
         return new npc_mageguard_dalaranAI(creature);
     }
@@ -131,29 +130,29 @@ class npc_hira_snowdawn : public CreatureScript
 public:
     npc_hira_snowdawn() : CreatureScript("npc_hira_snowdawn") { }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* pPlayer, Creature* pCreature)
     {
-        if (!creature->isVendor() || !creature->isTrainer())
+        if (!pCreature->isVendor() || !pCreature->isTrainer())
             return false;
 
-        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_TEXT_TRAIN_HIRA, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_TEXT_TRAIN_HIRA, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
 
-        if (player->getLevel() >= 80 && player->HasSpell(SPELL_COLD_WEATHER_FLYING))
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
+        if (pPlayer->getLevel() >= 80 && pPlayer->HasSpell(SPELL_COLD_WEATHER_FLYING))
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
-        player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+        pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
 
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction)
+    bool OnGossipSelect(Player* pPlayer, Creature* pCreature, uint32 /*uiSender*/, uint32 uiAction)
     {
-        player->PlayerTalkClass->ClearMenus();
+        pPlayer->PlayerTalkClass->ClearMenus();
         if (uiAction == GOSSIP_ACTION_TRAIN)
-            player->GetSession()->SendTrainerList(creature->GetGUID());
+            pPlayer->SEND_TRAINERLIST(pCreature->GetGUID());
 
         if (uiAction == GOSSIP_ACTION_TRADE)
-            player->GetSession()->SendListInventory(creature->GetGUID());
+            pPlayer->SEND_VENDORLIST(pCreature->GetGUID());
 
         return true;
     }

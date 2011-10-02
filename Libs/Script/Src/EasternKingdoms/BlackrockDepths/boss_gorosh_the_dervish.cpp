@@ -1,5 +1,4 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
  * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
  * Copyright (C) 2006-2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
  *
@@ -24,7 +23,7 @@ SDComment:
 SDCategory: Blackrock Depths
 EndScriptData */
 
-#include "PCH.h"
+#include "ScriptPCH.h"
 
 enum Spells
 {
@@ -37,14 +36,14 @@ class boss_gorosh_the_dervish : public CreatureScript
 public:
     boss_gorosh_the_dervish() : CreatureScript("boss_gorosh_the_dervish") { }
 
-    CreatureAI* GetAI(Creature* creature) const
+    CreatureAI* GetAI(Creature* pCreature) const
     {
-        return new boss_gorosh_the_dervishAI (creature);
+        return new boss_gorosh_the_dervishAI (pCreature);
     }
 
     struct boss_gorosh_the_dervishAI : public ScriptedAI
     {
-        boss_gorosh_the_dervishAI(Creature* c) : ScriptedAI(c) {}
+        boss_gorosh_the_dervishAI(Creature *c) : ScriptedAI(c) {}
 
         uint32 WhirlWind_Timer;
         uint32 MortalStrike_Timer;
@@ -55,7 +54,7 @@ public:
             MortalStrike_Timer = 22000;
         }
 
-        void EnterCombat(Unit* /*who*/)
+        void EnterCombat(Unit * /*who*/)
         {
         }
 

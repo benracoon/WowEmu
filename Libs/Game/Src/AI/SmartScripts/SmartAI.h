@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -92,19 +91,19 @@ class SmartAI : public CreatureAI
         void KilledUnit(Unit* victim);
 
         // Called when the creature summon successfully other creature
-        void JustSummoned(Creature* creature);
+        void JustSummoned(Creature* pUnit);
 
         // Tell creature to attack and follow the victim
-        void AttackStart(Unit* who);
+        void AttackStart(Unit *who);
 
         // Called if IsVisible(Unit *who) is true at each *who move, reaction at visibility zone enter
         void MoveInLineOfSight(Unit *who);
 
         // Called when hit by a spell
-        void SpellHit(Unit* pUnit, const SpellInfo* pSpell);
+        void SpellHit(Unit* pUnit, const SpellEntry* pSpell);
 
         // Called when spell hits a target
-        void SpellHitTarget(Unit* target, const SpellInfo* pSpell);
+        void SpellHitTarget(Unit* target, const SpellEntry* pSpell);
 
         // Called at any Damage from any attacker (before damage apply)
         void DamageTaken(Unit* done_by, uint32& damage);
@@ -125,7 +124,7 @@ class SmartAI : public CreatureAI
         void IsSummonedBy(Unit* summoner);
 
         // Called at any Damage to any victim (before damage apply)
-        void DamageDealt(Unit* done_to, uint32 & damage, DamageEffectType /*damagetype*/);
+        void DamageDealt(Unit * done_to, uint32 & damage, DamageEffectType /*damagetype*/);
 
         // Called when a summoned creature dissapears (UnSommoned)
         void SummonedCreatureDespawn(Creature* unit);
@@ -158,7 +157,7 @@ class SmartAI : public CreatureAI
         void SetData(uint32 id, uint32 value);
 
         // Used in scripts to share variables
-        void SetGUID(const uint64 guid, int32 id = 0);
+        void SetGUID(const uint64 &guid, int32 id = 0);
 
         // Used in scripts to share variables
         uint64 GetGUID(int32 id = 0);
@@ -252,7 +251,7 @@ public:
     void SetScript9(SmartScriptHolder &e, uint32 entry, Unit* invoker);
 
 protected:
-    GameObject* const go;
+    GameObject * const go;
     SmartScript mScript;
 };
 #endif

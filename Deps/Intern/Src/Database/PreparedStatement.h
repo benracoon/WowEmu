@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2011 Strawberry-Pr0jcts <http://www.strawberry-pr0jcts.com/>
- * Copyright (C) 2008-2011 TrinityCore <http://www.trinitycore.org/>
+ * Copyright (C) 2008-2010 TrinityCore <http://www.trinitycore.org/>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -20,7 +19,6 @@
 #define _PREPAREDSTATEMENT_H
 
 #include "SQLOperation.h"
-#include <ace/Future.h>
 
 //- Union for data buffer (upper-level bind -> queue -> lower-level bind)
 union PreparedStatementDataUnion
@@ -76,7 +74,7 @@ class PreparedStatement
         explicit PreparedStatement(uint32 index);
         ~PreparedStatement();
 
-        void setBool(const uint8 index, const bool value);
+        void setBool(const uint8 index,const bool value);
         void setUInt8(const uint8 index, const uint8 value);
         void setUInt16(const uint8 index, const uint16 value);
         void setUInt32(const uint8 index, const uint32 value);
@@ -110,7 +108,7 @@ class MySQLPreparedStatement
         MySQLPreparedStatement(MYSQL_STMT* stmt);
         ~MySQLPreparedStatement();
 
-        void setBool(const uint8 index, const bool value);
+        void setBool(const uint8 index,const bool value);
         void setUInt8(const uint8 index, const uint8 value);
         void setUInt16(const uint8 index, const uint16 value);
         void setUInt32(const uint8 index, const uint32 value);
@@ -129,7 +127,6 @@ class MySQLPreparedStatement
         PreparedStatement* m_stmt;
         void ClearParameters();
         bool CheckValidIndex(uint8 index);
-        std::string getQueryString(const char *query);
 
     private:
         void setValue(MYSQL_BIND* param, enum_field_types type, const void* value, uint32 len, bool isUnsigned);
@@ -141,21 +138,16 @@ class MySQLPreparedStatement
         MYSQL_BIND* m_bind;
 };
 
-typedef ACE_Future<PreparedQueryResult> PreparedQueryResultFuture;
-
 //- Lower-level class, enqueuable operation
 class PreparedStatementTask : public SQLOperation
 {
     public:
         PreparedStatementTask(PreparedStatement* stmt);
-        PreparedStatementTask(PreparedStatement* stmt, PreparedQueryResultFuture result);
         ~PreparedStatementTask();
 
         bool Execute();
 
     protected:
         PreparedStatement* m_stmt;
-        bool m_has_result;
-        PreparedQueryResultFuture m_result;
 };
 #endif

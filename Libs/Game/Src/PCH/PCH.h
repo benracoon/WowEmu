@@ -1,18 +1,15 @@
-//add here most rarely modified headers to speed up debug build compilation
-
-#include "WorldSocket.h"        // must be first to make ACE happy with ACE includes in it
-
+// Main includes
+#include "WorldSocket.h"
 #include "Common.h"
-
 #include "MapManager.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
 #include "ObjectDefines.h"
-#include "Opcodes.h"
+#include "SQLStorage.h"
 #include "SharedDefines.h"
-#include "ObjectMgr.h"
+#include "OpcodeHandler.h"
 
-// Scripted
+// Scripts
 #include "ScriptMgr.h"
 #include "Cell.h"
 #include "CellImpl.h"
@@ -31,6 +28,9 @@
 #include "DBCStores.h"
 #include "SpellScript.h"
 #include "SpellAuraEffects.h"
+
+// Main and Script includes
+#include "ObjectMgr.h"
 
 #ifdef _WIN32
 #include <windows.h>
