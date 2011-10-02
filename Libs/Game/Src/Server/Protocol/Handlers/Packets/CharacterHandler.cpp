@@ -736,7 +736,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket & recv_data)
 {
     if (PlayerLoading() || GetPlayer() != NULL)
     {
-        sLog->outError("Player tryes to login again, AccountId = %d",GetAccountId());
+        sLog->outError("Player tries to login again, AccountId = %d",GetAccountId());
         return;
     }
 
@@ -744,41 +744,48 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket & recv_data)
     uint64 playerGuid = 0;
     uint8 guidMark, byte;
 
-    sLog->outStaticDebug("WORLD: Recvd Player Logon Message");
+    sLog->outStaticDebug("WORLD: Recvd Player Login Message");
 
-    //recv_data >> playerGuid;
     recv_data >> guidMark;
 
-    // Bits are mixed up...
-    // Let's skip the highguid part -- it's 0x0000 for players anyway
-    if (guidMark & (1 << 2))
+    if (guidMark == 0)
     {
-        recv_data >> byte;
-
-        playerGuid |= uint64(byte << 8);
+        playerGuid = 1;
     }
-    if (guidMark & (1 << 5))
+    else
     {
-        recv_data >> byte;
+        // uint8
+        if (guidMark & 4)
+        {
+            recv_data >> byte;
+            playerGuid |= uint64(byte << 8);
+        }
 
-        playerGuid |= uint64(byte << 16);
-    }
-    if (guidMark & (1 << 6))
-    {
-        recv_data >> byte;
+        // uint16
+        if (guidMark & 16)
+        {
+            recv_data >> byte;
+            playerGuid |= uint64(byte << 24);
+        }
 
-        playerGuid |= uint64(byte);
-    }
-    if (guidMark & (1 << 4))
-    {
-        recv_data >> byte;
+        // uint32
+        if (guidMark & 32)
+        {
+            recv_data >> byte;
+            playerGuid |= uint64(byte << 16);
+        }
 
-        playerGuid |= uint64(byte << 24);
+        // uint64
+        if (guidMark & 64)
+        {
+            recv_data >> byte;
+            playerGuid |= uint64(byte);
+        }
     }
 
     sLog->outStaticDebug("GUID Marker: %u GUID: %u", guidMark, playerGuid);
 
-    if (!CharCanLogin(uint32(playerGuid)))
+    if (!CharCanLogin(GUID_LOPART(playerGuid)))
     {
         KickPlayer();
         return;
