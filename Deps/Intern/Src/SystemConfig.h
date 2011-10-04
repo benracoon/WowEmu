@@ -28,10 +28,11 @@
 #endif
 
 // Name of the Core
-#define _PACKAGENAME "StrawberryCore 430-willcrashforsure "
+#define _PACKAGENAME "StrawberryCore "
+#define _BRANCH "430-willcrashforsure "
 
 // For revision output in console
-#define _FULLVERSION _PACKAGENAME "\n" "Revision: " REVISION_NR
+#define _FULLVERSION _PACKAGENAME _BRANCH "\n" "Revision: " REVISION_NR " + " WCFS_430
 
 /*-----------------------CONFIGS-----------------------*/
 
@@ -47,4 +48,3 @@
 #define REALM_CONFIG_FILE SYSCONFDIR "RealmServer.conf"
 
 #endif
-
