@@ -1431,15 +1431,12 @@ void ObjectMgr::LoadCreatures()
     uint32 oldMSTime = getMSTime();
 
     uint32 count = 0;
-    //                                                0              1   2    3
-    QueryResult result = WorldDB.Query("SELECT creature.guid, id, map, modelid,"
-    //   4             5           6           7           8            9              10         11
-        "equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, spawndist, currentwaypoint,"
-    //   12         13       14          15            16         17             18        19
-        "curhealth, curmana, DeathState, MovementType, spawnMask, phaseMask, eventEntry, pool_entry,"
-    //   20                21                   22
-        "creature.npcflag, creature.unit_flags, creature.dynamicflags "
-        "FROM creature LEFT OUTER JOIN game_event_creature ON creature.guid = game_event_creature.guid "
+    //                                         0              1   2    3
+    QueryResult result = WorldDB.Query("SELECT creature.guid, id, map, modelid, equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, spawndist, "
+    //   11               12        13        14           15           16        17          18          19                 20                  21
+        "currentwaypoint, curhealth, curmana, MovementType, spawnMask, phaseMask, eventEntry, pool_entry, creature.npcflag, creature.unit_flags, creature.dynamicflags "
+        "FROM creature "
+        "LEFT OUTER JOIN game_event_creature ON creature.guid = game_event_creature.guid "
         "LEFT OUTER JOIN pool_creature ON creature.guid = pool_creature.guid");
 
     if (!result)
@@ -1792,8 +1789,8 @@ void ObjectMgr::LoadGameobjects()
     
     uint32 count = 0;
 
-    //                                                0                1   2    3           4           5           6
-    QueryResult result = WorldDB.Query("SELECT gameobject.guid, id, map, position_x, position_y, position_z, orientation,"
+    //                                         0                1   2    3           4           5           6
+    QueryResult result = WorldDB.Query("SELECT gameobject.guid, id, map, position_x, position_y, position_z, orientation, "
     //   7          8          9          10         11             12            13     14         15             16          17
         "rotation0, rotation1, rotation2, rotation3, spawntimesecs, animprogress, state, spawnMask, phaseMask, eventEntry, pool_entry "
         "FROM gameobject LEFT OUTER JOIN game_event_gameobject ON gameobject.guid = game_event_gameobject.guid "

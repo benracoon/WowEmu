@@ -970,7 +970,7 @@ void GameEventMgr::StartArenaSeason()
 
     if (!result)
     {
-        sLog->outError("ArenaSeason (%i) must be an existant Arena Season",sWorld->getIntConfig(CONFIG_ARENA_SEASON_ID));
+        sLog->outError("ArenaSeason (%i) must be an existent Arena Season", sWorld->getIntConfig(CONFIG_ARENA_SEASON_ID));
         return;
     }
 
@@ -978,8 +978,8 @@ void GameEventMgr::StartArenaSeason()
 
     uint16 eventId = fields[0].GetUInt16();
 
-    StartEvent(eventId,true);
-    sLog->outString("Arena Season %i started...",sWorld->getIntConfig(CONFIG_ARENA_SEASON_ID));
+    StartEvent(eventId, true);
+    sLog->outString("Arena Season %i started...", sWorld->getIntConfig(CONFIG_ARENA_SEASON_ID));
     sLog->outString();
 }
 
