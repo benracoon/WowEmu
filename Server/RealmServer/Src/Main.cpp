@@ -43,54 +43,28 @@ RealmDBWorkerPool RealmDB;                      // Accessor to the RealmServer d
 // Handle RealmServer termination signals
 class AuthServerSignalHandler : public Strawberry::SignalHandler
 {
-public:
-    virtual void HandleSignal(int SigNum)
-    {
-        switch (SigNum)
+    public:
+        virtual void HandleSignal(int SigNum)
         {
-        case SIGINT:
-        case SIGTERM:
-            stopEvent = true;
-            break;
+            switch (SigNum)
+            {
+            case SIGINT:
+            case SIGTERM:
+                stopEvent = true;
+                break;
+            }
         }
-    }
 };
 
-/// Print out the usage string for this program on the console.
-void usage(const char *prog)
-{
-    sLog->outString("Usage: \n %s [<options>]\n"
-        "    -c config_file           use config_file as configuration file\n\r",
-        prog);
-}
-
-// Launch the auth server
-extern int main(int argc, char **argv)
+extern int main(int argc)
 {
     sLog->SetLogDB(false);
-    // Command line parsing to get the configuration file name
+
     char const *cfg_file = REALM_CONFIG_FILE;
-    int c = 1;
-    while(c < argc)
-    {
-        if (strcmp(argv[c], "-c") == 0)
-        {
-            if (++c >= argc)
-            {
-                sLog->outError("Runtime-Error: -c option requires an input argument");
-                usage(argv[0]);
-                return 1;
-            }
-            else
-                cfg_file = argv[c];
-        }
-        ++c;
-    }
 
     if (!sConfig->SetSource(cfg_file))
     {
         sLog->outError("Invalid or missing configuration file : %s", cfg_file);
-        sLog->outError("Verify that the file exists and has \'[RealmServer]\' written in the top of the file!");
         return 1;
     }
     sLog->Initialize();
@@ -130,7 +104,7 @@ extern int main(int argc, char **argv)
     // Initialize the log database
     sLog->SetLogDBLater(sConfig->GetBoolDefault("EnableLogDB", false)); // set var to enable DB logging once startup finished.
     sLog->SetLogDB(false);
-    sLog->SetRealmID(0);                                               // ensure we've set realm to 0 (RealmServer realmid)
+    sLog->SetRealmID(0);                                                // ensure we've set realm to 0 (RealmServer realmid)
 
     // Get the list of realms for the server
     sRealmList->Initialize(sConfig->GetIntDefault("RealmsStateUpdateDelay", 20));
@@ -163,7 +137,7 @@ extern int main(int argc, char **argv)
     Handler.register_handler(SIGTERM, &SignalTERM);
 
     ///- Handle affinity for multiple processors and process priority on Windows
-#ifdef _WIN32
+    #ifdef _WIN32
     {
         HANDLE hProcess = GetCurrentProcess();
 
@@ -178,7 +152,7 @@ extern int main(int argc, char **argv)
                 ULONG_PTR curAff = Aff & appAff;            // remove non accessible processors
 
                 if (!curAff)
-                    sLog->outError("Processors marked in UseProcessors bitmask (hex) %x not accessible for authserver. Accessible processors bitmask (hex): %x", Aff, appAff);
+                    sLog->outError("Processors marked in UseProcessors bitmask (hex) %x not accessible for realmserver. Accessible processors bitmask (hex): %x", Aff, appAff);
                 else if (SetProcessAffinityMask(hProcess,curAff))
                     sLog->outString("Using processors (bitmask, hex): %x", curAff);
                 else
@@ -198,7 +172,7 @@ extern int main(int argc, char **argv)
             sLog->outString();
         }
     }
-#endif
+    #endif
 
     // maximum counter for next ping
     uint32 numLoops = (sConfig->GetIntDefault("MaxPingTime", 30) * (MINUTE * 1000000 / 100000));
